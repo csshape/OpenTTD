@@ -5,3 +5,6 @@ docs/aidocs/*
 docs/gamedocs/*
 docs/source/*
 /out
+os/drawing/OpenTTD.xcodeproj/project.xcworkspace/xcuserdata
+os/drawing/libpng/projects/xcode/libpng.xcodeproj/xcuserdata
+os/drawing/OpenTTD.xcodeproj/xcuserdata
