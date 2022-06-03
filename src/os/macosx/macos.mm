@@ -42,9 +42,9 @@ typedef struct {
 #define NSOperatingSystemVersion OTTDOperatingSystemVersion
 #endif
 
-#ifdef WITH_COCOA
-static NSAutoreleasePool *_ottd_autorelease_pool;
-#endif
+//#ifdef WITH_COCOA
+//static NSAutoreleasePool *_ottd_autorelease_pool;
+//#endif
 
 /**
  * Get the version of the MacOS we are running under. Code adopted
@@ -232,7 +232,7 @@ void CocoaSetApplicationBundleDir()
  */
 void CocoaSetupAutoreleasePool()
 {
-	_ottd_autorelease_pool = [ [ NSAutoreleasePool alloc ] init ];
+//	_ottd_autorelease_pool = [ [ NSAutoreleasePool alloc ] init ];
 }
 
 /**
@@ -240,7 +240,7 @@ void CocoaSetupAutoreleasePool()
  */
 void CocoaReleaseAutoreleasePool()
 {
-	[ _ottd_autorelease_pool release ];
+//	[ _ottd_autorelease_pool release ];
 }
 
 #endif

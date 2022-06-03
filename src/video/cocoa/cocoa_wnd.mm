@@ -36,7 +36,8 @@
 #include "../../toolbar_gui.h"
 #include <array>
 
-#include "table/sprites.h"
+//#include "table/sprites.h"
+#include "sprites.h"
 
 /* Table data for key mapping. */
 #include "cocoa_keys.h"
@@ -189,7 +190,8 @@ static NSImage *NSImageFromSprite(SpriteID sprite_id, ZoomLevel zoom)
 	CFAutoRelease<CGImage> bitmap(CGImageCreate(dim.width, dim.height, 8, 32, dim.width * 4, color_space.get(), info, data.get(), nullptr, false, kCGRenderingIntentDefault));
 	if (!bitmap) return nullptr;
 
-	return [ [ [ NSImage alloc ] initWithCGImage:bitmap.get() size:NSZeroSize ] autorelease ];
+	//return [ [ [ NSImage alloc ] initWithCGImage:bitmap.get() size:NSZeroSize ] autorelease ];
+    return [ [ NSImage alloc ] initWithCGImage:bitmap.get() size:NSZeroSize ];
 }
 
 
@@ -224,7 +226,7 @@ static NSImage *NSImageFromSprite(SpriteID sprite_id, ZoomLevel zoom)
 	/* Setup cursor for the current _game_mode. */
 	NSEvent *e = [ [ NSEvent alloc ] init ];
 	[ drv->cocoaview cursorUpdate:e ];
-	[ e release ];
+//	[ e release ];
 
 	/* Hand off to main application code. */
 	drv->MainLoopReal();
@@ -304,8 +306,8 @@ static void setApplicationMenu()
 	}
 
 	/* Finally give up our references to the objects */
-	[ appleMenu release ];
-	[ menuItem release ];
+//	[ appleMenu release ];
+//	[ menuItem release ];
 }
 
 /**
@@ -332,8 +334,8 @@ static void setupWindowMenu()
 	[ NSApp setWindowsMenu:windowMenu ];
 
 	/* Finally give up our references to the objects */
-	[ windowMenu release ];
-	[ menuItem release ];
+//	[ windowMenu release ];
+//	[ menuItem release ];
 }
 
 /**
@@ -378,7 +380,7 @@ bool CocoaSetupApplication()
 void CocoaExitApplication()
 {
 	[ _ottd_main unregisterObserver ];
-	[ _ottd_main release ];
+//	[ _ottd_main release ];
 }
 
 /**
@@ -413,7 +415,7 @@ void CocoaDialog(const char *title, const char *message, const char *buttonLabel
 		[ alert setInformativeText:[ NSString stringWithUTF8String:message ] ];
 		[ alert addButtonWithTitle: [ NSString stringWithUTF8String:buttonLabel ] ];
 		[ alert runModal ];
-		[ alert release ];
+//		[ alert release ];
 	}
 
 	if (!wasstarted && VideoDriver::GetInstance() != nullptr) VideoDriver::GetInstance()->Stop();
@@ -461,7 +463,7 @@ void CocoaDialog(const char *title, const char *message, const char *buttonLabel
 		NSString *nsscaption = [ [ NSString alloc ] initWithUTF8String:caption.c_str() ];
 		[ self setTitle:nsscaption ];
 		[ self setMiniwindowTitle:nsscaption ];
-		[ nsscaption release ];
+//		[ nsscaption release ];
 	}
 
 	return self;
@@ -499,7 +501,7 @@ void CocoaDialog(const char *title, const char *message, const char *buttonLabel
 	NSTouchBar *bar = [ [ NSTouchBar alloc ] init ];
 	bar.delegate = self;
 	bar.defaultItemIdentifiers = button_ids;
-	[ button_ids release ];
+//	[ button_ids release ];
 
 	self->touchbar_created = true;
 
@@ -621,7 +623,7 @@ void CocoaDialog(const char *title, const char *message, const char *buttonLabel
 	NSTrackingAreaOptions track_opt = NSTrackingInVisibleRect | NSTrackingActiveInActiveApp | NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved | NSTrackingCursorUpdate;
 	NSTrackingArea *track = [ [ NSTrackingArea alloc ] initWithRect:[ self bounds ] options:track_opt owner:self userInfo:nil ];
 	[ self addTrackingArea:track ];
-	[ track release ];
+//	[ track release ];
 }
 /**
  * Make OpenTTD aware that it has control over the mouse
@@ -1031,7 +1033,8 @@ void CocoaDialog(const char *title, const char *message, const char *buttonLabel
 	if (actualRange != nullptr) *actualRange = valid_range;
 	if (valid_range.length == 0) return nil;
 
-	return [ [ [ NSAttributedString alloc ] initWithString:[ s substringWithRange:valid_range ] ] autorelease ];
+//	return [ [ [ NSAttributedString alloc ] initWithString:[ s substringWithRange:valid_range ] ] autorelease ];
+    return [ [ NSAttributedString alloc ] initWithString:[ s substringWithRange:valid_range ] ];
 }
 
 /** Get a string corresponding to the given range. */
@@ -1043,9 +1046,12 @@ void CocoaDialog(const char *title, const char *message, const char *buttonLabel
 /** Get the current edit box string. */
 - (NSAttributedString *)attributedString
 {
-	if (!EditBoxInGlobalFocus()) return [ [ [ NSAttributedString alloc ] initWithString:@"" ] autorelease ];
+//	if (!EditBoxInGlobalFocus()) return [ [ [ NSAttributedString alloc ] initWithString:@"" ] autorelease ];
+    if (!EditBoxInGlobalFocus()) return [ [ NSAttributedString alloc ] initWithString:@"" ];
 
-	return [ [ [ NSAttributedString alloc ] initWithString:[ NSString stringWithUTF8String:_focused_window->GetFocusedText() ] ] autorelease ];
+//	return [ [ [ NSAttributedString alloc ] initWithString:[ NSString stringWithUTF8String:_focused_window->GetFocusedText() ] ] autorelease ];
+    
+    return [ [ NSAttributedString alloc ] initWithString:[ NSString stringWithUTF8String:_focused_window->GetFocusedText() ]];
 }
 
 /** Get the character that is rendered at the given point. */
@@ -1263,7 +1269,7 @@ void CocoaDialog(const char *title, const char *message, const char *buttonLabel
 		/* We don't care about the event, but the compiler does. */
 		NSEvent *e = [ [ NSEvent alloc ] init ];
 		[ driver->cocoaview mouseEntered:e ];
-		[ e release ];
+//		[ e release ];
 	}
 }
 /** Screen the window is on changed. */

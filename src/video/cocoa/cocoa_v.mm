@@ -119,8 +119,8 @@ void VideoDriver_Cocoa::Stop()
 
 	/* Release window mode resources */
 	if (this->window != nil) [ this->window close ];
-	[ this->cocoaview release ];
-	[ this->delegate release ];
+//	[ this->cocoaview release ];
+//	[ this->delegate release ];
 
 	CGColorSpaceRelease(this->color_space);
 
@@ -441,7 +441,7 @@ bool VideoDriver_Cocoa::MakeWindow(int width, int height)
 	[ this->window setContentView:this->cocoaview ];
 	[ this->cocoaview addSubview:draw_view ];
 	[ this->window makeFirstResponder:this->cocoaview ];
-	[ draw_view release ];
+//	[ draw_view release ];
 
 	[ this->window setColorSpace:[ NSColorSpace sRGBColorSpace ] ];
 	CGColorSpaceRelease(this->color_space);

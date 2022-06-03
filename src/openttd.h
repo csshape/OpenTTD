@@ -13,6 +13,8 @@
 #include <atomic>
 #include "core/enum_type.hpp"
 
+typedef unsigned char byte;
+
 /** Mode which defines the state of the game. */
 enum GameMode {
 	GM_MENU,

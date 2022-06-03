@@ -81,9 +81,12 @@
 #endif
 
 /* Check for mismatching 'architectures' */
-#if !defined(STRGEN) && !defined(SETTINGSGEN) && ((defined(__LP64__) && !defined(POINTER_IS_64BIT)) || (!defined(__LP64__) && defined(POINTER_IS_64BIT)))
-#	error "Compiling 64 bits without POINTER_IS_64BIT set! (or vice versa)"
+#if defined(__LP64__)
+#define _SQ64
 #endif
+//#if !defined(STRGEN) && !defined(SETTINGSGEN) && ((defined(__LP64__) && !defined(POINTER_IS_64BIT)) || (!defined(__LP64__) && defined(POINTER_IS_64BIT)))
+//#	error "Compiling 64 bits without POINTER_IS_64BIT set! (or vice versa)"
+//#endif
 
 /* Name conflict */
 #define Rect        OTTDRect

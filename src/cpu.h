@@ -10,6 +10,9 @@
 #ifndef CPU_H
 #define CPU_H
 
+typedef uint64_t uint64;
+typedef unsigned int uint;
+
 /**
  * Get the tick counter from the CPU (high precision timing).
  * @return The count.

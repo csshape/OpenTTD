@@ -10,6 +10,20 @@
 #ifndef MATH_FUNC_HPP
 #define MATH_FUNC_HPP
 
+#include "stdafx.h"
+#include "stdint.h"
+#include "stdio.h"
+
+typedef int32_t int32;
+typedef int64_t int64;
+typedef uint32_t uint32;
+typedef uint16_t uint16;
+typedef uint64_t uint64;
+typedef unsigned char byte;
+
+#define likely(x)       __builtin_expect(!!(x), 1)
+#define unlikely(x)     __builtin_expect(!!(x), 0)
+
 /**
  * Returns the absolute value of (scalar) variable.
  *
@@ -156,7 +170,7 @@ static inline uint16 ClampToU16(const uint64 a)
 	 * match for min(uint64, uint) than uint64 min(uint64, uint64). As such we
 	 * need to cast the UINT16_MAX to prevent MSVC from displaying its
 	 * infinite loads of warnings. */
-	return static_cast<uint16>(std::min(a, static_cast<uint64>(UINT16_MAX)));
+    return static_cast<uint16>(fmin(a, static_cast<uint64>(UINT16_MAX)));
 }
 
 /**

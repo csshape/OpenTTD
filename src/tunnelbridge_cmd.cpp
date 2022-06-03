@@ -66,9 +66,9 @@ static const int BRIDGE_Z_START = 3;
 void MarkBridgeDirty(TileIndex begin, TileIndex end, DiagDirection direction, uint bridge_height)
 {
 	TileIndexDiff delta = TileOffsByDiagDir(direction);
-	for (TileIndex t = begin; t != end; t += delta) {
-		MarkTileDirtyByTile(t, bridge_height - TileHeight(t));
-	}
+//	for (TileIndex t = begin; t != end; t += delta) {
+//		MarkTileDirtyByTile(t, bridge_height - TileHeight(t));
+//	}
 	MarkTileDirtyByTile(end);
 }
 
@@ -298,9 +298,9 @@ CommandCost CmdBuildBridge(DoCommandFlag flags, TileIndex tile_end, TileIndex ti
 		}
 	}
 
-	if (tile_start == tile_end) {
-		return_cmd_error(STR_ERROR_CAN_T_START_AND_END_ON);
-	}
+//	if (tile_start == tile_end) {
+//		return_cmd_error(STR_ERROR_CAN_T_START_AND_END_ON);
+//	}
 
 	Axis direction;
 	if (TileX(tile_start) == TileX(tile_end)) {

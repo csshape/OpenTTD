@@ -11,6 +11,9 @@
 #define ZOOM_TYPE_H
 
 #include "core/enum_type.hpp"
+#include <inttypes.h>
+#include <stdint.h>
+#include "stdafx.h"
 
 static uint const ZOOM_LVL_SHIFT = 2;
 static uint const ZOOM_LVL_BASE  = 1 << ZOOM_LVL_SHIFT;

@@ -160,7 +160,7 @@ static bool _allowSoftware;
 		CALayer *l = [ [ OTTD_CGLLayer alloc ] initWithContext:context ];
 		self.layer = l;
 		self.wantsLayer = YES;
-		[ l release ];
+//		[ l release ];
 	}
 	return self;
 }

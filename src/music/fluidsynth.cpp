@@ -13,7 +13,7 @@
 #include "../debug.h"
 #include "fluidsynth.h"
 #include "midifile.hpp"
-#include <fluidsynth.h>
+//#include <fluidsynth.h>
 #include "../mixer.h"
 #include <mutex>
 

@@ -46,7 +46,12 @@ extern NSString *OTTDMainLaunchGameEngine;
 @end
 
 /** Subclass of NSView to support mouse awareness and text input. */
+#ifdef ENABLE_COCOA_METAL
+#include <MetalKit/MetalKit.h>
+@interface OTTD_CocoaView : MTKView <NSTextInputClient>
+#else
 @interface OTTD_CocoaView : NSView <NSTextInputClient>
+#endif
 - (NSRect)getRealRect:(NSRect)rect;
 - (NSRect)getVirtualRect:(NSRect)rect;
 - (CGFloat)getContentsScale;

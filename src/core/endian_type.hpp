@@ -23,8 +23,27 @@
 /** Big endian builds use this for TTD_ENDIAN. */
 #define TTD_BIG_ENDIAN 1
 
-#if !defined(TTD_ENDIAN)
-#	error "TTD_ENDIAN is not defined; please set it to either TTD_LITTLE_ENDIAN or TTD_BIG_ENDIAN"
-#endif /* !TTD_ENDIAN */
+/* Windows has always LITTLE_ENDIAN */
+#if defined(WIN32) || defined(__OS2__) || defined(WIN64)
+#    define TTD_ENDIAN TTD_LITTLE_ENDIAN
+#elif defined(OSX)
+#    include <sys/types.h>
+#    if __DARWIN_BYTE_ORDER == __DARWIN_LITTLE_ENDIAN
+#        define TTD_ENDIAN TTD_LITTLE_ENDIAN
+#    else
+#        define TTD_ENDIAN TTD_BIG_ENDIAN
+#    endif
+#elif !defined(TESTING)
+#    include <sys/param.h>
+#    if __BYTE_ORDER == __LITTLE_ENDIAN
+#        define TTD_ENDIAN TTD_LITTLE_ENDIAN
+#    else
+#        define TTD_ENDIAN TTD_BIG_ENDIAN
+#    endif
+#endif /* WIN32 || __OS2__ || WIN64 */
+
+//#if !defined(TTD_ENDIAN)
+//#	error "TTD_ENDIAN is not defined; please set it to either TTD_LITTLE_ENDIAN or TTD_BIG_ENDIAN"
+//#endif /* !TTD_ENDIAN */
 
 #endif /* ENDIAN_TYPE_HPP */

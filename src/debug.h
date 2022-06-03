@@ -87,6 +87,9 @@ const char *GetDebugString();
  * The output is counted in CPU cycles, and not comparable across
  *  machines. Mainly useful for local optimisations.
  **/
+
+#include "stdafx.h"
+
 #define TIC() {\
 	uint64 _xxx_ = ottd_rdtsc();\
 	static uint64 _sum_ = 0;\

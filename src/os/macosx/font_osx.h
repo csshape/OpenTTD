@@ -11,7 +11,8 @@
 #define FONT_OSX_H
 
 #include "../../fontcache_internal.h"
-#include "os/macosx/macos.h"
+//#include "os/macosx/macos.h"
+#include "macos.h"
 
 #include <CoreFoundation/CoreFoundation.h>
 
