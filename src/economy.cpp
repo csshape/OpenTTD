@@ -103,14 +103,33 @@ static PriceMultipliers _price_base_multiplier;
 
 /**
  * Calculate the value of the company. That is the value of all
- * assets (vehicles, stations, etc) and money minus the loan,
+ * assets (vehicles, stations, shares) and money minus the loan,
  * except when including_loan is \c false which is useful when
  * we want to calculate the value for bankruptcy.
- * @param c              the company to get the value of.
+ * @param c the company to get the value of.
  * @param including_loan include the loan in the company value.
  * @return the value of the company.
  */
 Money CalculateCompanyValue(const Company *c, bool including_loan)
+{
+	Money owned_shares_value = 0;
+
+	for (const Company *co : Company::Iterate()) {
+		uint8 shares_owned = 0;
+
+		for (uint8 i = 0; i < 4; i++) {
+			if (co->share_owners[i] == c->index) {
+				shares_owned++;
+			}
+		}
+
+		owned_shares_value += (CalculateCompanyValueExcludingShares(co) / 4) * shares_owned;
+	}
+
+	return std::max<Money>(owned_shares_value + CalculateCompanyValueExcludingShares(c), 1);
+}
+
+Money CalculateCompanyValueExcludingShares(const Company *c, bool including_loan)
 {
 	Owner owner = c->index;
 
@@ -2004,10 +2023,10 @@ extern int GetAmountOwnedBy(const Company *c, Owner owner);
 /**
  * Acquire shares in an opposing company.
  * @param flags type of operation
- * @param p1 company to buy the shares from
+ * @param target_company company to buy the shares from
  * @return the cost of this operation or an error
  */
-CommandCost CmdBuyShareInCompany(DoCommandFlag flags, TileIndex tile, CompanyID target_company)
+CommandCost CmdBuyShareInCompany(DoCommandFlag flags, CompanyID target_company)
 {
 	CommandCost cost(EXPENSES_OTHER);
 	Company *c = Company::GetIfValid(target_company);
