@@ -27,7 +27,11 @@
 #endif
 
 #if defined(__APPLE__)
-#	include "os/macosx/osx_stdafx.h"
+    #if IOS
+        #include "os/ios/ios_stdafx.h"
+    #else
+        #include "os/macosx/osx_stdafx.h"
+    #endif
 #endif /* __APPLE__ */
 
 #if defined(__HAIKU__)

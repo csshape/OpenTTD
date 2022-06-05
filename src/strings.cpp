@@ -1801,7 +1801,7 @@ bool ReadLanguagePack(const LanguageMetadata *lang)
 	Win32SetCurrentLocaleName(_current_language->isocode);
 #endif
 
-#ifdef WITH_COCOA
+#if defined(WITH_COCOA) && !defined(IOS) //TODO: CSE
 	extern void MacOSSetCurrentLocaleName(const char *iso_code);
 	MacOSSetCurrentLocaleName(_current_language->isocode);
 #endif

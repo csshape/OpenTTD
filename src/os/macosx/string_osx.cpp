@@ -19,7 +19,7 @@
 
 
 /* CTRunDelegateCreate is supported since MacOS X 10.5, but was only included in the SDKs starting with the 10.9 SDK. */
-#ifndef HAVE_OSX_109_SDK
+#if !defined(HAVE_OSX_109_SDK) && !defined(IOS)
 extern "C" {
 	typedef const struct __CTRunDelegate * CTRunDelegateRef;
 

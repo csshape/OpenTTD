@@ -435,6 +435,12 @@
 		335246C7282BD809006B68EE /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 335246C6282BD809006B68EE /* AudioToolbox.framework */; };
 		335246C9282BD815006B68EE /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 335246C8282BD815006B68EE /* CoreText.framework */; };
 		335246CA282BD828006B68EE /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 33523891282BB08F006B68EE /* libz.tbd */; };
+		33560DA1284CC43600B6B8C4 /* font_osx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243E3282BBEC8006B68EE /* font_osx.cpp */; };
+		33560DA2284CC6CF00B6B8C4 /* string_osx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243DE282BBEC8006B68EE /* string_osx.cpp */; };
+		33560DA3284CC87800B6B8C4 /* gs_instruments.dls in Resources */ = {isa = PBXBuildFile; fileRef = 336E6BA0284A25CC0057061C /* gs_instruments.dls */; };
+		33560DA4284CC8AA00B6B8C4 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6C07284A78790057061C /* AppDelegate.mm */; };
+		33560DA5284CC8EC00B6B8C4 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 336E6C0A284A78790057061C /* SceneDelegate.m */; };
+		33560DA6284CC8F000B6B8C4 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6C0D284A78790057061C /* ViewController.mm */; };
 		336E6963282D71900057061C /* libFreetype2_Mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 336E6962282D71790057061C /* libFreetype2_Mac.a */; };
 		336E6977283405CB0057061C /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 336E6970283405B90057061C /* libpng.a */; };
 		336E697B2844E0A70057061C /* rev.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 336E697A2844E0A70057061C /* rev.cpp */; };
@@ -896,6 +902,440 @@
 		336E6BE0284A5FFE0057061C /* cocoa_wnd.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6BDC284A5FFD0057061C /* cocoa_wnd.mm */; };
 		336E6BE1284A5FFE0057061C /* cocoa_v.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6BDD284A5FFD0057061C /* cocoa_v.mm */; };
 		336E6BFB284A62CA0057061C /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 336E6BF9284A62CA0057061C /* MainMenu.xib */; };
+		336E6C11284A78790057061C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 336E6C0F284A78790057061C /* Main.storyboard */; };
+		336E6C13284A787A0057061C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 336E6C12284A787A0057061C /* Assets.xcassets */; };
+		336E6C16284A787A0057061C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 336E6C14284A787A0057061C /* LaunchScreen.storyboard */; };
+		336E6C27284A78B50057061C /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 336E6974283405B90057061C /* libpng.a */; };
+		336E6C28284A78BD0057061C /* libFreetype2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 336E6960282D71790057061C /* libFreetype2.a */; };
+		336E6C2A284A78DD0057061C /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 336E6C29284A78D40057061C /* libz.tbd */; };
+		336E6C2C284A78E60057061C /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 336E6C2B284A78E60057061C /* OpenGLES.framework */; };
+		336E6C2E284A78ED0057061C /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 336E6C2D284A78ED0057061C /* QuartzCore.framework */; };
+		336E6C30284A78F70057061C /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 336E6C2F284A78F70057061C /* SystemConfiguration.framework */; };
+		336E6C32284A79000057061C /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 336E6C31284A79000057061C /* CoreText.framework */; };
+		336E6C34284A790A0057061C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 336E6C33284A79090057061C /* CoreGraphics.framework */; };
+		336E6C36284A79170057061C /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 336E6C35284A79170057061C /* CoreFoundation.framework */; };
+		336E6C38284A79210057061C /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 336E6C37284A79210057061C /* CoreAudio.framework */; };
+		336E6C3A284A792D0057061C /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 336E6C39284A792D0057061C /* AudioToolbox.framework */; };
+		336E6C3C284A793B0057061C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 336E6C3B284A793B0057061C /* UIKit.framework */; };
+		336E6C3D284A7A2A0057061C /* sqcompiler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352443E282BBEC8006B68EE /* sqcompiler.cpp */; };
+		336E6C3E284A7A2A0057061C /* sqtable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524440282BBEC8006B68EE /* sqtable.cpp */; };
+		336E6C3F284A7A2A0057061C /* sqstate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352443D282BBEC8006B68EE /* sqstate.cpp */; };
+		336E6C40284A7A2A0057061C /* autoreplace_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352407E282BBEC7006B68EE /* autoreplace_cmd.cpp */; };
+		336E6C41284A7A2A0057061C /* null.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241B8282BBEC7006B68EE /* null.cpp */; };
+		336E6C42284A7A2A0057061C /* random_func.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352405C282BBEC7006B68EE /* random_func.cpp */; };
+		336E6C43284A7A2A0057061C /* ai_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524393282BBEC8006B68EE /* ai_info.cpp */; };
+		336E6C44284A7A2A0057061C /* airport_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352403B282BBEC7006B68EE /* airport_gui.cpp */; };
+		336E6C45284A7A2A0057061C /* articulated_vehicles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524143282BBEC7006B68EE /* articulated_vehicles.cpp */; };
+		336E6C46284A7A2A0057061C /* 40bpp_anim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241C6282BBEC7006B68EE /* 40bpp_anim.cpp */; };
+		336E6C47284A7A2A0057061C /* 32bpp_sse4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241CD282BBEC7006B68EE /* 32bpp_sse4.cpp */; };
+		336E6C48284A7A2A0057061C /* cheat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352445E282BBEC8006B68EE /* cheat.cpp */; };
+		336E6C49284A7A2A0057061C /* md5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524406282BBEC8006B68EE /* md5.cpp */; };
+		336E6C4A284A7A2A0057061C /* sqclass.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352442E282BBEC8006B68EE /* sqclass.cpp */; };
+		336E6C4B284A7A2A0057061C /* sqapi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352443F282BBEC8006B68EE /* sqapi.cpp */; };
+		336E6C4C284A7A2A0057061C /* sqfuncstate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352443A282BBEC8006B68EE /* sqfuncstate.cpp */; };
+		336E6C4D284A7A2A0057061C /* 32bpp_simple.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241C1282BBEC7006B68EE /* 32bpp_simple.cpp */; };
+		336E6C4E284A7A2A0057061C /* clear_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335244DC282BBEC8006B68EE /* clear_cmd.cpp */; };
+		336E6C4F284A7A2A0057061C /* geometry_func.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524062282BBEC7006B68EE /* geometry_func.cpp */; };
+		336E6C50284A7A2A0057061C /* 32bpp_sse2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241CA282BBEC7006B68EE /* 32bpp_sse2.cpp */; };
+		336E6C51284A7A2A0057061C /* ai_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524390282BBEC8006B68EE /* ai_gui.cpp */; };
+		336E6C52284A7A2A0057061C /* sqstdaux.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352441E282BBEC8006B68EE /* sqstdaux.cpp */; };
+		336E6C53284A7A2A0057061C /* autoreplace_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352445B282BBEC8006B68EE /* autoreplace_gui.cpp */; };
+		336E6C54284A7A2A0057061C /* autoreplace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524048282BBEC7006B68EE /* autoreplace.cpp */; };
+		336E6C55284A7A2A0057061C /* 32bpp_anim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241BB282BBEC7006B68EE /* 32bpp_anim.cpp */; };
+		336E6C56284A7A2A0057061C /* alloc_func.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524051282BBEC7006B68EE /* alloc_func.cpp */; };
+		336E6C57284A7A2A0057061C /* 32bpp_ssse3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241BC282BBEC7006B68EE /* 32bpp_ssse3.cpp */; };
+		336E6C58284A7A2A0057061C /* sqmem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524429282BBEC8006B68EE /* sqmem.cpp */; };
+		336E6C59284A7A2A0057061C /* 32bpp_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241B6282BBEC7006B68EE /* 32bpp_base.cpp */; };
+		336E6C5A284A7A2A0057061C /* 32bpp_optimized.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241CC282BBEC7006B68EE /* 32bpp_optimized.cpp */; };
+		336E6C5B284A7A2A0057061C /* command.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352419E282BBEC7006B68EE /* command.cpp */; };
+		336E6C5C284A7A2A0057061C /* aircraft_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524329282BBEC8006B68EE /* aircraft_cmd.cpp */; };
+		336E6C5D284A7A2A0057061C /* console.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240F0282BBEC7006B68EE /* console.cpp */; };
+		336E6C5E284A7A2A0057061C /* aircraft_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241A7282BBEC7006B68EE /* aircraft_gui.cpp */; };
+		336E6C5F284A7A2A0057061C /* sqstdmath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352441B282BBEC8006B68EE /* sqstdmath.cpp */; };
+		336E6C60284A7A2A0057061C /* base_consist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524037282BBEC7006B68EE /* base_consist.cpp */; };
+		336E6C61284A7A2A0057061C /* cargopacket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243FF282BBEC8006B68EE /* cargopacket.cpp */; };
+		336E6C62284A7A2A0057061C /* 8bpp_simple.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241BA282BBEC7006B68EE /* 8bpp_simple.cpp */; };
+		336E6C63284A7A2A0057061C /* bridge_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243C4282BBEC8006B68EE /* bridge_gui.cpp */; };
+		336E6C64284A7A2A0057061C /* ai_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524399282BBEC8006B68EE /* ai_config.cpp */; };
+		336E6C65284A7A2A0057061C /* cpu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524456282BBEC8006B68EE /* cpu.cpp */; };
+		336E6C66284A7A2A0057061C /* bmp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524085282BBEC7006B68EE /* bmp.cpp */; };
+		336E6C67284A7A2A0057061C /* sqbaselib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524432282BBEC8006B68EE /* sqbaselib.cpp */; };
+		336E6C68284A7A2A0057061C /* sqvm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524436282BBEC8006B68EE /* sqvm.cpp */; };
+		336E6C69284A7A2A0057061C /* sqobject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352443B282BBEC8006B68EE /* sqobject.cpp */; };
+		336E6C6A284A7A2A0057061C /* ai_core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524395282BBEC8006B68EE /* ai_core.cpp */; };
+		336E6C6B284A7A2A0057061C /* animated_tile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524137282BBEC7006B68EE /* animated_tile.cpp */; };
+		336E6C6C284A7A2A0057061C /* sqstdstring.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352441D282BBEC8006B68EE /* sqstdstring.cpp */; };
+		336E6C6D284A7A2A0057061C /* sqstdrex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352441A282BBEC8006B68EE /* sqstdrex.cpp */; };
+		336E6C6E284A7A2A0057061C /* ai_scanner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524391282BBEC8006B68EE /* ai_scanner.cpp */; };
+		336E6C6F284A7A2A0057061C /* 32bpp_anim_sse4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241C7282BBEC7006B68EE /* 32bpp_anim_sse4.cpp */; };
+		336E6C70284A7A2A0057061C /* sqlexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524438282BBEC8006B68EE /* sqlexer.cpp */; };
+		336E6C71284A7A2A0057061C /* 8bpp_optimized.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241C8282BBEC7006B68EE /* 8bpp_optimized.cpp */; };
+		336E6C72284A7A2A0057061C /* 32bpp_anim_sse2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241CB282BBEC7006B68EE /* 32bpp_anim_sse2.cpp */; };
+		336E6C73284A7A2A0057061C /* rev.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 336E697A2844E0A70057061C /* rev.cpp */; };
+		336E6C74284A7A2A0057061C /* bootstrap_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524030282BBEC7006B68EE /* bootstrap_gui.cpp */; };
+		336E6C75284A7A2A0057061C /* cargoaction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352418D282BBEC7006B68EE /* cargoaction.cpp */; };
+		336E6C76284A7A2A0057061C /* build_vehicle_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352431F282BBEC8006B68EE /* build_vehicle_gui.cpp */; };
+		336E6C77284A7A2A0057061C /* pool_func.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352405A282BBEC7006B68EE /* pool_func.cpp */; };
+		336E6C78284A7A2A0057061C /* 8bpp_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241B7282BBEC7006B68EE /* 8bpp_base.cpp */; };
+		336E6C79284A7A2A0057061C /* cheat_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352406F282BBEC7006B68EE /* cheat_gui.cpp */; };
+		336E6C7A284A7A2A0057061C /* console_cmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524033282BBEC7006B68EE /* console_cmds.cpp */; };
+		336E6C7B284A7A2A0057061C /* math_func.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352405E282BBEC7006B68EE /* math_func.cpp */; };
+		336E6C7C284A7A2A0057061C /* bridge_map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243C6282BBEC8006B68EE /* bridge_map.cpp */; };
+		336E6C7D284A7A2A0057061C /* crashlog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524074282BBEC7006B68EE /* crashlog.cpp */; };
+		336E6C7E284A7A2A0057061C /* airport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240F6282BBEC7006B68EE /* airport.cpp */; };
+		336E6C7F284A7A2A0057061C /* cargotype.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240F2282BBEC7006B68EE /* cargotype.cpp */; };
+		336E6C80284A7A2A0057061C /* company_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524135282BBEC7006B68EE /* company_gui.cpp */; };
+		336E6C81284A7A2A0057061C /* company_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243BE282BBEC8006B68EE /* company_cmd.cpp */; };
+		336E6C82284A7A2A0057061C /* cargomonitor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FAB282BBEC7006B68EE /* cargomonitor.cpp */; };
+		336E6C83284A7A2A0057061C /* console_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243CA282BBEC8006B68EE /* console_gui.cpp */; };
+		336E6C84284A7A2A0057061C /* sqdebug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524431282BBEC8006B68EE /* sqdebug.cpp */; };
+		336E6C85284A7A2A0057061C /* ai_instance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524397282BBEC8006B68EE /* ai_instance.cpp */; };
+		336E6C86284A7A2A0057061C /* bitmath_func.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524061282BBEC7006B68EE /* bitmath_func.cpp */; };
+		336E6C87284A7A2F0057061C /* fios_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524192282BBEC7006B68EE /* fios_gui.cpp */; };
+		336E6C88284A7A2F0057061C /* error_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FFC282BBEC7006B68EE /* error_gui.cpp */; };
+		336E6C89284A7A2F0057061C /* currency.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241D2282BBEC7006B68EE /* currency.cpp */; };
+		336E6C8A284A7A2F0057061C /* dedicated.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335244DB282BBEC8006B68EE /* dedicated.cpp */; };
+		336E6C8B284A7A2F0057061C /* depot_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524479282BBEC8006B68EE /* depot_cmd.cpp */; };
+		336E6C8C284A7A2F0057061C /* engine_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335242CC282BBEC7006B68EE /* engine_gui.cpp */; };
+		336E6C8D284A7A2F0057061C /* framerate_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524451282BBEC8006B68EE /* framerate_gui.cpp */; };
+		336E6C8E284A7A2F0057061C /* date.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352411D282BBEC7006B68EE /* date.cpp */; };
+		336E6C8F284A7A2F0057061C /* driver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524389282BBEC8006B68EE /* driver.cpp */; };
+		336E6C90284A7A2F0057061C /* debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243AB282BBEC8006B68EE /* debug.cpp */; };
+		336E6C91284A7A2F0057061C /* engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243FD282BBEC8006B68EE /* engine.cpp */; };
+		336E6C92284A7A2F0057061C /* dock_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352432D282BBEC8006B68EE /* dock_gui.cpp */; };
+		336E6C93284A7A2F0057061C /* effectvehicle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524331282BBEC8006B68EE /* effectvehicle.cpp */; };
+		336E6C94284A7A2F0057061C /* depot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524488282BBEC8006B68EE /* depot.cpp */; };
+		336E6C95284A7A2F0057061C /* elrail.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352418C282BBEC7006B68EE /* elrail.cpp */; };
+		336E6C96284A7A2F0057061C /* fileio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241D4282BBEC7006B68EE /* fileio.cpp */; };
+		336E6C97284A7A2F0057061C /* fontcache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241D5282BBEC7006B68EE /* fontcache.cpp */; };
+		336E6C98284A7A2F0057061C /* depot_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FAF282BBEC7006B68EE /* depot_gui.cpp */; };
+		336E6C99284A7A2F0057061C /* date_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352418E282BBEC7006B68EE /* date_gui.cpp */; };
+		336E6C9A284A7A2F0057061C /* disaster_vehicle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335242D9282BBEC7006B68EE /* disaster_vehicle.cpp */; };
+		336E6C9B284A7A2F0057061C /* fios.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241CF282BBEC7006B68EE /* fios.cpp */; };
+		336E6C9C284A7A2F0057061C /* economy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524089282BBEC7006B68EE /* economy.cpp */; };
+		336E6C9D284A7A340057061C /* game_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241E9282BBEC7006B68EE /* game_text.cpp */; };
+		336E6C9E284A7A340057061C /* game_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241E1282BBEC7006B68EE /* game_info.cpp */; };
+		336E6C9F284A7A340057061C /* game_scanner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241DE282BBEC7006B68EE /* game_scanner.cpp */; };
+		336E6CA0284A7A340057061C /* game_instance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241E3282BBEC7006B68EE /* game_instance.cpp */; };
+		336E6CA1284A7A340057061C /* game_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241E4282BBEC7006B68EE /* game_config.cpp */; };
+		336E6CA2284A7A340057061C /* game_core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241E8282BBEC7006B68EE /* game_core.cpp */; };
+		336E6CA3284A7A520057061C /* misc_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524482282BBEC8006B68EE /* misc_gui.cpp */; };
+		336E6CA4284A7A520057061C /* misc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240E8282BBEC7006B68EE /* misc.cpp */; };
+		336E6CA5284A7A520057061C /* mixer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524198282BBEC7006B68EE /* mixer.cpp */; };
+		336E6CA6284A7A520057061C /* dbg_helpers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FC1282BBEC7006B68EE /* dbg_helpers.cpp */; };
+		336E6CA7284A7A520057061C /* genworld_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243CD282BBEC8006B68EE /* genworld_gui.cpp */; };
+		336E6CA8284A7A520057061C /* main_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352403F282BBEC7006B68EE /* main_gui.cpp */; };
+		336E6CA9284A7A520057061C /* linkgraphjob.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241F7282BBEC7006B68EE /* linkgraphjob.cpp */; };
+		336E6CAA284A7A520057061C /* host.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352416D282BBEC7006B68EE /* host.cpp */; };
+		336E6CAB284A7A520057061C /* hotkeys.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FF6282BBEC7006B68EE /* hotkeys.cpp */; };
+		336E6CAC284A7A520057061C /* mcf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241F3282BBEC7006B68EE /* mcf.cpp */; };
+		336E6CAD284A7A520057061C /* linkgraph_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241F9282BBEC7006B68EE /* linkgraph_gui.cpp */; };
+		336E6CAE284A7A520057061C /* map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352432F282BBEC8006B68EE /* map.cpp */; };
+		336E6CAF284A7A520057061C /* genworld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524212282BBEC7006B68EE /* genworld.cpp */; };
+		336E6CB0284A7A520057061C /* midifile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FDE282BBEC7006B68EE /* midifile.cpp */; };
+		336E6CB1284A7A520057061C /* tcp_content.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352415A282BBEC7006B68EE /* tcp_content.cpp */; };
+		336E6CB2284A7A520057061C /* refresh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241EF282BBEC7006B68EE /* refresh.cpp */; };
+		336E6CB3284A7A520057061C /* music.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335242CF282BBEC7006B68EE /* music.cpp */; };
+		336E6CB4284A7A520057061C /* highscore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243A6282BBEC8006B68EE /* highscore.cpp */; };
+		336E6CB5284A7A520057061C /* music_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524072282BBEC7006B68EE /* music_gui.cpp */; };
+		336E6CB6284A7A520057061C /* demands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241FF282BBEC7006B68EE /* demands.cpp */; };
+		336E6CB7284A7A520057061C /* null_m.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FD4282BBEC7006B68EE /* null_m.cpp */; };
+		336E6CB8284A7A520057061C /* intro_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352449B282BBEC8006B68EE /* intro_gui.cpp */; };
+		336E6CB9284A7A520057061C /* network_content.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352414A282BBEC7006B68EE /* network_content.cpp */; };
+		336E6CBA284A7A520057061C /* network.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524148282BBEC7006B68EE /* network.cpp */; };
+		336E6CBB284A7A520057061C /* gfx_layout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352407B282BBEC7006B68EE /* gfx_layout.cpp */; };
+		336E6CBC284A7A520057061C /* game_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524152282BBEC7006B68EE /* game_info.cpp */; };
+		336E6CBD284A7A520057061C /* group_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240EA282BBEC7006B68EE /* group_cmd.cpp */; };
+		336E6CBE284A7A520057061C /* ini.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352439D282BBEC8006B68EE /* ini.cpp */; };
+		336E6CBF284A7A520057061C /* tcp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524159282BBEC7006B68EE /* tcp.cpp */; };
+		336E6CC0284A7A520057061C /* countedobj.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FC3282BBEC7006B68EE /* countedobj.cpp */; };
+		336E6CC1284A7A520057061C /* ground_vehicle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524341282BBEC8006B68EE /* ground_vehicle.cpp */; };
+		336E6CC2284A7A520057061C /* ini_load.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243A1282BBEC8006B68EE /* ini_load.cpp */; };
+		336E6CC3284A7A520057061C /* tcp_turn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352416B282BBEC7006B68EE /* tcp_turn.cpp */; };
+		336E6CC5284A7A520057061C /* tcp_connect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352415C282BBEC7006B68EE /* tcp_connect.cpp */; };
+		336E6CC6284A7A520057061C /* flowmapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241F8282BBEC7006B68EE /* flowmapper.cpp */; };
+		336E6CC7284A7A520057061C /* config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524164282BBEC7006B68EE /* config.cpp */; };
+		336E6CC8284A7A520057061C /* highscore_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352433D282BBEC8006B68EE /* highscore_gui.cpp */; };
+		336E6CC9284A7A520057061C /* tcp_http.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524161282BBEC7006B68EE /* tcp_http.cpp */; };
+		336E6CCA284A7A520057061C /* heightmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524206282BBEC7006B68EE /* heightmap.cpp */; };
+		336E6CCB284A7A520057061C /* goal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243FC282BBEC8006B68EE /* goal.cpp */; };
+		336E6CCC284A7A520057061C /* gfxinit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335244E8282BBEC8006B68EE /* gfxinit.cpp */; };
+		336E6CCD284A7A520057061C /* landscape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352448C282BBEC8006B68EE /* landscape.cpp */; };
+		336E6CCE284A7A520057061C /* misc_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FAD282BBEC7006B68EE /* misc_cmd.cpp */; };
+		336E6CCF284A7A520057061C /* udp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352415F282BBEC7006B68EE /* udp.cpp */; };
+		336E6CD0284A7A520057061C /* address.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524163282BBEC7006B68EE /* address.cpp */; };
+		336E6CD1284A7A520057061C /* goal_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524133282BBEC7006B68EE /* goal_gui.cpp */; };
+		336E6CD2284A7A520057061C /* tcp_admin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524167282BBEC7006B68EE /* tcp_admin.cpp */; };
+		336E6CD3284A7A520057061C /* gfx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524487282BBEC8006B68EE /* gfx.cpp */; };
+		336E6CD4284A7A520057061C /* gamelog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524485282BBEC8006B68EE /* gamelog.cpp */; };
+		336E6CD5284A7A520057061C /* linkgraphschedule.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524201282BBEC7006B68EE /* linkgraphschedule.cpp */; };
+		336E6CD6284A7A520057061C /* tcp_game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524155282BBEC7006B68EE /* tcp_game.cpp */; };
+		336E6CD7284A7A520057061C /* getoptdata.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FC0282BBEC7006B68EE /* getoptdata.cpp */; };
+		336E6CD8284A7A520057061C /* graph_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241EB282BBEC7006B68EE /* graph_gui.cpp */; };
+		336E6CD9284A7A520057061C /* tcp_stun.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524150282BBEC7006B68EE /* tcp_stun.cpp */; };
+		336E6CDA284A7A520057061C /* os_abstraction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352415D282BBEC7006B68EE /* os_abstraction.cpp */; };
+		336E6CDB284A7A520057061C /* group_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243A0282BBEC8006B68EE /* group_gui.cpp */; };
+		336E6CDC284A7A520057061C /* industry_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243C5282BBEC8006B68EE /* industry_gui.cpp */; };
+		336E6CDD284A7A520057061C /* core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524156282BBEC7006B68EE /* core.cpp */; };
+		336E6CDE284A7A520057061C /* linkgraph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241F0282BBEC7006B68EE /* linkgraph.cpp */; };
+		336E6CDF284A7A520057061C /* tcp_coordinator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524162282BBEC7006B68EE /* tcp_coordinator.cpp */; };
+		336E6CE0284A7A520057061C /* packet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524160282BBEC7006B68EE /* packet.cpp */; };
+		336E6CE1284A7A520057061C /* industry_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524193282BBEC7006B68EE /* industry_cmd.cpp */; };
+		336E6CE2284A7A5C0057061C /* newgrf_storage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FE5282BBEC7006B68EE /* newgrf_storage.cpp */; };
+		336E6CE3284A7A5C0057061C /* newgrf_canal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524024282BBEC7006B68EE /* newgrf_canal.cpp */; };
+		336E6CE4284A7A5C0057061C /* network_stun.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524179282BBEC7006B68EE /* network_stun.cpp */; };
+		336E6CE5284A7A5C0057061C /* newgrf_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524498282BBEC8006B68EE /* newgrf_gui.cpp */; };
+		336E6CE6284A7A5C0057061C /* network_admin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524184282BBEC7006B68EE /* network_admin.cpp */; };
+		336E6CE7284A7A5C0057061C /* newgrf_generic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524003282BBEC7006B68EE /* newgrf_generic.cpp */; };
+		336E6CE8284A7A5C0057061C /* object_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524041282BBEC7006B68EE /* object_gui.cpp */; };
+		336E6CE9284A7A5C0057061C /* newgrf_commons.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335244E7282BBEC8006B68EE /* newgrf_commons.cpp */; };
+		336E6CEA284A7A5C0057061C /* network_udp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524176282BBEC7006B68EE /* network_udp.cpp */; };
+		336E6CEB284A7A5C0057061C /* newgrf_sound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335244DF282BBEC8006B68EE /* newgrf_sound.cpp */; };
+		336E6CEC284A7A5C0057061C /* order_backup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335244F4282BBEC8006B68EE /* order_backup.cpp */; };
+		336E6CED284A7A5C0057061C /* network_content_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352417C282BBEC7006B68EE /* network_content_gui.cpp */; };
+		336E6CEE284A7A5C0057061C /* newgrf_object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335242CA282BBEC7006B68EE /* newgrf_object.cpp */; };
+		336E6CEF284A7A5C0057061C /* newgrf_engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FFF282BBEC7006B68EE /* newgrf_engine.cpp */; };
+		336E6CF0284A7A5C0057061C /* newgrf_railtype.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241D9282BBEC7006B68EE /* newgrf_railtype.cpp */; };
+		336E6CF1284A7A5C0057061C /* newgrf_station.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352412F282BBEC7006B68EE /* newgrf_station.cpp */; };
+		336E6CF2284A7A5C0057061C /* order_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524126282BBEC7006B68EE /* order_cmd.cpp */; };
+		336E6CF3284A7A5C0057061C /* newgrf_spritegroup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352412E282BBEC7006B68EE /* newgrf_spritegroup.cpp */; };
+		336E6CF4284A7A5C0057061C /* openttd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352431D282BBEC7006B68EE /* openttd.cpp */; };
+		336E6CF5284A7A5C0057061C /* network_gamelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524171282BBEC7006B68EE /* network_gamelist.cpp */; };
+		336E6CF6284A7A5C0057061C /* network_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352417E282BBEC7006B68EE /* network_gui.cpp */; };
+		336E6CF7284A7A5C0057061C /* newgrf_industries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243FB282BBEC8006B68EE /* newgrf_industries.cpp */; };
+		336E6CF8284A7A5C0057061C /* newgrf_airporttiles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524204282BBEC7006B68EE /* newgrf_airporttiles.cpp */; };
+		336E6CF9284A7A5C0057061C /* network_server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524172282BBEC7006B68EE /* network_server.cpp */; };
+		336E6CFA284A7A5C0057061C /* newgrf_industrytiles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FB5282BBEC7006B68EE /* newgrf_industrytiles.cpp */; };
+		336E6CFB284A7A5C0057061C /* newgrf_house.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335244E2282BBEC8006B68EE /* newgrf_house.cpp */; };
+		336E6CFC284A7A5C0057061C /* order_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243B3282BBEC8006B68EE /* order_gui.cpp */; };
+		336E6CFD284A7A5C0057061C /* object_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243D0282BBEC8006B68EE /* object_cmd.cpp */; };
+		336E6CFE284A7A5C0057061C /* network_turn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524177282BBEC7006B68EE /* network_turn.cpp */; };
+		336E6CFF284A7A5C0057061C /* network_coordinator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352417F282BBEC7006B68EE /* network_coordinator.cpp */; };
+		336E6D00284A7A5C0057061C /* network_query.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524186282BBEC7006B68EE /* network_query.cpp */; };
+		336E6D01284A7A5C0057061C /* newgrf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524323282BBEC8006B68EE /* newgrf.cpp */; };
+		336E6D02284A7A5C0057061C /* network_command.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524187282BBEC7006B68EE /* network_command.cpp */; };
+		336E6D03284A7A5C0057061C /* newgrf_town.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524332282BBEC8006B68EE /* newgrf_town.cpp */; };
+		336E6D04284A7A5C0057061C /* newgrf_airport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240E7282BBEC7006B68EE /* newgrf_airport.cpp */; };
+		336E6D05284A7A5C0057061C /* newgrf_cargo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352403C282BBEC7006B68EE /* newgrf_cargo.cpp */; };
+		336E6D06284A7A5C0057061C /* newgrf_debug_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524343282BBEC8006B68EE /* newgrf_debug_gui.cpp */; };
+		336E6D07284A7A5C0057061C /* network_chat_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524175282BBEC7006B68EE /* network_chat_gui.cpp */; };
+		336E6D08284A7A5C0057061C /* newgrf_profiling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524205282BBEC7006B68EE /* newgrf_profiling.cpp */; };
+		336E6D09284A7A5C0057061C /* newgrf_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241DC282BBEC7006B68EE /* newgrf_config.cpp */; };
+		336E6D0A284A7A5C0057061C /* newgrf_roadtype.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352406E282BBEC7006B68EE /* newgrf_roadtype.cpp */; };
+		336E6D0B284A7A5C0057061C /* newgrf_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352413E282BBEC7006B68EE /* newgrf_text.cpp */; };
+		336E6D0C284A7A5C0057061C /* news_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241D8282BBEC7006B68EE /* news_gui.cpp */; };
+		336E6D0D284A7A5C0057061C /* newgrf_townname.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352445F282BBEC8006B68EE /* newgrf_townname.cpp */; };
+		336E6D0E284A7A5C0057061C /* network_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524189282BBEC7006B68EE /* network_client.cpp */; };
+		336E6D10284A7A670057061C /* osk_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524080282BBEC7006B68EE /* osk_gui.cpp */; };
+		336E6D11284A7A7C0057061C /* random_access_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241D3282BBEC7006B68EE /* random_access_file.cpp */; };
+		336E6D12284A7A7C0057061C /* roadstop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FC8282BBEC7006B68EE /* roadstop.cpp */; };
+		336E6D13284A7A7C0057061C /* roadveh_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524144282BBEC7006B68EE /* roadveh_gui.cpp */; };
+		336E6D14284A7A7C0057061C /* aystar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524104282BBEC7006B68EE /* aystar.cpp */; };
+		336E6D15284A7A7C0057061C /* npf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524101282BBEC7006B68EE /* npf.cpp */; };
+		336E6D16284A7A7C0057061C /* rail_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524484282BBEC8006B68EE /* rail_gui.cpp */; };
+		336E6D17284A7A7C0057061C /* road_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524136282BBEC7006B68EE /* road_cmd.cpp */; };
+		336E6D18284A7A7C0057061C /* rail.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352408A282BBEC7006B68EE /* rail.cpp */; };
+		336E6D19284A7A7C0057061C /* queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524103282BBEC7006B68EE /* queue.cpp */; };
+		336E6D1A284A7A7C0057061C /* yapf_ship.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524116282BBEC7006B68EE /* yapf_ship.cpp */; };
+		336E6D1B284A7A7C0057061C /* progress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243D1282BBEC8006B68EE /* progress.cpp */; };
+		336E6D1C284A7A7C0057061C /* road_map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243B9282BBEC8006B68EE /* road_map.cpp */; };
+		336E6D1D284A7A7C0057061C /* road.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352433B282BBEC8006B68EE /* road.cpp */; };
+		336E6D1E284A7A7C0057061C /* pbs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352413C282BBEC7006B68EE /* pbs.cpp */; };
+		336E6D1F284A7A7C0057061C /* roadveh_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243CB282BBEC8006B68EE /* roadveh_cmd.cpp */; };
+		336E6D20284A7A7C0057061C /* yapf_road.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524110282BBEC7006B68EE /* yapf_road.cpp */; };
+		336E6D21284A7A7C0057061C /* road_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243BD282BBEC8006B68EE /* road_gui.cpp */; };
+		336E6D22284A7A7C0057061C /* rail_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FEE282BBEC7006B68EE /* rail_cmd.cpp */; };
+		336E6D23284A7A7C0057061C /* yapf_rail.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352410C282BBEC7006B68EE /* yapf_rail.cpp */; };
+		336E6D24284A7A980057061C /* squirrel_std.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524225282BBEC7006B68EE /* squirrel_std.cpp */; };
+		336E6D25284A7A980057061C /* storage_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240B2282BBEC7006B68EE /* storage_sl.cpp */; };
+		336E6D26284A7A980057061C /* cargopacket_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240C9282BBEC7006B68EE /* cargopacket_sl.cpp */; };
+		336E6D27284A7A980057061C /* industry_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240CC282BBEC7006B68EE /* industry_sl.cpp */; };
+		336E6D28284A7A980057061C /* gamelog_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240C8282BBEC7006B68EE /* gamelog_sl.cpp */; };
+		336E6D29284A7A980057061C /* object_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240CA282BBEC7006B68EE /* object_sl.cpp */; };
+		336E6D2A284A7A980057061C /* cargomonitor_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240B8282BBEC7006B68EE /* cargomonitor_sl.cpp */; };
+		336E6D2B284A7A980057061C /* order_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240C3282BBEC7006B68EE /* order_sl.cpp */; };
+		336E6D2C284A7A980057061C /* cheat_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240B1282BBEC7006B68EE /* cheat_sl.cpp */; };
+		336E6D2D284A7A980057061C /* town_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240CD282BBEC7006B68EE /* town_sl.cpp */; };
+		336E6D2E284A7A980057061C /* script_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352421A282BBEC7006B68EE /* script_config.cpp */; };
+		336E6D2F284A7A980057061C /* map_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240C1282BBEC7006B68EE /* map_sl.cpp */; };
+		336E6D30284A7A980057061C /* strings_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240D7282BBEC7006B68EE /* strings_sl.cpp */; };
+		336E6D31284A7A980057061C /* script_instance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352421E282BBEC7006B68EE /* script_instance.cpp */; };
+		336E6D32284A7A980057061C /* script_scanner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524224282BBEC7006B68EE /* script_scanner.cpp */; };
+		336E6D33284A7A980057061C /* oldloader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352408D282BBEC7006B68EE /* oldloader.cpp */; };
+		336E6D34284A7A980057061C /* animated_tile_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240B6282BBEC7006B68EE /* animated_tile_sl.cpp */; };
+		336E6D35284A7A980057061C /* engine_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240BB282BBEC7006B68EE /* engine_sl.cpp */; };
+		336E6D36284A7A980057061C /* station_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240C7282BBEC7006B68EE /* station_sl.cpp */; };
+		336E6D37284A7A980057061C /* oldloader_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352408E282BBEC7006B68EE /* oldloader_sl.cpp */; };
+		336E6D38284A7A980057061C /* subsidy_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240B4282BBEC7006B68EE /* subsidy_sl.cpp */; };
+		336E6D39284A7A980057061C /* misc_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240C6282BBEC7006B68EE /* misc_sl.cpp */; };
+		336E6D3A284A7A980057061C /* saveload.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240D4282BBEC7006B68EE /* saveload.cpp */; };
+		336E6D3B284A7A980057061C /* game_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240B5282BBEC7006B68EE /* game_sl.cpp */; };
+		336E6D3C284A7A980057061C /* vehicle_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240BA282BBEC7006B68EE /* vehicle_sl.cpp */; };
+		336E6D3D284A7A980057061C /* goal_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240C0282BBEC7006B68EE /* goal_sl.cpp */; };
+		336E6D3E284A7A980057061C /* script_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524217282BBEC7006B68EE /* script_info.cpp */; };
+		336E6D3F284A7A980057061C /* squirrel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524219282BBEC7006B68EE /* squirrel.cpp */; };
+		336E6D40284A7A980057061C /* newgrf_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240CF282BBEC7006B68EE /* newgrf_sl.cpp */; };
+		336E6D41284A7A980057061C /* ai_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240D5282BBEC7006B68EE /* ai_sl.cpp */; };
+		336E6D42284A7A980057061C /* afterload.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240BE282BBEC7006B68EE /* afterload.cpp */; };
+		336E6D43284A7A980057061C /* script_info_dummy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524215282BBEC7006B68EE /* script_info_dummy.cpp */; };
+		336E6D44284A7A980057061C /* screenshot_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352412A282BBEC7006B68EE /* screenshot_gui.cpp */; };
+		336E6D45284A7A980057061C /* story_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240B3282BBEC7006B68EE /* story_sl.cpp */; };
+		336E6D46284A7A980057061C /* autoreplace_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240D2282BBEC7006B68EE /* autoreplace_sl.cpp */; };
+		336E6D47284A7A980057061C /* settings_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240CB282BBEC7006B68EE /* settings_sl.cpp */; };
+		336E6D48284A7A980057061C /* airport_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240CE282BBEC7006B68EE /* airport_sl.cpp */; };
+		336E6D49284A7A980057061C /* linkgraph_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240D1282BBEC7006B68EE /* linkgraph_sl.cpp */; };
+		336E6D4A284A7A980057061C /* economy_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240BD282BBEC7006B68EE /* economy_sl.cpp */; };
+		336E6D4B284A7A980057061C /* screenshot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243C7282BBEC8006B68EE /* screenshot.cpp */; };
+		336E6D4C284A7A980057061C /* group_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240BC282BBEC7006B68EE /* group_sl.cpp */; };
+		336E6D4D284A7A980057061C /* labelmaps_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240D3282BBEC7006B68EE /* labelmaps_sl.cpp */; };
+		336E6D4E284A7A980057061C /* company_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240BF282BBEC7006B68EE /* company_sl.cpp */; };
+		336E6D4F284A7A980057061C /* depot_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240D6282BBEC7006B68EE /* depot_sl.cpp */; };
+		336E6D50284A7A980057061C /* waypoint_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240C4282BBEC7006B68EE /* waypoint_sl.cpp */; };
+		336E6D51284A7A980057061C /* signs_sl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240B7282BBEC7006B68EE /* signs_sl.cpp */; };
+		336E6D52284A7AF50057061C /* script_subsidylist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352424E282BBEC7006B68EE /* script_subsidylist.cpp */; };
+		336E6D53284A7AF50057061C /* script_road.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352426F282BBEC7006B68EE /* script_road.cpp */; };
+		336E6D54284A7AF50057061C /* story_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352445C282BBEC8006B68EE /* story_gui.cpp */; };
+		336E6D55284A7AF50057061C /* script_townlist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335242A9282BBEC7006B68EE /* script_townlist.cpp */; };
+		336E6D56284A7AF50057061C /* script_sign.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524249282BBEC7006B68EE /* script_sign.cpp */; };
+		336E6D57284A7AF50057061C /* script_object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524292282BBEC7006B68EE /* script_object.cpp */; };
+		336E6D58284A7AF50057061C /* script_viewport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524267282BBEC7006B68EE /* script_viewport.cpp */; };
+		336E6D59284A7AF50057061C /* script_list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352424A282BBEC7006B68EE /* script_list.cpp */; };
+		336E6D5A284A7AF50057061C /* script_depotlist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335242AF282BBEC7006B68EE /* script_depotlist.cpp */; };
+		336E6D5B284A7AF50057061C /* script_newgrf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352426B282BBEC7006B68EE /* script_newgrf.cpp */; };
+		336E6D5C284A7AF50057061C /* script_companymode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352424C282BBEC7006B68EE /* script_companymode.cpp */; };
+		336E6D5D284A7AF50057061C /* script_goal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352423B282BBEC7006B68EE /* script_goal.cpp */; };
+		336E6D5E284A7AF50057061C /* script_tunnel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524269282BBEC7006B68EE /* script_tunnel.cpp */; };
+		336E6D5F284A7AF50057061C /* settings_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243A3282BBEC8006B68EE /* settings_gui.cpp */; };
+		336E6D60284A7AF50057061C /* signs_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FC5282BBEC7006B68EE /* signs_gui.cpp */; };
+		336E6D61284A7AF50057061C /* statusbar_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524388282BBEC8006B68EE /* statusbar_gui.cpp */; };
+		336E6D62284A7AF50057061C /* script_storypageelementlist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524282282BBEC7006B68EE /* script_storypageelementlist.cpp */; };
+		336E6D63284A7AF50057061C /* script_company.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524273282BBEC7006B68EE /* script_company.cpp */; };
+		336E6D64284A7AF50057061C /* story.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352407D282BBEC7006B68EE /* story.cpp */; };
+		336E6D65284A7AF50057061C /* script_event.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524290282BBEC7006B68EE /* script_event.cpp */; };
+		336E6D66284A7AF50057061C /* script_error.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352423E282BBEC7006B68EE /* script_error.cpp */; };
+		336E6D67284A7AF50057061C /* script_town.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352422A282BBEC7006B68EE /* script_town.cpp */; };
+		336E6D68284A7AF50057061C /* script_tilelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352425D282BBEC7006B68EE /* script_tilelist.cpp */; };
+		336E6D69284A7AF50057061C /* script_testmode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524286282BBEC7006B68EE /* script_testmode.cpp */; };
+		336E6D6A284A7AF50057061C /* script_date.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352428E282BBEC7006B68EE /* script_date.cpp */; };
+		336E6D6B284A7AF50057061C /* signs_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524492282BBEC8006B68EE /* signs_cmd.cpp */; };
+		336E6D6C284A7AF50057061C /* script_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352427D282BBEC7006B68EE /* script_base.cpp */; };
+		336E6D6D284A7AF50057061C /* script_clientlist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335242B6282BBEC7006B68EE /* script_clientlist.cpp */; };
+		336E6D6E284A7AF50057061C /* script_infrastructure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524285282BBEC7006B68EE /* script_infrastructure.cpp */; };
+		336E6D6F284A7AF50057061C /* script_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335242A1282BBEC7006B68EE /* script_text.cpp */; };
+		336E6D70284A7AF50057061C /* smallmap_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524140282BBEC7006B68EE /* smallmap_gui.cpp */; };
+		336E6D71284A7AF50057061C /* script_subsidy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524231282BBEC7006B68EE /* script_subsidy.cpp */; };
+		336E6D72284A7AF50057061C /* null_s.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524470282BBEC8006B68EE /* null_s.cpp */; };
+		336E6D73284A7AF50057061C /* script_vehiclelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524233282BBEC7006B68EE /* script_vehiclelist.cpp */; };
+		336E6D74284A7AF50057061C /* script_gamesettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335242B5282BBEC7006B68EE /* script_gamesettings.cpp */; };
+		336E6D75284A7AF50057061C /* script_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335242AB282BBEC7006B68EE /* script_client.cpp */; };
+		336E6D76284A7AF50057061C /* allegro_s.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524476282BBEC8006B68EE /* allegro_s.cpp */; };
+		336E6D77284A7AF50057061C /* script_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335242BE282BBEC7006B68EE /* script_controller.cpp */; };
+		336E6D78284A7AF50057061C /* settings_table.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524458282BBEC8006B68EE /* settings_table.cpp */; };
+		336E6D79284A7AF50057061C /* signs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241A0282BBEC7006B68EE /* signs.cpp */; };
+		336E6D7A284A7AF50057061C /* script_tile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352423F282BBEC7006B68EE /* script_tile.cpp */; };
+		336E6D7B284A7AF50057061C /* script_industrylist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352422D282BBEC7006B68EE /* script_industrylist.cpp */; };
+		336E6D7D284A7AF50057061C /* sprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524134282BBEC7006B68EE /* sprite.cpp */; };
+		336E6D7E284A7AF50057061C /* script_objecttypelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524241282BBEC7006B68EE /* script_objecttypelist.cpp */; };
+		336E6D7F284A7AF50057061C /* script_priorityqueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352427C282BBEC7006B68EE /* script_priorityqueue.cpp */; };
+		336E6D80284A7AF50057061C /* sprite_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335244EE282BBEC8006B68EE /* sprite_file.cpp */; };
+		336E6D81284A7AF50057061C /* script_map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352427B282BBEC7006B68EE /* script_map.cpp */; };
+		336E6D82284A7AF50057061C /* script_rail.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335242B1282BBEC7006B68EE /* script_rail.cpp */; };
+		336E6D83284A7AF50057061C /* sound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243AC282BBEC8006B68EE /* sound.cpp */; };
+		336E6D84284A7AF50057061C /* script_enginelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524268282BBEC7006B68EE /* script_enginelist.cpp */; };
+		336E6D85284A7AF50057061C /* station_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243BB282BBEC8006B68EE /* station_cmd.cpp */; };
+		336E6D86284A7AF50057061C /* ship_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FE1282BBEC7006B68EE /* ship_cmd.cpp */; };
+		336E6D87284A7AF50057061C /* script_basestation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352423C282BBEC7006B68EE /* script_basestation.cpp */; };
+		336E6D88284A7AF50057061C /* signal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524337282BBEC8006B68EE /* signal.cpp */; };
+		336E6D89284A7AF50057061C /* station.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524084282BBEC7006B68EE /* station.cpp */; };
+		336E6D8A284A7AF50057061C /* script_station.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335242C0282BBEC7006B68EE /* script_station.cpp */; };
+		336E6D8B284A7AF50057061C /* script_log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524228282BBEC7006B68EE /* script_log.cpp */; };
+		336E6D8C284A7AF50057061C /* script_roadtypelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335242A5282BBEC7006B68EE /* script_roadtypelist.cpp */; };
+		336E6D8D284A7AF50057061C /* ship_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524494282BBEC8006B68EE /* ship_gui.cpp */; };
+		336E6D8E284A7AF50057061C /* grf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335244EC282BBEC8006B68EE /* grf.cpp */; };
+		336E6D8F284A7AF50057061C /* script_cargomonitor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352425E282BBEC7006B68EE /* script_cargomonitor.cpp */; };
+		336E6D90284A7AF50057061C /* script_window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352429B282BBEC7006B68EE /* script_window.cpp */; };
+		336E6D91284A7AF50057061C /* script_grouplist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524270282BBEC7006B68EE /* script_grouplist.cpp */; };
+		336E6D92284A7AF50057061C /* script_railtypelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524277282BBEC7006B68EE /* script_railtypelist.cpp */; };
+		336E6D93284A7AF50057061C /* sdl_s.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352446A282BBEC8006B68EE /* sdl_s.cpp */; };
+		336E6D94284A7AF50057061C /* script_admin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524260282BBEC7006B68EE /* script_admin.cpp */; };
+		336E6D95284A7AF50057061C /* script_airport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352427A282BBEC7006B68EE /* script_airport.cpp */; };
+		336E6D96284A7AF50057061C /* script_game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524230282BBEC7006B68EE /* script_game.cpp */; };
+		336E6D97284A7AF50057061C /* script_industrytypelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524289282BBEC7006B68EE /* script_industrytypelist.cpp */; };
+		336E6D98284A7AF50057061C /* spritecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FAA282BBEC7006B68EE /* spritecache.cpp */; };
+		336E6D99284A7AF50057061C /* script_execmode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335242A6282BBEC7006B68EE /* script_execmode.cpp */; };
+		336E6D9A284A7AF50057061C /* script_stationlist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352422F282BBEC7006B68EE /* script_stationlist.cpp */; };
+		336E6D9B284A7AF50057061C /* script_bridgelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524253282BBEC7006B68EE /* script_bridgelist.cpp */; };
+		336E6D9C284A7AF50057061C /* script_bridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524262282BBEC7006B68EE /* script_bridge.cpp */; };
+		336E6D9D284A7AF50057061C /* script_story_page.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524263282BBEC7006B68EE /* script_story_page.cpp */; };
+		336E6D9E284A7AF50057061C /* script_cargolist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524235282BBEC7006B68EE /* script_cargolist.cpp */; };
+		336E6D9F284A7AF50057061C /* script_industry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524283282BBEC7006B68EE /* script_industry.cpp */; };
+		336E6DA0284A7AF50057061C /* script_storypagelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524280282BBEC7006B68EE /* script_storypagelist.cpp */; };
+		336E6DA1284A7AF50057061C /* script_group.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352427E282BBEC7006B68EE /* script_group.cpp */; };
+		336E6DA2284A7AF50057061C /* script_vehicle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335242BF282BBEC7006B68EE /* script_vehicle.cpp */; };
+		336E6DA3284A7AF50057061C /* script_cargo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524237282BBEC7006B68EE /* script_cargo.cpp */; };
+		336E6DA4284A7AF50057061C /* sdl2_s.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524473282BBEC8006B68EE /* sdl2_s.cpp */; };
+		336E6DA5284A7AF50057061C /* script_waypoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524271282BBEC7006B68EE /* script_waypoint.cpp */; };
+		336E6DA6284A7AF50057061C /* station_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352413D282BBEC7006B68EE /* station_gui.cpp */; };
+		336E6DA7284A7AF50057061C /* script_event_types.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524261282BBEC7006B68EE /* script_event_types.cpp */; };
+		336E6DA8284A7AF50057061C /* script_objecttype.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524281282BBEC7006B68EE /* script_objecttype.cpp */; };
+		336E6DA9284A7AF50057061C /* script_signlist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352426E282BBEC7006B68EE /* script_signlist.cpp */; };
+		336E6DAA284A7AF50057061C /* script_news.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524243282BBEC7006B68EE /* script_news.cpp */; };
+		336E6DAB284A7AF50057061C /* script_engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524247282BBEC7006B68EE /* script_engine.cpp */; };
+		336E6DAC284A7AF50057061C /* script_accounting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524294282BBEC7006B68EE /* script_accounting.cpp */; };
+		336E6DAD284A7AF50057061C /* script_industrytype.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524259282BBEC7006B68EE /* script_industrytype.cpp */; };
+		336E6DAE284A7AF50057061C /* script_order.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524278282BBEC7006B68EE /* script_order.cpp */; };
+		336E6DAF284A7AF50057061C /* script_marine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524298282BBEC7006B68EE /* script_marine.cpp */; };
+		336E6DB0284A7AF50057061C /* script_waypointlist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524242282BBEC7006B68EE /* script_waypointlist.cpp */; };
+		336E6DB1284A7AF50057061C /* settings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524495282BBEC8006B68EE /* settings.cpp */; };
+		336E6DB2284A7B0D0057061C /* textfile_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524342282BBEC8006B68EE /* textfile_gui.cpp */; };
+		336E6DB3284A7B0D0057061C /* viewport_sprite_sorter_sse4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524334282BBEC8006B68EE /* viewport_sprite_sorter_sse4.cpp */; };
+		336E6DB4284A7B0D0057061C /* viewport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524460282BBEC8006B68EE /* viewport.cpp */; };
+		336E6DB5284A7B0D0057061C /* water_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240F5282BBEC7006B68EE /* water_cmd.cpp */; };
+		336E6DB6284A7B0D0057061C /* dedicated_v.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524010282BBEC7006B68EE /* dedicated_v.cpp */; };
+		336E6DB7284A7B0D0057061C /* vehicle_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524199282BBEC7006B68EE /* vehicle_gui.cpp */; };
+		336E6DB8284A7B0D0057061C /* townname.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243FA282BBEC8006B68EE /* townname.cpp */; };
+		336E6DB9284A7B0D0057061C /* widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FB1282BBEC7006B68EE /* widget.cpp */; };
+		336E6DBA284A7B0D0057061C /* toolbar_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241D0282BBEC7006B68EE /* toolbar_gui.cpp */; };
+		336E6DBB284A7B0D0057061C /* strings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524124282BBEC7006B68EE /* strings.cpp */; };
+		336E6DBC284A7B0D0057061C /* vehicle_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243C2282BBEC8006B68EE /* vehicle_cmd.cpp */; };
+		336E6DBD284A7B0D0057061C /* void_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241A6282BBEC7006B68EE /* void_cmd.cpp */; };
+		336E6DBE284A7B0D0057061C /* window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240F1282BBEC7006B68EE /* window.cpp */; };
+		336E6DBF284A7B0D0057061C /* dropdown.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335244B4282BBEC8006B68EE /* dropdown.cpp */; };
+		336E6DC0284A7B0D0057061C /* subsidy_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FC7282BBEC7006B68EE /* subsidy_gui.cpp */; };
+		336E6DC1284A7B0D0057061C /* stringfilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FAE282BBEC7006B68EE /* stringfilter.cpp */; };
+		336E6DC2284A7B0D0057061C /* video_driver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524022282BBEC7006B68EE /* video_driver.cpp */; };
+		336E6DC3284A7B0D0057061C /* train_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243AD282BBEC8006B68EE /* train_gui.cpp */; };
+		336E6DC4284A7B0D0057061C /* transparency_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524330282BBEC8006B68EE /* transparency_gui.cpp */; };
+		336E6DC5284A7B0D0057061C /* texteff.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352444B282BBEC8006B68EE /* texteff.cpp */; };
+		336E6DC6284A7B0D0057061C /* null_v.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352401C282BBEC7006B68EE /* null_v.cpp */; };
+		336E6DC7284A7B0D0057061C /* terraform_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FF1282BBEC7006B68EE /* terraform_cmd.cpp */; };
+		336E6DC8284A7B0D0057061C /* tile_map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FB2282BBEC7006B68EE /* tile_map.cpp */; };
+		336E6DC9284A7B0D0057061C /* tunnelbridge_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524031282BBEC7006B68EE /* tunnelbridge_cmd.cpp */; };
+		336E6DCA284A7B0D0057061C /* town_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243B8282BBEC8006B68EE /* town_gui.cpp */; };
+		336E6DCB284A7B0D0057061C /* string.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241A8282BBEC7006B68EE /* string.cpp */; };
+		336E6DCC284A7B0D0057061C /* tgp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524466282BBEC8006B68EE /* tgp.cpp */; };
+		336E6DCD284A7B0D0057061C /* timetable_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352438B282BBEC8006B68EE /* timetable_cmd.cpp */; };
+		336E6DCF284A7B0D0057061C /* waypoint_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335242D1282BBEC7006B68EE /* waypoint_gui.cpp */; };
+		336E6DD0284A7B0D0057061C /* tree_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524339282BBEC8006B68EE /* tree_cmd.cpp */; };
+		336E6DD1284A7B0D0057061C /* terraform_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524486282BBEC8006B68EE /* terraform_gui.cpp */; };
+		336E6DD2284A7B0D0057061C /* strgen_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524043282BBEC7006B68EE /* strgen_base.cpp */; };
+		336E6DD3284A7B0D0057061C /* tunnel_map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524125282BBEC7006B68EE /* tunnel_map.cpp */; };
+		336E6DD4284A7B0D0057061C /* vehiclelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335242D7282BBEC7006B68EE /* vehiclelist.cpp */; };
+		336E6DD5284A7B0D0057061C /* waypoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524401282BBEC8006B68EE /* waypoint.cpp */; };
+		336E6DD6284A7B0D0057061C /* tree_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241D6282BBEC7006B68EE /* tree_gui.cpp */; };
+		336E6DD7284A7B0D0057061C /* town_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524141282BBEC7006B68EE /* town_cmd.cpp */; };
+		336E6DD8284A7B0D0057061C /* vehicle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524083282BBEC7006B68EE /* vehicle.cpp */; };
+		336E6DD9284A7B0D0057061C /* train_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352412B282BBEC7006B68EE /* train_cmd.cpp */; };
+		336E6DDA284A7B0D0057061C /* subsidy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524462282BBEC8006B68EE /* subsidy.cpp */; };
+		336E6DDB284A7B0D0057061C /* slider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335244D0282BBEC8006B68EE /* slider.cpp */; };
+		336E6DDC284A7B0D0057061C /* textbuf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524467282BBEC8006B68EE /* textbuf.cpp */; };
+		336E6DDD284A7B0D0057061C /* waypoint_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241A1282BBEC7006B68EE /* waypoint_cmd.cpp */; };
+		336E6DDE284A7B0D0057061C /* timetable_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240F8282BBEC7006B68EE /* timetable_gui.cpp */; };
+		336E6DDF284A7B0D0057061C /* tilearea.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243A4282BBEC8006B68EE /* tilearea.cpp */; };
+		336E6DE0284A7B0D0057061C /* viewport_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240D8282BBEC7006B68EE /* viewport_gui.cpp */; };
+		336E6DE5284B4A740057061C /* MIDIManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 336E6DE3284B4A740057061C /* MIDIManager.m */; };
+		336E6DE8284B4A890057061C /* cocoa_touch_m.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 336E6DE6284B4A890057061C /* cocoa_touch_m.cpp */; };
+		336E6DEA284B4AA20057061C /* ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6DE9284B4AA20057061C /* ios.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -968,6 +1408,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = 336E6864282D708D0057061C;
 			remoteInfo = Freetype2_Mac;
+		};
+		336E6C23284A78920057061C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 336E6966283405B90057061C /* libpng.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 5BF3B093122B1B9B0092AE4E;
+			remoteInfo = "libpng static (iOS)";
+		};
+		336E6C25284A78980057061C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 336E695A282D71790057061C /* freetype2.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 6382B1B00FB0FC5100ECAC02;
+			remoteInfo = Freetype2_iOS;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -1965,7 +2419,6 @@
 		335243E4282BBEC8006B68EE /* macos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = macos.h; sourceTree = "<group>"; };
 		335243E5282BBEC8006B68EE /* macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = macos.mm; sourceTree = "<group>"; };
 		335243E6282BBEC8006B68EE /* osx_stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = osx_stdafx.h; sourceTree = "<group>"; };
-		335243E7282BBEC8006B68EE /* G5_detector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = G5_detector.cpp; sourceTree = "<group>"; };
 		335243F2282BBEC8006B68EE /* station_type.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = station_type.h; sourceTree = "<group>"; };
 		335243F3282BBEC8006B68EE /* newgrf_townname.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = newgrf_townname.h; sourceTree = "<group>"; };
 		335243F4282BBEC8006B68EE /* console_func.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = console_func.h; sourceTree = "<group>"; };
@@ -2237,6 +2690,35 @@
 		336E6BDD284A5FFD0057061C /* cocoa_v.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = cocoa_v.mm; sourceTree = "<group>"; };
 		336E6BDE284A5FFD0057061C /* cocoa_v.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cocoa_v.h; sourceTree = "<group>"; };
 		336E6BFA284A62CA0057061C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		336E6C04284A78790057061C /* OpenTTD_iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenTTD_iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		336E6C06284A78790057061C /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		336E6C07284A78790057061C /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
+		336E6C09284A78790057061C /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
+		336E6C0A284A78790057061C /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
+		336E6C0C284A78790057061C /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		336E6C0D284A78790057061C /* ViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewController.mm; sourceTree = "<group>"; };
+		336E6C10284A78790057061C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		336E6C12284A787A0057061C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		336E6C15284A787A0057061C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		336E6C17284A787A0057061C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		336E6C18284A787A0057061C /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
+		336E6C29284A78D40057061C /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/usr/lib/libz.tbd; sourceTree = DEVELOPER_DIR; };
+		336E6C2B284A78E60057061C /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/System/Library/Frameworks/OpenGLES.framework; sourceTree = DEVELOPER_DIR; };
+		336E6C2D284A78ED0057061C /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
+		336E6C2F284A78F70057061C /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
+		336E6C31284A79000057061C /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/System/Library/Frameworks/CoreText.framework; sourceTree = DEVELOPER_DIR; };
+		336E6C33284A79090057061C /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
+		336E6C35284A79170057061C /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/System/Library/Frameworks/CoreFoundation.framework; sourceTree = DEVELOPER_DIR; };
+		336E6C37284A79210057061C /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/System/Library/Frameworks/CoreAudio.framework; sourceTree = DEVELOPER_DIR; };
+		336E6C39284A792D0057061C /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
+		336E6C3B284A793B0057061C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		336E6DE2284B472C0057061C /* ios_stdafx.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ios_stdafx.h; sourceTree = "<group>"; };
+		336E6DE3284B4A740057061C /* MIDIManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIDIManager.m; sourceTree = "<group>"; };
+		336E6DE4284B4A740057061C /* MIDIManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIDIManager.h; sourceTree = "<group>"; };
+		336E6DE6284B4A890057061C /* cocoa_touch_m.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cocoa_touch_m.cpp; sourceTree = "<group>"; };
+		336E6DE7284B4A890057061C /* cocoa_touch_m.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cocoa_touch_m.h; sourceTree = "<group>"; };
+		336E6DE9284B4AA20057061C /* ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ios.mm; sourceTree = "<group>"; };
+		336E6DEB284B4AAB0057061C /* endian_target.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = endian_target.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2280,6 +2762,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		336E6C01284A78790057061C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				336E6C2E284A78ED0057061C /* QuartzCore.framework in Frameworks */,
+				336E6C3C284A793B0057061C /* UIKit.framework in Frameworks */,
+				336E6C28284A78BD0057061C /* libFreetype2.a in Frameworks */,
+				336E6C36284A79170057061C /* CoreFoundation.framework in Frameworks */,
+				336E6C3A284A792D0057061C /* AudioToolbox.framework in Frameworks */,
+				336E6C2A284A78DD0057061C /* libz.tbd in Frameworks */,
+				336E6C27284A78B50057061C /* libpng.a in Frameworks */,
+				336E6C34284A790A0057061C /* CoreGraphics.framework in Frameworks */,
+				336E6C32284A79000057061C /* CoreText.framework in Frameworks */,
+				336E6C30284A78F70057061C /* SystemConfiguration.framework in Frameworks */,
+				336E6C38284A79210057061C /* CoreAudio.framework in Frameworks */,
+				336E6C2C284A78E60057061C /* OpenGLES.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -2290,6 +2791,7 @@
 				336E695A282D71790057061C /* freetype2.xcodeproj */,
 				33523887282BAEEE006B68EE /* OpenTTD */,
 				336E69A0284A09360057061C /* OpenTTD_Mac */,
+				336E6C05284A78790057061C /* OpenTTD_iOS */,
 				33523886282BAEEE006B68EE /* Products */,
 				33523890282BB08F006B68EE /* Frameworks */,
 			);
@@ -2300,6 +2802,7 @@
 			children = (
 				33523885282BAEEE006B68EE /* OpenTTD_Mac_Test */,
 				336E699F284A09360057061C /* OpenTTD_Mac.app */,
+				336E6C04284A78790057061C /* OpenTTD_iOS.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2318,6 +2821,16 @@
 		33523890282BB08F006B68EE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				336E6C3B284A793B0057061C /* UIKit.framework */,
+				336E6C39284A792D0057061C /* AudioToolbox.framework */,
+				336E6C37284A79210057061C /* CoreAudio.framework */,
+				336E6C35284A79170057061C /* CoreFoundation.framework */,
+				336E6C33284A79090057061C /* CoreGraphics.framework */,
+				336E6C31284A79000057061C /* CoreText.framework */,
+				336E6C2F284A78F70057061C /* SystemConfiguration.framework */,
+				336E6C2D284A78ED0057061C /* QuartzCore.framework */,
+				336E6C2B284A78E60057061C /* OpenGLES.framework */,
+				336E6C29284A78D40057061C /* libz.tbd */,
 				336E698E284A011E0057061C /* QuartzCore.framework */,
 				336E698C284A00AE0057061C /* CoreImage.framework */,
 				336E698A2849FFEE0057061C /* OpenAL.framework */,
@@ -2872,6 +3385,10 @@
 		33523FC9282BBEC7006B68EE /* music */ = {
 			isa = PBXGroup;
 			children = (
+				336E6DE6284B4A890057061C /* cocoa_touch_m.cpp */,
+				336E6DE7284B4A890057061C /* cocoa_touch_m.h */,
+				336E6DE4284B4A740057061C /* MIDIManager.h */,
+				336E6DE3284B4A740057061C /* MIDIManager.m */,
 				33523FD7282BBEC7006B68EE /* cocoa_m.cpp */,
 				33523FD0282BBEC7006B68EE /* cocoa_m.h */,
 				33523FCE282BBEC7006B68EE /* midi.h */,
@@ -3635,6 +4152,7 @@
 		335243D3282BBEC8006B68EE /* os */ = {
 			isa = PBXGroup;
 			children = (
+				336E6DE1284B47160057061C /* ios */,
 				336E6990284A05260057061C /* unix */,
 				335243DD282BBEC8006B68EE /* macosx */,
 			);
@@ -3644,15 +4162,14 @@
 		335243DD282BBEC8006B68EE /* macosx */ = {
 			isa = PBXGroup;
 			children = (
-				335243DE282BBEC8006B68EE /* string_osx.cpp */,
-				335243E0282BBEC8006B68EE /* font_osx.h */,
 				335243E1282BBEC8006B68EE /* crashlog_osx.cpp */,
-				335243E2282BBEC8006B68EE /* string_osx.h */,
 				335243E3282BBEC8006B68EE /* font_osx.cpp */,
+				335243E0282BBEC8006B68EE /* font_osx.h */,
 				335243E4282BBEC8006B68EE /* macos.h */,
 				335243E5282BBEC8006B68EE /* macos.mm */,
 				335243E6282BBEC8006B68EE /* osx_stdafx.h */,
-				335243E7282BBEC8006B68EE /* G5_detector.cpp */,
+				335243DE282BBEC8006B68EE /* string_osx.cpp */,
+				335243E2282BBEC8006B68EE /* string_osx.h */,
 			);
 			path = macosx;
 			sourceTree = "<group>";
@@ -3940,6 +4457,34 @@
 			path = bin;
 			sourceTree = "<group>";
 		};
+		336E6C05284A78790057061C /* OpenTTD_iOS */ = {
+			isa = PBXGroup;
+			children = (
+				336E6C06284A78790057061C /* AppDelegate.h */,
+				336E6C07284A78790057061C /* AppDelegate.mm */,
+				336E6C09284A78790057061C /* SceneDelegate.h */,
+				336E6C0A284A78790057061C /* SceneDelegate.m */,
+				336E6C0C284A78790057061C /* ViewController.h */,
+				336E6C0D284A78790057061C /* ViewController.mm */,
+				336E6C0F284A78790057061C /* Main.storyboard */,
+				336E6C12284A787A0057061C /* Assets.xcassets */,
+				336E6C14284A787A0057061C /* LaunchScreen.storyboard */,
+				336E6C17284A787A0057061C /* Info.plist */,
+				336E6C18284A787A0057061C /* main.mm */,
+			);
+			path = OpenTTD_iOS;
+			sourceTree = "<group>";
+		};
+		336E6DE1284B47160057061C /* ios */ = {
+			isa = PBXGroup;
+			children = (
+				336E6DE2284B472C0057061C /* ios_stdafx.h */,
+				336E6DE9284B4AA20057061C /* ios.mm */,
+				336E6DEB284B4AAB0057061C /* endian_target.h */,
+			);
+			path = ios;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -3981,6 +4526,25 @@
 			productReference = 336E699F284A09360057061C /* OpenTTD_Mac.app */;
 			productType = "com.apple.product-type.application";
 		};
+		336E6C03284A78790057061C /* OpenTTD_iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 336E6C22284A787A0057061C /* Build configuration list for PBXNativeTarget "OpenTTD_iOS" */;
+			buildPhases = (
+				336E6C00284A78790057061C /* Sources */,
+				336E6C01284A78790057061C /* Frameworks */,
+				336E6C02284A78790057061C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				336E6C26284A78980057061C /* PBXTargetDependency */,
+				336E6C24284A78920057061C /* PBXTargetDependency */,
+			);
+			name = OpenTTD_iOS;
+			productName = OpenTTD_iOS;
+			productReference = 336E6C04284A78790057061C /* OpenTTD_iOS.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -3994,6 +4558,9 @@
 						CreatedOnToolsVersion = 13.3;
 					};
 					336E699E284A09360057061C = {
+						CreatedOnToolsVersion = 13.3;
+					};
+					336E6C03284A78790057061C = {
 						CreatedOnToolsVersion = 13.3;
 					};
 				};
@@ -4023,6 +4590,7 @@
 			targets = (
 				33523884282BAEEE006B68EE /* OpenTTD_Mac_Test */,
 				336E699E284A09360057061C /* OpenTTD_Mac */,
+				336E6C03284A78790057061C /* OpenTTD_iOS */,
 			);
 		};
 /* End PBXProject section */
@@ -4086,6 +4654,17 @@
 				336E6BA3284A25CC0057061C /* Fragment.glsl in Resources */,
 				336E6BA6284A25CC0057061C /* Vertex.glsl in Resources */,
 				336E6BFB284A62CA0057061C /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		336E6C02284A78790057061C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33560DA3284CC87800B6B8C4 /* gs_instruments.dls in Resources */,
+				336E6C16284A787A0057061C /* LaunchScreen.storyboard in Resources */,
+				336E6C13284A787A0057061C /* Assets.xcassets in Resources */,
+				336E6C11284A78790057061C /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4960,6 +5539,437 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		336E6C00284A78790057061C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				336E6CBB284A7A520057061C /* gfx_layout.cpp in Sources */,
+				336E6D47284A7A980057061C /* settings_sl.cpp in Sources */,
+				336E6DA8284A7AF50057061C /* script_objecttype.cpp in Sources */,
+				336E6D22284A7A7C0057061C /* rail_cmd.cpp in Sources */,
+				336E6CE2284A7A5C0057061C /* newgrf_storage.cpp in Sources */,
+				336E6D3E284A7A980057061C /* script_info.cpp in Sources */,
+				336E6CF3284A7A5C0057061C /* newgrf_spritegroup.cpp in Sources */,
+				336E6CDF284A7A520057061C /* tcp_coordinator.cpp in Sources */,
+				336E6D24284A7A980057061C /* squirrel_std.cpp in Sources */,
+				336E6DCD284A7B0D0057061C /* timetable_cmd.cpp in Sources */,
+				336E6CD5284A7A520057061C /* linkgraphschedule.cpp in Sources */,
+				336E6D3F284A7A980057061C /* squirrel.cpp in Sources */,
+				336E6D17284A7A7C0057061C /* road_cmd.cpp in Sources */,
+				336E6D84284A7AF50057061C /* script_enginelist.cpp in Sources */,
+				336E6DCF284A7B0D0057061C /* waypoint_gui.cpp in Sources */,
+				336E6DD3284A7B0D0057061C /* tunnel_map.cpp in Sources */,
+				336E6D27284A7A980057061C /* industry_sl.cpp in Sources */,
+				336E6D5A284A7AF50057061C /* script_depotlist.cpp in Sources */,
+				336E6D80284A7AF50057061C /* sprite_file.cpp in Sources */,
+				336E6D87284A7AF50057061C /* script_basestation.cpp in Sources */,
+				336E6DE0284A7B0D0057061C /* viewport_gui.cpp in Sources */,
+				336E6CF6284A7A5C0057061C /* network_gui.cpp in Sources */,
+				336E6DCA284A7B0D0057061C /* town_gui.cpp in Sources */,
+				336E6D13284A7A7C0057061C /* roadveh_gui.cpp in Sources */,
+				336E6CD6284A7A520057061C /* tcp_game.cpp in Sources */,
+				336E6D32284A7A980057061C /* script_scanner.cpp in Sources */,
+				336E6CC8284A7A520057061C /* highscore_gui.cpp in Sources */,
+				336E6D2F284A7A980057061C /* map_sl.cpp in Sources */,
+				336E6CB0284A7A520057061C /* midifile.cpp in Sources */,
+				336E6D67284A7AF50057061C /* script_town.cpp in Sources */,
+				336E6C69284A7A2A0057061C /* sqobject.cpp in Sources */,
+				336E6C61284A7A2A0057061C /* cargopacket.cpp in Sources */,
+				336E6CE8284A7A5C0057061C /* object_gui.cpp in Sources */,
+				336E6D29284A7A980057061C /* object_sl.cpp in Sources */,
+				336E6DC9284A7B0D0057061C /* tunnelbridge_cmd.cpp in Sources */,
+				336E6CB2284A7A520057061C /* refresh.cpp in Sources */,
+				336E6D09284A7A5C0057061C /* newgrf_config.cpp in Sources */,
+				336E6DA9284A7AF50057061C /* script_signlist.cpp in Sources */,
+				336E6C9B284A7A2F0057061C /* fios.cpp in Sources */,
+				336E6D11284A7A7C0057061C /* random_access_file.cpp in Sources */,
+				336E6CF2284A7A5C0057061C /* order_cmd.cpp in Sources */,
+				336E6D73284A7AF50057061C /* script_vehiclelist.cpp in Sources */,
+				336E6DAE284A7AF50057061C /* script_order.cpp in Sources */,
+				336E6C67284A7A2A0057061C /* sqbaselib.cpp in Sources */,
+				336E6D40284A7A980057061C /* newgrf_sl.cpp in Sources */,
+				336E6D7B284A7AF50057061C /* script_industrylist.cpp in Sources */,
+				336E6D8F284A7AF50057061C /* script_cargomonitor.cpp in Sources */,
+				336E6DE8284B4A890057061C /* cocoa_touch_m.cpp in Sources */,
+				336E6C76284A7A2A0057061C /* build_vehicle_gui.cpp in Sources */,
+				336E6CA9284A7A520057061C /* linkgraphjob.cpp in Sources */,
+				336E6C81284A7A2A0057061C /* company_cmd.cpp in Sources */,
+				336E6D5B284A7AF50057061C /* script_newgrf.cpp in Sources */,
+				33560DA2284CC6CF00B6B8C4 /* string_osx.cpp in Sources */,
+				336E6C7A284A7A2A0057061C /* console_cmds.cpp in Sources */,
+				336E6D05284A7A5C0057061C /* newgrf_cargo.cpp in Sources */,
+				336E6C3F284A7A2A0057061C /* sqstate.cpp in Sources */,
+				336E6D3D284A7A980057061C /* goal_sl.cpp in Sources */,
+				336E6D02284A7A5C0057061C /* network_command.cpp in Sources */,
+				336E6CE3284A7A5C0057061C /* newgrf_canal.cpp in Sources */,
+				336E6CDA284A7A520057061C /* os_abstraction.cpp in Sources */,
+				336E6CC1284A7A520057061C /* ground_vehicle.cpp in Sources */,
+				336E6C74284A7A2A0057061C /* bootstrap_gui.cpp in Sources */,
+				336E6D2A284A7A980057061C /* cargomonitor_sl.cpp in Sources */,
+				336E6C4C284A7A2A0057061C /* sqfuncstate.cpp in Sources */,
+				336E6C65284A7A2A0057061C /* cpu.cpp in Sources */,
+				336E6C43284A7A2A0057061C /* ai_info.cpp in Sources */,
+				336E6D95284A7AF50057061C /* script_airport.cpp in Sources */,
+				336E6C4A284A7A2A0057061C /* sqclass.cpp in Sources */,
+				336E6C95284A7A2F0057061C /* elrail.cpp in Sources */,
+				336E6C70284A7A2A0057061C /* sqlexer.cpp in Sources */,
+				336E6DC4284A7B0D0057061C /* transparency_gui.cpp in Sources */,
+				336E6DDD284A7B0D0057061C /* waypoint_cmd.cpp in Sources */,
+				336E6C4D284A7A2A0057061C /* 32bpp_simple.cpp in Sources */,
+				336E6D39284A7A980057061C /* misc_sl.cpp in Sources */,
+				336E6CA0284A7A340057061C /* game_instance.cpp in Sources */,
+				336E6D9C284A7AF50057061C /* script_bridge.cpp in Sources */,
+				336E6CA6284A7A520057061C /* dbg_helpers.cpp in Sources */,
+				336E6D19284A7A7C0057061C /* queue.cpp in Sources */,
+				336E6CC7284A7A520057061C /* config.cpp in Sources */,
+				336E6D2D284A7A980057061C /* town_sl.cpp in Sources */,
+				336E6C3D284A7A2A0057061C /* sqcompiler.cpp in Sources */,
+				336E6C83284A7A2A0057061C /* console_gui.cpp in Sources */,
+				336E6D86284A7AF50057061C /* ship_cmd.cpp in Sources */,
+				336E6D26284A7A980057061C /* cargopacket_sl.cpp in Sources */,
+				336E6D7E284A7AF50057061C /* script_objecttypelist.cpp in Sources */,
+				336E6D83284A7AF50057061C /* sound.cpp in Sources */,
+				336E6C57284A7A2A0057061C /* 32bpp_ssse3.cpp in Sources */,
+				336E6DD7284A7B0D0057061C /* town_cmd.cpp in Sources */,
+				336E6C90284A7A2F0057061C /* debug.cpp in Sources */,
+				336E6D48284A7A980057061C /* airport_sl.cpp in Sources */,
+				336E6CEE284A7A5C0057061C /* newgrf_object.cpp in Sources */,
+				336E6D25284A7A980057061C /* storage_sl.cpp in Sources */,
+				336E6D5D284A7AF50057061C /* script_goal.cpp in Sources */,
+				336E6D62284A7AF50057061C /* script_storypageelementlist.cpp in Sources */,
+				336E6DC6284A7B0D0057061C /* null_v.cpp in Sources */,
+				336E6C5F284A7A2A0057061C /* sqstdmath.cpp in Sources */,
+				336E6D2B284A7A980057061C /* order_sl.cpp in Sources */,
+				336E6CAB284A7A520057061C /* hotkeys.cpp in Sources */,
+				336E6C52284A7A2A0057061C /* sqstdaux.cpp in Sources */,
+				336E6DC3284A7B0D0057061C /* train_gui.cpp in Sources */,
+				336E6CCC284A7A520057061C /* gfxinit.cpp in Sources */,
+				336E6CBA284A7A520057061C /* network.cpp in Sources */,
+				336E6CAF284A7A520057061C /* genworld.cpp in Sources */,
+				336E6D46284A7A980057061C /* autoreplace_sl.cpp in Sources */,
+				336E6DDA284A7B0D0057061C /* subsidy.cpp in Sources */,
+				336E6DA2284A7AF50057061C /* script_vehicle.cpp in Sources */,
+				336E6C42284A7A2A0057061C /* random_func.cpp in Sources */,
+				336E6CC9284A7A520057061C /* tcp_http.cpp in Sources */,
+				336E6D34284A7A980057061C /* animated_tile_sl.cpp in Sources */,
+				336E6C7B284A7A2A0057061C /* math_func.cpp in Sources */,
+				336E6D23284A7A7C0057061C /* yapf_rail.cpp in Sources */,
+				336E6C8C284A7A2F0057061C /* engine_gui.cpp in Sources */,
+				336E6C72284A7A2A0057061C /* 32bpp_anim_sse2.cpp in Sources */,
+				336E6CEA284A7A5C0057061C /* network_udp.cpp in Sources */,
+				336E6D1C284A7A7C0057061C /* road_map.cpp in Sources */,
+				336E6DB8284A7B0D0057061C /* townname.cpp in Sources */,
+				336E6CBC284A7A520057061C /* game_info.cpp in Sources */,
+				336E6D9E284A7AF50057061C /* script_cargolist.cpp in Sources */,
+				336E6D5E284A7AF50057061C /* script_tunnel.cpp in Sources */,
+				336E6D55284A7AF50057061C /* script_townlist.cpp in Sources */,
+				336E6CAD284A7A520057061C /* linkgraph_gui.cpp in Sources */,
+				336E6DAD284A7AF50057061C /* script_industrytype.cpp in Sources */,
+				336E6CD1284A7A520057061C /* goal_gui.cpp in Sources */,
+				336E6C96284A7A2F0057061C /* fileio.cpp in Sources */,
+				336E6DBA284A7B0D0057061C /* toolbar_gui.cpp in Sources */,
+				336E6D00284A7A5C0057061C /* network_query.cpp in Sources */,
+				336E6CC5284A7A520057061C /* tcp_connect.cpp in Sources */,
+				336E6D28284A7A980057061C /* gamelog_sl.cpp in Sources */,
+				336E6C6C284A7A2A0057061C /* sqstdstring.cpp in Sources */,
+				336E6CCA284A7A520057061C /* heightmap.cpp in Sources */,
+				336E6D72284A7AF50057061C /* null_s.cpp in Sources */,
+				336E6D12284A7A7C0057061C /* roadstop.cpp in Sources */,
+				336E6CA4284A7A520057061C /* misc.cpp in Sources */,
+				336E6DC5284A7B0D0057061C /* texteff.cpp in Sources */,
+				336E6DC7284A7B0D0057061C /* terraform_cmd.cpp in Sources */,
+				336E6C77284A7A2A0057061C /* pool_func.cpp in Sources */,
+				336E6CDD284A7A520057061C /* core.cpp in Sources */,
+				336E6DCB284A7B0D0057061C /* string.cpp in Sources */,
+				336E6D66284A7AF50057061C /* script_error.cpp in Sources */,
+				336E6C5E284A7A2A0057061C /* aircraft_gui.cpp in Sources */,
+				336E6CE5284A7A5C0057061C /* newgrf_gui.cpp in Sources */,
+				336E6DD1284A7B0D0057061C /* terraform_gui.cpp in Sources */,
+				336E6DB7284A7B0D0057061C /* vehicle_gui.cpp in Sources */,
+				336E6CB1284A7A520057061C /* tcp_content.cpp in Sources */,
+				336E6D0B284A7A5C0057061C /* newgrf_text.cpp in Sources */,
+				336E6C8B284A7A2F0057061C /* depot_cmd.cpp in Sources */,
+				336E6DA4284A7AF50057061C /* sdl2_s.cpp in Sources */,
+				336E6D94284A7AF50057061C /* script_admin.cpp in Sources */,
+				336E6C73284A7A2A0057061C /* rev.cpp in Sources */,
+				336E6C53284A7A2A0057061C /* autoreplace_gui.cpp in Sources */,
+				336E6D03284A7A5C0057061C /* newgrf_town.cpp in Sources */,
+				336E6D4F284A7A980057061C /* depot_sl.cpp in Sources */,
+				336E6D9B284A7AF50057061C /* script_bridgelist.cpp in Sources */,
+				336E6D88284A7AF50057061C /* signal.cpp in Sources */,
+				336E6C9D284A7A340057061C /* game_text.cpp in Sources */,
+				336E6CF1284A7A5C0057061C /* newgrf_station.cpp in Sources */,
+				336E6D68284A7AF50057061C /* script_tilelist.cpp in Sources */,
+				336E6D90284A7AF50057061C /* script_window.cpp in Sources */,
+				336E6D30284A7A980057061C /* strings_sl.cpp in Sources */,
+				336E6DBD284A7B0D0057061C /* void_cmd.cpp in Sources */,
+				336E6DDF284A7B0D0057061C /* tilearea.cpp in Sources */,
+				336E6DAC284A7AF50057061C /* script_accounting.cpp in Sources */,
+				33560DA6284CC8F000B6B8C4 /* ViewController.mm in Sources */,
+				336E6C79284A7A2A0057061C /* cheat_gui.cpp in Sources */,
+				336E6DAF284A7AF50057061C /* script_marine.cpp in Sources */,
+				336E6C64284A7A2A0057061C /* ai_config.cpp in Sources */,
+				336E6D64284A7AF50057061C /* story.cpp in Sources */,
+				336E6CCB284A7A520057061C /* goal.cpp in Sources */,
+				336E6D81284A7AF50057061C /* script_map.cpp in Sources */,
+				336E6CF7284A7A5C0057061C /* newgrf_industries.cpp in Sources */,
+				336E6DB0284A7AF50057061C /* script_waypointlist.cpp in Sources */,
+				336E6D4E284A7A980057061C /* company_sl.cpp in Sources */,
+				336E6CF0284A7A5C0057061C /* newgrf_railtype.cpp in Sources */,
+				336E6D53284A7AF50057061C /* script_road.cpp in Sources */,
+				336E6D56284A7AF50057061C /* script_sign.cpp in Sources */,
+				336E6D61284A7AF50057061C /* statusbar_gui.cpp in Sources */,
+				336E6DC2284A7B0D0057061C /* video_driver.cpp in Sources */,
+				336E6CEB284A7A5C0057061C /* newgrf_sound.cpp in Sources */,
+				336E6D96284A7AF50057061C /* script_game.cpp in Sources */,
+				336E6DC0284A7B0D0057061C /* subsidy_gui.cpp in Sources */,
+				336E6D8D284A7AF50057061C /* ship_gui.cpp in Sources */,
+				336E6C8E284A7A2F0057061C /* date.cpp in Sources */,
+				336E6CFB284A7A5C0057061C /* newgrf_house.cpp in Sources */,
+				336E6D1E284A7A7C0057061C /* pbs.cpp in Sources */,
+				336E6CCF284A7A520057061C /* udp.cpp in Sources */,
+				336E6D7D284A7AF50057061C /* sprite.cpp in Sources */,
+				336E6C7E284A7A2A0057061C /* airport.cpp in Sources */,
+				336E6C41284A7A2A0057061C /* null.cpp in Sources */,
+				336E6C89284A7A2F0057061C /* currency.cpp in Sources */,
+				336E6D31284A7A980057061C /* script_instance.cpp in Sources */,
+				336E6D3C284A7A980057061C /* vehicle_sl.cpp in Sources */,
+				336E6DB6284A7B0D0057061C /* dedicated_v.cpp in Sources */,
+				336E6DA3284A7AF50057061C /* script_cargo.cpp in Sources */,
+				336E6CF8284A7A5C0057061C /* newgrf_airporttiles.cpp in Sources */,
+				336E6CD3284A7A520057061C /* gfx.cpp in Sources */,
+				336E6CB5284A7A520057061C /* music_gui.cpp in Sources */,
+				336E6D75284A7AF50057061C /* script_client.cpp in Sources */,
+				336E6D99284A7AF50057061C /* script_execmode.cpp in Sources */,
+				336E6D20284A7A7C0057061C /* yapf_road.cpp in Sources */,
+				336E6DE5284B4A740057061C /* MIDIManager.m in Sources */,
+				336E6C84284A7A2A0057061C /* sqdebug.cpp in Sources */,
+				336E6CB7284A7A520057061C /* null_m.cpp in Sources */,
+				336E6DA7284A7AF50057061C /* script_event_types.cpp in Sources */,
+				336E6C9E284A7A340057061C /* game_info.cpp in Sources */,
+				336E6CE7284A7A5C0057061C /* newgrf_generic.cpp in Sources */,
+				336E6C4B284A7A2A0057061C /* sqapi.cpp in Sources */,
+				336E6C8D284A7A2F0057061C /* framerate_gui.cpp in Sources */,
+				336E6DDB284A7B0D0057061C /* slider.cpp in Sources */,
+				336E6C91284A7A2F0057061C /* engine.cpp in Sources */,
+				336E6C62284A7A2A0057061C /* 8bpp_simple.cpp in Sources */,
+				336E6C5D284A7A2A0057061C /* console.cpp in Sources */,
+				336E6CA7284A7A520057061C /* genworld_gui.cpp in Sources */,
+				336E6CF5284A7A5C0057061C /* network_gamelist.cpp in Sources */,
+				336E6C86284A7A2A0057061C /* bitmath_func.cpp in Sources */,
+				336E6D78284A7AF50057061C /* settings_table.cpp in Sources */,
+				33560DA1284CC43600B6B8C4 /* font_osx.cpp in Sources */,
+				336E6C71284A7A2A0057061C /* 8bpp_optimized.cpp in Sources */,
+				336E6CBD284A7A520057061C /* group_cmd.cpp in Sources */,
+				336E6C75284A7A2A0057061C /* cargoaction.cpp in Sources */,
+				336E6C80284A7A2A0057061C /* company_gui.cpp in Sources */,
+				336E6D65284A7AF50057061C /* script_event.cpp in Sources */,
+				336E6C6F284A7A2A0057061C /* 32bpp_anim_sse4.cpp in Sources */,
+				336E6D6E284A7AF50057061C /* script_infrastructure.cpp in Sources */,
+				336E6D06284A7A5C0057061C /* newgrf_debug_gui.cpp in Sources */,
+				336E6D69284A7AF50057061C /* script_testmode.cpp in Sources */,
+				336E6DD6284A7B0D0057061C /* tree_gui.cpp in Sources */,
+				336E6DB3284A7B0D0057061C /* viewport_sprite_sorter_sse4.cpp in Sources */,
+				336E6C50284A7A2A0057061C /* 32bpp_sse2.cpp in Sources */,
+				336E6D8B284A7AF50057061C /* script_log.cpp in Sources */,
+				336E6D3B284A7A980057061C /* game_sl.cpp in Sources */,
+				336E6C4F284A7A2A0057061C /* geometry_func.cpp in Sources */,
+				336E6D58284A7AF50057061C /* script_viewport.cpp in Sources */,
+				336E6CDB284A7A520057061C /* group_gui.cpp in Sources */,
+				336E6DC8284A7B0D0057061C /* tile_map.cpp in Sources */,
+				336E6C4E284A7A2A0057061C /* clear_cmd.cpp in Sources */,
+				336E6DB2284A7B0D0057061C /* textfile_gui.cpp in Sources */,
+				336E6D7A284A7AF50057061C /* script_tile.cpp in Sources */,
+				336E6D6F284A7AF50057061C /* script_text.cpp in Sources */,
+				336E6C9C284A7A2F0057061C /* economy.cpp in Sources */,
+				336E6C3E284A7A2A0057061C /* sqtable.cpp in Sources */,
+				336E6CE1284A7A520057061C /* industry_cmd.cpp in Sources */,
+				336E6CA5284A7A520057061C /* mixer.cpp in Sources */,
+				336E6DA0284A7AF50057061C /* script_storypagelist.cpp in Sources */,
+				336E6C8F284A7A2F0057061C /* driver.cpp in Sources */,
+				336E6D63284A7AF50057061C /* script_company.cpp in Sources */,
+				336E6C46284A7A2A0057061C /* 40bpp_anim.cpp in Sources */,
+				336E6C85284A7A2A0057061C /* ai_instance.cpp in Sources */,
+				336E6CFE284A7A5C0057061C /* network_turn.cpp in Sources */,
+				336E6C7D284A7A2A0057061C /* crashlog.cpp in Sources */,
+				336E6CE9284A7A5C0057061C /* newgrf_commons.cpp in Sources */,
+				336E6C92284A7A2F0057061C /* dock_gui.cpp in Sources */,
+				336E6C5B284A7A2A0057061C /* command.cpp in Sources */,
+				336E6D6A284A7AF50057061C /* script_date.cpp in Sources */,
+				336E6D43284A7A980057061C /* script_info_dummy.cpp in Sources */,
+				336E6CB8284A7A520057061C /* intro_gui.cpp in Sources */,
+				336E6D74284A7AF50057061C /* script_gamesettings.cpp in Sources */,
+				336E6D16284A7A7C0057061C /* rail_gui.cpp in Sources */,
+				336E6CDE284A7A520057061C /* linkgraph.cpp in Sources */,
+				336E6D2C284A7A980057061C /* cheat_sl.cpp in Sources */,
+				336E6C7C284A7A2A0057061C /* bridge_map.cpp in Sources */,
+				336E6CA8284A7A520057061C /* main_gui.cpp in Sources */,
+				336E6CFA284A7A5C0057061C /* newgrf_industrytiles.cpp in Sources */,
+				336E6CE6284A7A5C0057061C /* network_admin.cpp in Sources */,
+				336E6C56284A7A2A0057061C /* alloc_func.cpp in Sources */,
+				336E6CE4284A7A5C0057061C /* network_stun.cpp in Sources */,
+				336E6D4C284A7A980057061C /* group_sl.cpp in Sources */,
+				336E6C98284A7A2F0057061C /* depot_gui.cpp in Sources */,
+				336E6D1F284A7A7C0057061C /* roadveh_cmd.cpp in Sources */,
+				336E6CDC284A7A520057061C /* industry_gui.cpp in Sources */,
+				336E6CEC284A7A5C0057061C /* order_backup.cpp in Sources */,
+				336E6D0D284A7A5C0057061C /* newgrf_townname.cpp in Sources */,
+				336E6D79284A7AF50057061C /* signs.cpp in Sources */,
+				336E6C82284A7A2A0057061C /* cargomonitor.cpp in Sources */,
+				336E6DD5284A7B0D0057061C /* waypoint.cpp in Sources */,
+				336E6CD9284A7A520057061C /* tcp_stun.cpp in Sources */,
+				336E6D4B284A7A980057061C /* screenshot.cpp in Sources */,
+				336E6DDE284A7B0D0057061C /* timetable_gui.cpp in Sources */,
+				336E6CF4284A7A5C0057061C /* openttd.cpp in Sources */,
+				336E6D4D284A7A980057061C /* labelmaps_sl.cpp in Sources */,
+				336E6DDC284A7B0D0057061C /* textbuf.cpp in Sources */,
+				336E6D8E284A7AF50057061C /* grf.cpp in Sources */,
+				336E6CD7284A7A520057061C /* getoptdata.cpp in Sources */,
+				336E6C40284A7A2A0057061C /* autoreplace_cmd.cpp in Sources */,
+				336E6CAE284A7A520057061C /* map.cpp in Sources */,
+				336E6C9F284A7A340057061C /* game_scanner.cpp in Sources */,
+				336E6D6D284A7AF50057061C /* script_clientlist.cpp in Sources */,
+				336E6C63284A7A2A0057061C /* bridge_gui.cpp in Sources */,
+				336E6DD2284A7B0D0057061C /* strgen_base.cpp in Sources */,
+				336E6CFF284A7A5C0057061C /* network_coordinator.cpp in Sources */,
+				336E6D97284A7AF50057061C /* script_industrytypelist.cpp in Sources */,
+				336E6D04284A7A5C0057061C /* newgrf_airport.cpp in Sources */,
+				336E6DD8284A7B0D0057061C /* vehicle.cpp in Sources */,
+				336E6DBB284A7B0D0057061C /* strings.cpp in Sources */,
+				336E6C59284A7A2A0057061C /* 32bpp_base.cpp in Sources */,
+				336E6C68284A7A2A0057061C /* sqvm.cpp in Sources */,
+				336E6C94284A7A2F0057061C /* depot.cpp in Sources */,
+				336E6D01284A7A5C0057061C /* newgrf.cpp in Sources */,
+				336E6CBF284A7A520057061C /* tcp.cpp in Sources */,
+				336E6C44284A7A2A0057061C /* airport_gui.cpp in Sources */,
+				336E6C9A284A7A2F0057061C /* disaster_vehicle.cpp in Sources */,
+				336E6D1D284A7A7C0057061C /* road.cpp in Sources */,
+				336E6C47284A7A2A0057061C /* 32bpp_sse4.cpp in Sources */,
+				336E6CFC284A7A5C0057061C /* order_gui.cpp in Sources */,
+				336E6C51284A7A2A0057061C /* ai_gui.cpp in Sources */,
+				336E6DA6284A7AF50057061C /* station_gui.cpp in Sources */,
+				336E6D4A284A7A980057061C /* economy_sl.cpp in Sources */,
+				336E6D15284A7A7C0057061C /* npf.cpp in Sources */,
+				336E6DC1284A7B0D0057061C /* stringfilter.cpp in Sources */,
+				336E6D60284A7AF50057061C /* signs_gui.cpp in Sources */,
+				336E6DD9284A7B0D0057061C /* train_cmd.cpp in Sources */,
+				336E6DBC284A7B0D0057061C /* vehicle_cmd.cpp in Sources */,
+				336E6D70284A7AF50057061C /* smallmap_gui.cpp in Sources */,
+				336E6D1A284A7A7C0057061C /* yapf_ship.cpp in Sources */,
+				336E6CE0284A7A520057061C /* packet.cpp in Sources */,
+				336E6D7F284A7AF50057061C /* script_priorityqueue.cpp in Sources */,
+				336E6CEF284A7A5C0057061C /* newgrf_engine.cpp in Sources */,
+				336E6D77284A7AF50057061C /* script_controller.cpp in Sources */,
+				336E6D41284A7A980057061C /* ai_sl.cpp in Sources */,
+				336E6D85284A7AF50057061C /* station_cmd.cpp in Sources */,
+				336E6D5F284A7AF50057061C /* settings_gui.cpp in Sources */,
+				336E6D38284A7A980057061C /* subsidy_sl.cpp in Sources */,
+				336E6DA1284A7AF50057061C /* script_group.cpp in Sources */,
+				336E6D0A284A7A5C0057061C /* newgrf_roadtype.cpp in Sources */,
+				336E6DAB284A7AF50057061C /* script_engine.cpp in Sources */,
+				336E6D2E284A7A980057061C /* script_config.cpp in Sources */,
+				336E6D98284A7AF50057061C /* spritecache.cpp in Sources */,
+				336E6D1B284A7A7C0057061C /* progress.cpp in Sources */,
+				336E6D44284A7A980057061C /* screenshot_gui.cpp in Sources */,
+				336E6D9D284A7AF50057061C /* script_story_page.cpp in Sources */,
+				336E6D91284A7AF50057061C /* script_grouplist.cpp in Sources */,
+				336E6D0C284A7A5C0057061C /* news_gui.cpp in Sources */,
+				336E6D5C284A7AF50057061C /* script_companymode.cpp in Sources */,
+				336E6C99284A7A2F0057061C /* date_gui.cpp in Sources */,
+				336E6D07284A7A5C0057061C /* network_chat_gui.cpp in Sources */,
+				336E6D33284A7A980057061C /* oldloader.cpp in Sources */,
+				336E6C45284A7A2A0057061C /* articulated_vehicles.cpp in Sources */,
+				336E6CCE284A7A520057061C /* misc_cmd.cpp in Sources */,
+				336E6CAC284A7A520057061C /* mcf.cpp in Sources */,
+				336E6D6B284A7AF50057061C /* signs_cmd.cpp in Sources */,
+				336E6CD2284A7A520057061C /* tcp_admin.cpp in Sources */,
+				336E6D82284A7AF50057061C /* script_rail.cpp in Sources */,
+				336E6D93284A7AF50057061C /* sdl_s.cpp in Sources */,
+				336E6CC6284A7A520057061C /* flowmapper.cpp in Sources */,
+				336E6CC2284A7A520057061C /* ini_load.cpp in Sources */,
+				336E6D8A284A7AF50057061C /* script_station.cpp in Sources */,
+				336E6CAA284A7A520057061C /* host.cpp in Sources */,
+				336E6CB3284A7A520057061C /* music.cpp in Sources */,
+				336E6DEA284B4AA20057061C /* ios.mm in Sources */,
+				336E6D49284A7A980057061C /* linkgraph_sl.cpp in Sources */,
+				336E6C5C284A7A2A0057061C /* aircraft_cmd.cpp in Sources */,
+				336E6CD4284A7A520057061C /* gamelog.cpp in Sources */,
+				336E6C87284A7A2F0057061C /* fios_gui.cpp in Sources */,
+				336E6D51284A7A980057061C /* signs_sl.cpp in Sources */,
+				336E6C78284A7A2A0057061C /* 8bpp_base.cpp in Sources */,
+				336E6CA1284A7A340057061C /* game_config.cpp in Sources */,
+				336E6C6A284A7A2A0057061C /* ai_core.cpp in Sources */,
+				336E6DBE284A7B0D0057061C /* window.cpp in Sources */,
+				336E6DB4284A7B0D0057061C /* viewport.cpp in Sources */,
+				336E6CC3284A7A520057061C /* tcp_turn.cpp in Sources */,
+				336E6D0E284A7A5C0057061C /* network_client.cpp in Sources */,
+				336E6D3A284A7A980057061C /* saveload.cpp in Sources */,
+				336E6CB9284A7A520057061C /* network_content.cpp in Sources */,
+				336E6C54284A7A2A0057061C /* autoreplace.cpp in Sources */,
+				336E6D18284A7A7C0057061C /* rail.cpp in Sources */,
+				336E6C5A284A7A2A0057061C /* 32bpp_optimized.cpp in Sources */,
+				336E6DD0284A7B0D0057061C /* tree_cmd.cpp in Sources */,
+				336E6D42284A7A980057061C /* afterload.cpp in Sources */,
+				336E6D14284A7A7C0057061C /* aystar.cpp in Sources */,
+				336E6DB1284A7AF50057061C /* settings.cpp in Sources */,
+				336E6C49284A7A2A0057061C /* md5.cpp in Sources */,
+				336E6D10284A7A670057061C /* osk_gui.cpp in Sources */,
+				336E6C6E284A7A2A0057061C /* ai_scanner.cpp in Sources */,
+				336E6D54284A7AF50057061C /* story_gui.cpp in Sources */,
+				336E6D08284A7A5C0057061C /* newgrf_profiling.cpp in Sources */,
+				336E6C7F284A7A2A0057061C /* cargotype.cpp in Sources */,
+				336E6CB4284A7A520057061C /* highscore.cpp in Sources */,
+				336E6CFD284A7A5C0057061C /* object_cmd.cpp in Sources */,
+				336E6C66284A7A2A0057061C /* bmp.cpp in Sources */,
+				336E6C6B284A7A2A0057061C /* animated_tile.cpp in Sources */,
+				336E6CCD284A7A520057061C /* landscape.cpp in Sources */,
+				336E6D89284A7AF50057061C /* station.cpp in Sources */,
+				336E6C8A284A7A2F0057061C /* dedicated.cpp in Sources */,
+				336E6D37284A7A980057061C /* oldloader_sl.cpp in Sources */,
+				33560DA5284CC8EC00B6B8C4 /* SceneDelegate.m in Sources */,
+				33560DA4284CC8AA00B6B8C4 /* AppDelegate.mm in Sources */,
+				336E6D9F284A7AF50057061C /* script_industry.cpp in Sources */,
+				336E6D76284A7AF50057061C /* allegro_s.cpp in Sources */,
+				336E6CBE284A7A520057061C /* ini.cpp in Sources */,
+				336E6D6C284A7AF50057061C /* script_base.cpp in Sources */,
+				336E6DB9284A7B0D0057061C /* widget.cpp in Sources */,
+				336E6D52284A7AF50057061C /* script_subsidylist.cpp in Sources */,
+				336E6C58284A7A2A0057061C /* sqmem.cpp in Sources */,
+				336E6C6D284A7A2A0057061C /* sqstdrex.cpp in Sources */,
+				336E6D21284A7A7C0057061C /* road_gui.cpp in Sources */,
+				336E6CED284A7A5C0057061C /* network_content_gui.cpp in Sources */,
+				336E6D35284A7A980057061C /* engine_sl.cpp in Sources */,
+				336E6CD8284A7A520057061C /* graph_gui.cpp in Sources */,
+				336E6C97284A7A2F0057061C /* fontcache.cpp in Sources */,
+				336E6CA2284A7A340057061C /* game_core.cpp in Sources */,
+				336E6D36284A7A980057061C /* station_sl.cpp in Sources */,
+				336E6D8C284A7AF50057061C /* script_roadtypelist.cpp in Sources */,
+				336E6DAA284A7AF50057061C /* script_news.cpp in Sources */,
+				336E6D45284A7A980057061C /* story_sl.cpp in Sources */,
+				336E6C88284A7A2F0057061C /* error_gui.cpp in Sources */,
+				336E6C93284A7A2F0057061C /* effectvehicle.cpp in Sources */,
+				336E6DBF284A7B0D0057061C /* dropdown.cpp in Sources */,
+				336E6C55284A7A2A0057061C /* 32bpp_anim.cpp in Sources */,
+				336E6CD0284A7A520057061C /* address.cpp in Sources */,
+				336E6D50284A7A980057061C /* waypoint_sl.cpp in Sources */,
+				336E6D57284A7AF50057061C /* script_object.cpp in Sources */,
+				336E6C60284A7A2A0057061C /* base_consist.cpp in Sources */,
+				336E6DA5284A7AF50057061C /* script_waypoint.cpp in Sources */,
+				336E6D9A284A7AF50057061C /* script_stationlist.cpp in Sources */,
+				336E6D59284A7AF50057061C /* script_list.cpp in Sources */,
+				336E6D71284A7AF50057061C /* script_subsidy.cpp in Sources */,
+				336E6CF9284A7A5C0057061C /* network_server.cpp in Sources */,
+				336E6DD4284A7B0D0057061C /* vehiclelist.cpp in Sources */,
+				336E6CC0284A7A520057061C /* countedobj.cpp in Sources */,
+				336E6C48284A7A2A0057061C /* cheat.cpp in Sources */,
+				336E6DCC284A7B0D0057061C /* tgp.cpp in Sources */,
+				336E6DB5284A7B0D0057061C /* water_cmd.cpp in Sources */,
+				336E6CB6284A7A520057061C /* demands.cpp in Sources */,
+				336E6D92284A7AF50057061C /* script_railtypelist.cpp in Sources */,
+				336E6CA3284A7A520057061C /* misc_gui.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -4983,6 +5993,16 @@
 			name = Freetype2_Mac;
 			targetProxy = 336E69B1284A09810057061C /* PBXContainerItemProxy */;
 		};
+		336E6C24284A78920057061C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "libpng static (iOS)";
+			targetProxy = 336E6C23284A78920057061C /* PBXContainerItemProxy */;
+		};
+		336E6C26284A78980057061C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Freetype2_iOS;
+			targetProxy = 336E6C25284A78980057061C /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -4992,6 +6012,22 @@
 				336E6BFA284A62CA0057061C /* Base */,
 			);
 			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		336E6C0F284A78790057061C /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				336E6C10284A78790057061C /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		336E6C14284A787A0057061C /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				336E6C15284A787A0057061C /* Base */,
+			);
+			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -5249,7 +6285,6 @@
 					"-DWITH_LZMA",
 					"-DWITH_PNG",
 					"-DENABLE_NETWORK",
-					"-DIOS",
 					"$(inherited)",
 				);
 				OTHER_LDFLAGS = (
@@ -5310,7 +6345,6 @@
 					"-DWITH_LZMA",
 					"-DWITH_PNG",
 					"-DENABLE_NETWORK",
-					"-DIOS",
 					"$(inherited)",
 				);
 				OTHER_LDFLAGS = (
@@ -5321,6 +6355,133 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.openttd.OpenTTD-Mac";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+		336E6C1A284A787A0057061C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LIBRARY = "libc++";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = T4S638758C;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../src/script/api/game",
+					"$(SRCROOT)/../../src/3rdparty/squirrel/include",
+					"$(SRCROOT)/../../build/generated",
+					"$(inherited)",
+					"$(SRCROOT)/freetype2/**",
+					"$(SRCROOT)/libpng/**",
+					"$(SRCROOT)/../../build/generated/table",
+					"$(SRCROOT)/../../src/script/api/ai",
+				);
+				INFOPLIST_FILE = OpenTTD_iOS/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_CFLAGS = (
+					"-D_FORTIFY_SOURCE=2",
+					"-DUNIX",
+					"-DNO_QUICKTIME",
+					"-DWITH_COCOA",
+					"-DWITH_COCOA_TOUCH",
+					"-DWITH_METAL",
+					"-DWITH_OPENGL",
+					"-DWITH_FREETYPE",
+					"-DWITH_ZLIB",
+					"-DWITH_LZMA",
+					"-DWITH_PNG",
+					"-DENABLE_NETWORK",
+					"-DIOS",
+					"$(inherited)",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"z\"",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "org.openttd.OpenTTD-iOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		336E6C1B284A787A0057061C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LIBRARY = "libc++";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = T4S638758C;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../src/script/api/game",
+					"$(SRCROOT)/../../src/3rdparty/squirrel/include",
+					"$(SRCROOT)/../../build/generated",
+					"$(inherited)",
+					"$(SRCROOT)/freetype2/**",
+					"$(SRCROOT)/libpng/**",
+					"$(SRCROOT)/../../build/generated/table",
+					"$(SRCROOT)/../../src/script/api/ai",
+				);
+				INFOPLIST_FILE = OpenTTD_iOS/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_CFLAGS = (
+					"-D_FORTIFY_SOURCE=2",
+					"-DUNIX",
+					"-DNO_QUICKTIME",
+					"-DWITH_COCOA",
+					"-DWITH_COCOA_TOUCH",
+					"-DWITH_METAL",
+					"-DWITH_OPENGL",
+					"-DWITH_FREETYPE",
+					"-DWITH_ZLIB",
+					"-DWITH_LZMA",
+					"-DWITH_PNG",
+					"-DENABLE_NETWORK",
+					"-DIOS",
+					"$(inherited)",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"z\"",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "org.openttd.OpenTTD-iOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -5350,6 +6511,15 @@
 			buildConfigurations = (
 				336E69AD284A09370057061C /* Debug */,
 				336E69AE284A09370057061C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		336E6C22284A787A0057061C /* Build configuration list for PBXNativeTarget "OpenTTD_iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				336E6C1A284A787A0057061C /* Debug */,
+				336E6C1B284A787A0057061C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

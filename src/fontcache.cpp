@@ -507,7 +507,7 @@ static void LoadFreeTypeFont(FontSize fs)
 	/* If font is an absolute path to a ttf, try loading that first. */
 	FT_Error error = FT_New_Face(_library, font_name, 0, &face);
 
-#if defined(WITH_COCOA)
+#if defined(WITH_COCOA) && !defined(IOS) //TODO: CSE
 	extern void MacOSRegisterExternalFont(const char *file_path);
 	if (error == FT_Err_Ok) MacOSRegisterExternalFont(font_name);
 #endif
@@ -517,7 +517,7 @@ static void LoadFreeTypeFont(FontSize fs)
 		std::string full_font = FioFindFullPath(BASE_DIR, font_name);
 		if (!full_font.empty()) {
 			error = FT_New_Face(_library, full_font.c_str(), 0, &face);
-#if defined(WITH_COCOA)
+#if defined(WITH_COCOA) && !defined(IOS) //TODO: CSE
 			if (error == FT_Err_Ok) MacOSRegisterExternalFont(full_font.c_str());
 #endif
 		}

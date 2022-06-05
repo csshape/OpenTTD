@@ -868,7 +868,7 @@ void Layouter::ResetFontCache(FontSize size)
 #if defined(WITH_UNISCRIBE)
 	UniscribeResetScriptCache(size);
 #endif
-#if defined(WITH_COCOA)
+#if defined(WITH_COCOA) && !defined(IOS) //TODO: CSE
 	MacOSResetScriptCache(size);
 #endif
 }

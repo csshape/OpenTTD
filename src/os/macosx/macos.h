@@ -10,6 +10,8 @@
 #ifndef MACOS_H
 #define MACOS_H
 
+#import <CoreText/CoreText.h>
+
 /** Helper function displaying a message the best possible way. */
 void ShowMacDialog(const char *title, const char *message, const char *button_label);
 

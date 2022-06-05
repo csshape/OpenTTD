@@ -753,7 +753,7 @@ int strnatcmp(const char *s1, const char *s2, bool ignore_garbage_at_front)
 	if (res != 0) return res - 2; // Convert to normal C return values.
 #endif
 
-#if defined(WITH_COCOA) && !defined(STRGEN) && !defined(SETTINGSGEN)
+#if defined(WITH_COCOA) && !defined(STRGEN) && !defined(SETTINGSGEN) && !defined(IOS) //TODO: CSE
 	int res = MacOSStringCompare(s1, s2);
 	if (res != 0) return res - 2; // Convert to normal C return values.
 #endif
@@ -1030,7 +1030,7 @@ public:
 	}
 };
 
-#if defined(WITH_COCOA) && !defined(STRGEN) && !defined(SETTINGSGEN)
+#if defined(WITH_COCOA) && !defined(STRGEN) && !defined(SETTINGSGEN) && !defined(IOS)
 /* static */ StringIterator *StringIterator::Create()
 {
 	StringIterator *i = OSXStringIterator::Create();
