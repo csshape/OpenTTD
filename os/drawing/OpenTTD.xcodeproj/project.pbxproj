@@ -439,8 +439,13 @@
 		33560DA2284CC6CF00B6B8C4 /* string_osx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243DE282BBEC8006B68EE /* string_osx.cpp */; };
 		33560DA3284CC87800B6B8C4 /* gs_instruments.dls in Resources */ = {isa = PBXBuildFile; fileRef = 336E6BA0284A25CC0057061C /* gs_instruments.dls */; };
 		33560DA4284CC8AA00B6B8C4 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6C07284A78790057061C /* AppDelegate.mm */; };
-		33560DA5284CC8EC00B6B8C4 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 336E6C0A284A78790057061C /* SceneDelegate.m */; };
 		33560DA6284CC8F000B6B8C4 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6C0D284A78790057061C /* ViewController.mm */; };
+		33560DAA284E099300B6B8C4 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 336E6BA1284A25CC0057061C /* Shaders.metal */; };
+		33560DAB284E099700B6B8C4 /* Vertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 336E6BA2284A25CC0057061C /* Vertex.glsl */; };
+		33560DAC284E099B00B6B8C4 /* Fragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B9F284A25CC0057061C /* Fragment.glsl */; };
+		33560DB8284E1E5600B6B8C4 /* VideoDriver_CocoaQuartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33560DB6284E1E5000B6B8C4 /* VideoDriver_CocoaQuartz.mm */; };
+		33560DBB284E1F6000B6B8C4 /* VideoDriver_OpenGLES.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33560DBA284E1F6000B6B8C4 /* VideoDriver_OpenGLES.mm */; };
+		33560DBF28534B6400B6B8C4 /* ios_wnd.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33560DBE28534B6400B6B8C4 /* ios_wnd.mm */; };
 		336E6963282D71900057061C /* libFreetype2_Mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 336E6962282D71790057061C /* libFreetype2_Mac.a */; };
 		336E6977283405CB0057061C /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 336E6970283405B90057061C /* libpng.a */; };
 		336E697B2844E0A70057061C /* rev.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 336E697A2844E0A70057061C /* rev.cpp */; };
@@ -894,15 +899,11 @@
 		336E6B9B284A25670057061C /* ai in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B99284A25660057061C /* ai */; };
 		336E6B9C284A25670057061C /* baseset in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B9A284A25660057061C /* baseset */; };
 		336E6B9E284A25750057061C /* scripts in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B9D284A25750057061C /* scripts */; };
-		336E6BA3284A25CC0057061C /* Fragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B9F284A25CC0057061C /* Fragment.glsl */; };
 		336E6BA4284A25CC0057061C /* gs_instruments.dls in Resources */ = {isa = PBXBuildFile; fileRef = 336E6BA0284A25CC0057061C /* gs_instruments.dls */; };
-		336E6BA5284A25CC0057061C /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 336E6BA1284A25CC0057061C /* Shaders.metal */; };
-		336E6BA6284A25CC0057061C /* Vertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 336E6BA2284A25CC0057061C /* Vertex.glsl */; };
 		336E6BDF284A5FFE0057061C /* cocoa_ogl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6BDB284A5FFD0057061C /* cocoa_ogl.mm */; };
 		336E6BE0284A5FFE0057061C /* cocoa_wnd.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6BDC284A5FFD0057061C /* cocoa_wnd.mm */; };
 		336E6BE1284A5FFE0057061C /* cocoa_v.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6BDD284A5FFD0057061C /* cocoa_v.mm */; };
 		336E6BFB284A62CA0057061C /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 336E6BF9284A62CA0057061C /* MainMenu.xib */; };
-		336E6C11284A78790057061C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 336E6C0F284A78790057061C /* Main.storyboard */; };
 		336E6C13284A787A0057061C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 336E6C12284A787A0057061C /* Assets.xcassets */; };
 		336E6C16284A787A0057061C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 336E6C14284A787A0057061C /* LaunchScreen.storyboard */; };
 		336E6C27284A78B50057061C /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 336E6974283405B90057061C /* libpng.a */; };
@@ -1336,6 +1337,11 @@
 		336E6DE5284B4A740057061C /* MIDIManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 336E6DE3284B4A740057061C /* MIDIManager.m */; };
 		336E6DE8284B4A890057061C /* cocoa_touch_m.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 336E6DE6284B4A890057061C /* cocoa_touch_m.cpp */; };
 		336E6DEA284B4AA20057061C /* ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6DE9284B4AA20057061C /* ios.mm */; };
+		33A02CBC285C7DFC00075442 /* cocoa_v.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6BDD284A5FFD0057061C /* cocoa_v.mm */; };
+		33A02CBE285F359900075442 /* lang in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B97284A25310057061C /* lang */; };
+		33A02CBF285F359D00075442 /* baseset in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B9A284A25660057061C /* baseset */; };
+		33A02CC0285F35A000075442 /* ai in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B99284A25660057061C /* ai */; };
+		33A02CC1285F35A400075442 /* scripts in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B9D284A25750057061C /* scripts */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -2652,6 +2658,12 @@
 		335246C4282BD7FD006B68EE /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		335246C6282BD809006B68EE /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		335246C8282BD815006B68EE /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
+		33560DB5284E1E5000B6B8C4 /* VideoDriver_CocoaQuartz.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VideoDriver_CocoaQuartz.h; sourceTree = "<group>"; };
+		33560DB6284E1E5000B6B8C4 /* VideoDriver_CocoaQuartz.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = VideoDriver_CocoaQuartz.mm; sourceTree = "<group>"; };
+		33560DB9284E1F6000B6B8C4 /* VideoDriver_OpenGLES.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VideoDriver_OpenGLES.h; sourceTree = "<group>"; };
+		33560DBA284E1F6000B6B8C4 /* VideoDriver_OpenGLES.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = VideoDriver_OpenGLES.mm; sourceTree = "<group>"; };
+		33560DBD28534B6400B6B8C4 /* ios_wnd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ios_wnd.h; sourceTree = "<group>"; };
+		33560DBE28534B6400B6B8C4 /* ios_wnd.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ios_wnd.mm; sourceTree = "<group>"; };
 		336E695A282D71790057061C /* freetype2.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = freetype2.xcodeproj; path = freetype2/freetype2.xcodeproj; sourceTree = "<group>"; };
 		336E6966283405B90057061C /* libpng.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = libpng.xcodeproj; path = libpng/projects/xcode/libpng.xcodeproj; sourceTree = "<group>"; };
 		336E697A2844E0A70057061C /* rev.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rev.cpp; sourceTree = "<group>"; };
@@ -2693,11 +2705,8 @@
 		336E6C04284A78790057061C /* OpenTTD_iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenTTD_iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		336E6C06284A78790057061C /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		336E6C07284A78790057061C /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
-		336E6C09284A78790057061C /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
-		336E6C0A284A78790057061C /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
 		336E6C0C284A78790057061C /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		336E6C0D284A78790057061C /* ViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewController.mm; sourceTree = "<group>"; };
-		336E6C10284A78790057061C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		336E6C12284A787A0057061C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		336E6C15284A787A0057061C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		336E6C17284A787A0057061C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -3427,6 +3436,12 @@
 				336E6BDD284A5FFD0057061C /* cocoa_v.mm */,
 				336E6BDA284A5FFD0057061C /* cocoa_wnd.h */,
 				336E6BDC284A5FFD0057061C /* cocoa_wnd.mm */,
+				33560DB5284E1E5000B6B8C4 /* VideoDriver_CocoaQuartz.h */,
+				33560DB6284E1E5000B6B8C4 /* VideoDriver_CocoaQuartz.mm */,
+				33560DB9284E1F6000B6B8C4 /* VideoDriver_OpenGLES.h */,
+				33560DBA284E1F6000B6B8C4 /* VideoDriver_OpenGLES.mm */,
+				33560DBD28534B6400B6B8C4 /* ios_wnd.h */,
+				33560DBE28534B6400B6B8C4 /* ios_wnd.mm */,
 			);
 			path = cocoa;
 			sourceTree = "<group>";
@@ -4462,11 +4477,8 @@
 			children = (
 				336E6C06284A78790057061C /* AppDelegate.h */,
 				336E6C07284A78790057061C /* AppDelegate.mm */,
-				336E6C09284A78790057061C /* SceneDelegate.h */,
-				336E6C0A284A78790057061C /* SceneDelegate.m */,
 				336E6C0C284A78790057061C /* ViewController.h */,
 				336E6C0D284A78790057061C /* ViewController.mm */,
-				336E6C0F284A78790057061C /* Main.storyboard */,
 				336E6C12284A787A0057061C /* Assets.xcassets */,
 				336E6C14284A787A0057061C /* LaunchScreen.storyboard */,
 				336E6C17284A787A0057061C /* Info.plist */,
@@ -4651,8 +4663,6 @@
 				336E69A5284A09370057061C /* Assets.xcassets in Resources */,
 				336E6B9E284A25750057061C /* scripts in Resources */,
 				336E6B9C284A25670057061C /* baseset in Resources */,
-				336E6BA3284A25CC0057061C /* Fragment.glsl in Resources */,
-				336E6BA6284A25CC0057061C /* Vertex.glsl in Resources */,
 				336E6BFB284A62CA0057061C /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4661,10 +4671,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				33A02CBE285F359900075442 /* lang in Resources */,
 				33560DA3284CC87800B6B8C4 /* gs_instruments.dls in Resources */,
+				33A02CBF285F359D00075442 /* baseset in Resources */,
+				33A02CC1285F35A400075442 /* scripts in Resources */,
 				336E6C16284A787A0057061C /* LaunchScreen.storyboard in Resources */,
+				33A02CC0285F35A000075442 /* ai in Resources */,
 				336E6C13284A787A0057061C /* Assets.xcassets in Resources */,
-				336E6C11284A78790057061C /* Main.storyboard in Resources */,
+				33560DAB284E099700B6B8C4 /* Vertex.glsl in Resources */,
+				33560DAC284E099B00B6B8C4 /* Fragment.glsl in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5176,6 +5191,7 @@
 				336E6B1F284A10810057061C /* script_sign.cpp in Sources */,
 				336E69F2284A0F090057061C /* sqstate.cpp in Sources */,
 				336E6A31284A0F580057061C /* dock_gui.cpp in Sources */,
+				33560DB8284E1E5600B6B8C4 /* VideoDriver_CocoaQuartz.mm in Sources */,
 				336E6B1B284A10810057061C /* script_testmode.cpp in Sources */,
 				336E6B19284A10810057061C /* script_list.cpp in Sources */,
 				336E6A1F284A0F3B0057061C /* alloc_func.cpp in Sources */,
@@ -5435,7 +5451,6 @@
 				336E6A65284A0FC00057061C /* music_gui.cpp in Sources */,
 				336E69EE284A0F090057061C /* animated_tile.cpp in Sources */,
 				336E6B68284A109C0057061C /* widget.cpp in Sources */,
-				336E6BA5284A25CC0057061C /* Shaders.metal in Sources */,
 				336E6B26284A10810057061C /* script_window.cpp in Sources */,
 				336E6AED284A10810057061C /* ship_cmd.cpp in Sources */,
 				336E6B75284A109C0057061C /* town_gui.cpp in Sources */,
@@ -5739,6 +5754,7 @@
 				336E6CF8284A7A5C0057061C /* newgrf_airporttiles.cpp in Sources */,
 				336E6CD3284A7A520057061C /* gfx.cpp in Sources */,
 				336E6CB5284A7A520057061C /* music_gui.cpp in Sources */,
+				33560DBB284E1F6000B6B8C4 /* VideoDriver_OpenGLES.mm in Sources */,
 				336E6D75284A7AF50057061C /* script_client.cpp in Sources */,
 				336E6D99284A7AF50057061C /* script_execmode.cpp in Sources */,
 				336E6D20284A7A7C0057061C /* yapf_road.cpp in Sources */,
@@ -5758,6 +5774,8 @@
 				336E6CF5284A7A5C0057061C /* network_gamelist.cpp in Sources */,
 				336E6C86284A7A2A0057061C /* bitmath_func.cpp in Sources */,
 				336E6D78284A7AF50057061C /* settings_table.cpp in Sources */,
+				33560DAA284E099300B6B8C4 /* Shaders.metal in Sources */,
+				33560DBF28534B6400B6B8C4 /* ios_wnd.mm in Sources */,
 				33560DA1284CC43600B6B8C4 /* font_osx.cpp in Sources */,
 				336E6C71284A7A2A0057061C /* 8bpp_optimized.cpp in Sources */,
 				336E6CBD284A7A520057061C /* group_cmd.cpp in Sources */,
@@ -5820,6 +5838,7 @@
 				336E6CD9284A7A520057061C /* tcp_stun.cpp in Sources */,
 				336E6D4B284A7A980057061C /* screenshot.cpp in Sources */,
 				336E6DDE284A7B0D0057061C /* timetable_gui.cpp in Sources */,
+				33A02CBC285C7DFC00075442 /* cocoa_v.mm in Sources */,
 				336E6CF4284A7A5C0057061C /* openttd.cpp in Sources */,
 				336E6D4D284A7A980057061C /* labelmaps_sl.cpp in Sources */,
 				336E6DDC284A7B0D0057061C /* textbuf.cpp in Sources */,
@@ -5926,7 +5945,6 @@
 				336E6D89284A7AF50057061C /* station.cpp in Sources */,
 				336E6C8A284A7A2F0057061C /* dedicated.cpp in Sources */,
 				336E6D37284A7A980057061C /* oldloader_sl.cpp in Sources */,
-				33560DA5284CC8EC00B6B8C4 /* SceneDelegate.m in Sources */,
 				33560DA4284CC8AA00B6B8C4 /* AppDelegate.mm in Sources */,
 				336E6D9F284A7AF50057061C /* script_industry.cpp in Sources */,
 				336E6D76284A7AF50057061C /* allegro_s.cpp in Sources */,
@@ -6014,14 +6032,6 @@
 			name = MainMenu.xib;
 			sourceTree = "<group>";
 		};
-		336E6C0F284A78790057061C /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				336E6C10284A78790057061C /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		336E6C14284A787A0057061C /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -6083,7 +6093,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -6135,7 +6146,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -6270,7 +6282,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MARKETING_VERSION = 1.0;
 				OTHER_CFLAGS = (
 					"-D_FORTIFY_SOURCE=2",
@@ -6330,7 +6342,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MARKETING_VERSION = 1.0;
 				OTHER_CFLAGS = (
 					"-D_FORTIFY_SOURCE=2",
@@ -6367,7 +6379,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = T4S638758C;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../src/script/api/game",
@@ -6382,11 +6393,10 @@
 				INFOPLIST_FILE = OpenTTD_iOS/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -6398,7 +6408,6 @@
 					"-DNO_QUICKTIME",
 					"-DWITH_COCOA",
 					"-DWITH_COCOA_TOUCH",
-					"-DWITH_METAL",
 					"-DWITH_OPENGL",
 					"-DWITH_FREETYPE",
 					"-DWITH_ZLIB",
@@ -6430,7 +6439,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = T4S638758C;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../src/script/api/game",
@@ -6445,11 +6453,10 @@
 				INFOPLIST_FILE = OpenTTD_iOS/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -6461,7 +6468,6 @@
 					"-DNO_QUICKTIME",
 					"-DWITH_COCOA",
 					"-DWITH_COCOA_TOUCH",
-					"-DWITH_METAL",
 					"-DWITH_OPENGL",
 					"-DWITH_FREETYPE",
 					"-DWITH_ZLIB",

@@ -231,5 +231,3 @@ void GetMacOSVersion(int *return_major, int *return_minor, int *return_bugfix) {
         *return_bugfix = (int)ver.patchVersion;
     }
 }
-
-bool _allow_hidpi_window = true; //TODO: CSE

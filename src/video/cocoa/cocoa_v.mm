@@ -13,15 +13,24 @@
  *  Nothing at the moment.                                                    *
  ******************************************************************************/
 
-#ifdef WITH_COCOA
+#if defined(WITH_COCOA) || defined(IOS)
 
 #include "../../stdafx.h"
+
+#if !defined(IOS)
 #include "../../os/macosx/macos.h"
+#endif
 
 #define Rect  OTTDRect
 #define Point OTTDPoint
+
+#if defined(IOS)
+#import <UIKit/UIKit.h>
+#else
 #import <Cocoa/Cocoa.h>
 #import <QuartzCore/QuartzCore.h>
+#endif
+
 #undef Rect
 #undef Point
 
@@ -30,7 +39,13 @@
 #include "../../core/geometry_func.hpp"
 #include "../../core/math_func.hpp"
 #include "cocoa_v.h"
+
+#if defined(IOS)
+#include "ios_wnd.h"
+#else
 #include "cocoa_wnd.h"
+#endif
+
 #include "../../blitter/factory.hpp"
 #include "../../framerate_type.h"
 #include "../../gfx_func.h"
@@ -44,6 +59,8 @@
 #import <sys/param.h> /* for MAXPATHLEN */
 #import <sys/time.h> /* gettimeofday */
 #include <array>
+
+#import "ViewController.h"
 
 /* The 10.12 SDK added new names for some enum constants and
  * deprecated the old ones. As there's no functional change in any
@@ -71,8 +88,12 @@
 #define kCGBitmapByteOrder32Host 0
 #endif
 
+extern "C" {
+    extern char ***_NSGetArgv(void);
+    extern int *_NSGetArgc(void);
+}
+
 bool _cocoa_video_started = false;
-static Palette _local_palette; ///< Current palette to use for drawing.
 
 extern bool _tab_is_down;
 
@@ -118,7 +139,9 @@ void VideoDriver_Cocoa::Stop()
 	CocoaExitApplication();
 
 	/* Release window mode resources */
+#if !defined(IOS)
 	if (this->window != nil) [ this->window close ];
+#endif
 //	[ this->cocoaview release ];
 //	[ this->delegate release ];
 
@@ -130,8 +153,10 @@ void VideoDriver_Cocoa::Stop()
 /** Common driver initialization. */
 const char *VideoDriver_Cocoa::Initialize()
 {
+#if !defined(IOS)
 	if (!MacOSVersionIsAtLeast(10, 7, 0)) return "The Cocoa video driver requires Mac OS X 10.7 or later.";
-
+#endif
+    
 	if (_cocoa_video_started) return "Already started";
 	_cocoa_video_started = true;
 
@@ -162,12 +187,25 @@ void VideoDriver_Cocoa::MakeDirty(int left, int top, int width, int height)
  */
 void VideoDriver_Cocoa::MainLoop()
 {
-	/* Restart game loop if it was already running (e.g. after bootstrapping),
-	 * otherwise this call is a no-op. */
-	[ [ NSNotificationCenter defaultCenter ] postNotificationName:OTTDMainLaunchGameEngine object:nil ];
+#if defined(IOS)
+    if (setjmp(main_loop_jmp) == 0) {
+        UIApplication *app = [UIApplication sharedApplication];
+        if (app == nil) {
+            UIApplicationMain(*_NSGetArgc(), *_NSGetArgv(), nil, @"AppDelegate");
+        } else {
+            // this only happens after bootstrap
+            [app.delegate performSelector:@selector(startGameLoop)];
+            [[NSRunLoop mainRunLoop] run];
+        }
+    }
+#else
+    /* Restart game loop if it was already running (e.g. after bootstrapping),
+     * otherwise this call is a no-op. */
+    [ [ NSNotificationCenter defaultCenter ] postNotificationName:OTTDMainLaunchGameEngine object:nil ];
 
-	/* Start the main event loop. */
-	[ NSApp run ];
+    /* Start the main event loop. */
+    [ NSApp run ];
+#endif
 }
 
 /**
@@ -178,6 +216,9 @@ void VideoDriver_Cocoa::MainLoop()
  */
 bool VideoDriver_Cocoa::ChangeResolution(int w, int h)
 {
+#if defined(IOS)
+    
+#else
 	NSSize screen_size = [ [ NSScreen mainScreen ] frame ].size;
 	w = std::min(w, (int)screen_size.width);
 	h = std::min(h, (int)screen_size.height);
@@ -195,6 +236,8 @@ bool VideoDriver_Cocoa::ChangeResolution(int w, int h)
 	}
 
 	[ (OTTD_CocoaWindow *)this->window center ];
+#endif
+    
 	this->AllocateBackingStore();
 
 	return true;
@@ -207,6 +250,9 @@ bool VideoDriver_Cocoa::ChangeResolution(int w, int h)
  */
 bool VideoDriver_Cocoa::ToggleFullscreen(bool full_screen)
 {
+#if defined(IOS)
+    return false;
+#else
 	if (this->IsFullscreen() == full_screen) return true;
 
 	if ([ this->window respondsToSelector:@selector(toggleFullScreen:) ]) {
@@ -221,6 +267,7 @@ bool VideoDriver_Cocoa::ToggleFullscreen(bool full_screen)
 	}
 
 	return false;
+#endif
 }
 
 void VideoDriver_Cocoa::ClearSystemSprites()
@@ -230,10 +277,12 @@ void VideoDriver_Cocoa::ClearSystemSprites()
 
 void VideoDriver_Cocoa::PopulateSystemSprites()
 {
+#if !defined(IOS)
 	if (this->refresh_sys_sprites && this->window != nil) {
 		[ this->window refreshSystemSprites ];
 		this->refresh_sys_sprites = false;
 	}
+#endif
 }
 
 /**
@@ -251,9 +300,11 @@ bool VideoDriver_Cocoa::AfterBlitterChange()
  */
 void VideoDriver_Cocoa::EditBoxLostFocus()
 {
+#if !defined(IOS)
 	[ [ this->cocoaview inputContext ] performSelectorOnMainThread:@selector(discardMarkedText) withObject:nil waitUntilDone:[ NSThread isMainThread ] ];
 	/* Clear any marked string from the current edit box. */
 	HandleTextInput(nullptr, true);
+#endif
 }
 
 /**
@@ -263,6 +314,7 @@ std::vector<int> VideoDriver_Cocoa::GetListOfMonitorRefreshRates()
 {
 	std::vector<int> rates{};
 
+#if !defined(IOS)
 	if (MacOSVersionIsAtLeast(10, 6, 0)) {
 		std::array<CGDirectDisplayID, 16> displays;
 
@@ -276,6 +328,7 @@ std::vector<int> VideoDriver_Cocoa::GetListOfMonitorRefreshRates()
 			CGDisplayModeRelease(mode);
 		}
 	}
+#endif
 
 	return rates;
 }
@@ -285,8 +338,13 @@ std::vector<int> VideoDriver_Cocoa::GetListOfMonitorRefreshRates()
  */
 Dimension VideoDriver_Cocoa::GetScreenSize() const
 {
-	NSRect frame = [ [ NSScreen mainScreen ] frame ];
-	return { static_cast<uint>(NSWidth(frame)), static_cast<uint>(NSHeight(frame)) };
+#if defined(IOS)
+    CGRect frame = [[UIScreen mainScreen] bounds];
+    return { static_cast<uint>(frame.size.width), static_cast<uint>(frame.size.height) };
+#else
+    NSRect frame = [ [ NSScreen mainScreen ] frame ];
+    return { static_cast<uint>(NSWidth(frame)), static_cast<uint>(NSHeight(frame)) };
+#endif
 }
 
 /** Get DPI scale of our window. */
@@ -325,7 +383,11 @@ void VideoDriver_Cocoa::UnlockVideoBuffer()
  */
 bool VideoDriver_Cocoa::IsFullscreen()
 {
+#if defined(IOS)
+    return true;
+#else
 	return this->window != nil && ([ this->window styleMask ] & NSWindowStyleMaskFullScreen) != 0;
+#endif
 }
 
 /**
@@ -355,19 +417,27 @@ void VideoDriver_Cocoa::UpdateVideoModes()
 {
 	_resolutions.clear();
 
-	if (this->IsFullscreen()) {
-		/* Full screen, there is only one possible resolution. */
-		NSSize screen = [ [ this->window screen ] frame ].size;
-		_resolutions.emplace_back((uint)screen.width, (uint)screen.height);
-	} else {
-		/* Windowed; offer a selection of common window sizes up until the
-		 * maximum usable screen space. This excludes the menu and dock areas. */
-		NSSize maxSize = [ [ NSScreen mainScreen] visibleFrame ].size;
-		for (const auto &d : _default_resolutions) {
-			if (d.width < maxSize.width && d.height < maxSize.height) _resolutions.push_back(d);
-		}
-		_resolutions.emplace_back((uint)maxSize.width, (uint)maxSize.height);
-	}
+#if defined(IOS)
+    CGSize maxSize = [[UIScreen mainScreen] bounds].size;
+    for (const auto &d : _default_resolutions) {
+        if (d.width < maxSize.width && d.height < maxSize.height) _resolutions.push_back(d);
+    }
+    _resolutions.emplace_back((uint)maxSize.width, (uint)maxSize.height);
+#else
+    if (this->IsFullscreen()) {
+        /* Full screen, there is only one possible resolution. */
+        NSSize screen = [ [ this->window screen ] frame ].size;
+        _resolutions.emplace_back((uint)screen.width, (uint)screen.height);
+    } else {
+        /* Windowed; offer a selection of common window sizes up until the
+         * maximum usable screen space. This excludes the menu and dock areas. */
+        NSSize maxSize = [ [ NSScreen mainScreen] visibleFrame ].size;
+        for (const auto &d : _default_resolutions) {
+            if (d.width < maxSize.width && d.height < maxSize.height) _resolutions.push_back(d);
+        }
+        _resolutions.emplace_back((uint)maxSize.width, (uint)maxSize.height);
+    }
+#endif
 }
 
 /**
@@ -378,7 +448,25 @@ void VideoDriver_Cocoa::UpdateVideoModes()
 bool VideoDriver_Cocoa::MakeWindow(int width, int height)
 {
 	this->setup = true;
-
+#if defined(IOS)
+    this->window = [[OTTD_CocoaWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    CGRect view_frame = [this->window bounds];
+    this->cocoaview = [ [OTTD_CocoaView alloc] initWithFrame:view_frame];
+    
+    [this->cocoaview setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
+    
+    UIView *draw_view = this->AllocateDrawView();
+    
+    [draw_view setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
+    
+    ViewController *viewController = [[ViewController alloc] init];
+    viewController.view.frame = this->window.bounds;
+    this->window.rootViewController = viewController;
+    
+    [viewController.view addSubview:this->cocoaview];
+    [this->cocoaview addSubview:draw_view ];
+    
+#else
 	/* Limit window size to screen frame. */
 	NSSize screen_size = [ [ NSScreen mainScreen ] frame ].size;
 	if (width > screen_size.width) width = screen_size.width;
@@ -448,7 +536,7 @@ bool VideoDriver_Cocoa::MakeWindow(int width, int height)
 	this->color_space = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
 	if (this->color_space == nullptr) this->color_space = CGColorSpaceCreateDeviceRGB();
 	if (this->color_space == nullptr) error("Could not get a valid colour space for drawing.");
-
+#endif
 	this->setup = false;
 
 	return true;
@@ -461,6 +549,10 @@ bool VideoDriver_Cocoa::MakeWindow(int width, int height)
  */
 bool VideoDriver_Cocoa::PollEvent()
 {
+#if defined(IOS)
+    //TODO: CSE
+    return false;
+#else
 #ifdef HAVE_OSX_1012_SDK
 	NSEventMask mask = NSEventMaskAny;
 #else
@@ -473,10 +565,12 @@ bool VideoDriver_Cocoa::PollEvent()
 	[ NSApp sendEvent:event ];
 
 	return true;
+#endif
 }
 
 void VideoDriver_Cocoa::InputLoop()
 {
+#if !defined(IOS)
 	NSUInteger cur_mods = [ NSEvent modifierFlags ];
 
 	bool old_ctrl_pressed = _ctrl_pressed;
@@ -491,6 +585,7 @@ void VideoDriver_Cocoa::InputLoop()
 #endif
 
 	if (old_ctrl_pressed != _ctrl_pressed) HandleCtrlChanged();
+#endif
 }
 
 /** Main game loop. */
@@ -512,287 +607,6 @@ void VideoDriver_Cocoa::MainLoopReal()
 	}
 
 	this->StopGameThread();
-}
-
-
-/* Subclass of OTTD_CocoaView to fix Quartz rendering */
-@interface OTTD_QuartzView : NSView {
-	VideoDriver_CocoaQuartz *driver;
-}
-- (instancetype)initWithFrame:(NSRect)frameRect andDriver:(VideoDriver_CocoaQuartz *)drv;
-@end
-
-@implementation OTTD_QuartzView
-
-- (instancetype)initWithFrame:(NSRect)frameRect andDriver:(VideoDriver_CocoaQuartz *)drv
-{
-	if (self = [ super initWithFrame:frameRect ]) {
-		self->driver = drv;
-
-		/* We manage our content updates ourselves. */
-		self.layerContentsRedrawPolicy = NSViewLayerContentsRedrawOnSetNeedsDisplay;
-		self.wantsLayer = YES;
-
-		self.layer.magnificationFilter = kCAFilterNearest;
-		self.layer.opaque = YES;
-	}
-	return self;
-}
-
-- (BOOL)acceptsFirstResponder
-{
-	return NO;
-}
-
-- (BOOL)isOpaque
-{
-	return YES;
-}
-
-- (BOOL)wantsUpdateLayer
-{
-	return YES;
-}
-
-- (void)updateLayer
-{
-	if (driver->cgcontext == nullptr) return;
-
-	/* Set layer contents to our backing buffer, which avoids needless copying. */
-	CGImageRef fullImage = CGBitmapContextCreateImage(driver->cgcontext);
-	self.layer.contents = (__bridge id)fullImage;
-	CGImageRelease(fullImage);
-}
-
-- (void)viewDidChangeBackingProperties
-{
-	[ super viewDidChangeBackingProperties ];
-
-	self.layer.contentsScale = [ driver->cocoaview getContentsScale ];
-}
-
-@end
-
-
-static FVideoDriver_CocoaQuartz iFVideoDriver_CocoaQuartz;
-
-/** Clear buffer to opaque black. */
-static void ClearWindowBuffer(uint32 *buffer, uint32 pitch, uint32 height)
-{
-	uint32 fill = Colour(0, 0, 0).data;
-	for (uint32 y = 0; y < height; y++) {
-		for (uint32 x = 0; x < pitch; x++) {
-			buffer[y * pitch + x] = fill;
-		}
-	}
-}
-
-VideoDriver_CocoaQuartz::VideoDriver_CocoaQuartz()
-{
-	this->window_width  = 0;
-	this->window_height = 0;
-	this->window_pitch  = 0;
-	this->buffer_depth  = 0;
-	this->window_buffer = nullptr;
-	this->pixel_buffer  = nullptr;
-
-	this->cgcontext     = nullptr;
-}
-
-const char *VideoDriver_CocoaQuartz::Start(const StringList &param)
-{
-	const char *err = this->Initialize();
-	if (err != nullptr) return err;
-
-	int bpp = BlitterFactory::GetCurrentBlitter()->GetScreenDepth();
-	if (bpp != 8 && bpp != 32) {
-		Stop();
-		return "The cocoa quartz subdriver only supports 8 and 32 bpp.";
-	}
-
-	bool fullscreen = _fullscreen;
-	if (!this->MakeWindow(_cur_resolution.width, _cur_resolution.height)) {
-		Stop();
-		return "Could not create window";
-	}
-
-	this->AllocateBackingStore(true);
-
-	if (fullscreen) this->ToggleFullscreen(fullscreen);
-
-	this->GameSizeChanged();
-	this->UpdateVideoModes();
-
-	this->is_game_threaded = !GetDriverParamBool(param, "no_threads") && !GetDriverParamBool(param, "no_thread");
-
-	return nullptr;
-
-}
-
-void VideoDriver_CocoaQuartz::Stop()
-{
-	this->VideoDriver_Cocoa::Stop();
-
-	CGContextRelease(this->cgcontext);
-
-	free(this->window_buffer);
-	free(this->pixel_buffer);
-}
-
-NSView *VideoDriver_CocoaQuartz::AllocateDrawView()
-{
-	return [ [ OTTD_QuartzView alloc ] initWithFrame:[ this->cocoaview bounds ] andDriver:this ];
-}
-
-/** Resize the window. */
-void VideoDriver_CocoaQuartz::AllocateBackingStore(bool force)
-{
-	if (this->window == nil || this->cocoaview == nil || this->setup) return;
-
-	this->UpdatePalette(0, 256);
-
-	NSRect newframe = [ this->cocoaview getRealRect:[ this->cocoaview frame ] ];
-
-	this->window_width = (int)newframe.size.width;
-	this->window_height = (int)newframe.size.height;
-	this->window_pitch = Align(this->window_width, 16 / sizeof(uint32)); // Quartz likes lines that are multiple of 16-byte.
-	this->buffer_depth = BlitterFactory::GetCurrentBlitter()->GetScreenDepth();
-
-	/* Create Core Graphics Context */
-	free(this->window_buffer);
-	this->window_buffer = malloc(this->window_pitch * this->window_height * sizeof(uint32));
-	/* Initialize with opaque black. */
-	ClearWindowBuffer((uint32 *)this->window_buffer, this->window_pitch, this->window_height);
-
-	CGContextRelease(this->cgcontext);
-	this->cgcontext = CGBitmapContextCreate(
-		this->window_buffer,       // data
-		this->window_width,        // width
-		this->window_height,       // height
-		8,                         // bits per component
-		this->window_pitch * 4,    // bytes per row
-		this->color_space,         // color space
-		kCGImageAlphaNoneSkipFirst | kCGBitmapByteOrder32Host
-	);
-
-	assert(this->cgcontext != NULL);
-	CGContextSetShouldAntialias(this->cgcontext, FALSE);
-	CGContextSetAllowsAntialiasing(this->cgcontext, FALSE);
-	CGContextSetInterpolationQuality(this->cgcontext, kCGInterpolationNone);
-
-	if (this->buffer_depth == 8) {
-		free(this->pixel_buffer);
-		this->pixel_buffer = malloc(this->window_width * this->window_height);
-		if (this->pixel_buffer == nullptr) usererror("Out of memory allocating pixel buffer");
-	} else {
-		free(this->pixel_buffer);
-		this->pixel_buffer = nullptr;
-	}
-
-	/* Tell the game that the resolution has changed */
-	_screen.width   = this->window_width;
-	_screen.height  = this->window_height;
-	_screen.pitch   = this->buffer_depth == 8 ? this->window_width : this->window_pitch;
-	_screen.dst_ptr = this->GetVideoPointer();
-
-	/* Redraw screen */
-	this->MakeDirty(0, 0, _screen.width, _screen.height);
-	this->GameSizeChanged();
-}
-
-/**
- * This function copies 8bpp pixels from the screen buffer in 32bpp windowed mode.
- *
- * @param left The x coord for the left edge of the box to blit.
- * @param top The y coord for the top edge of the box to blit.
- * @param right The x coord for the right edge of the box to blit.
- * @param bottom The y coord for the bottom edge of the box to blit.
- */
-void VideoDriver_CocoaQuartz::BlitIndexedToView32(int left, int top, int right, int bottom)
-{
-	const uint32 *pal   = this->palette;
-	const uint8  *src   = (uint8*)this->pixel_buffer;
-	uint32       *dst   = (uint32*)this->window_buffer;
-	uint          width = this->window_width;
-	uint          pitch = this->window_pitch;
-
-	for (int y = top; y < bottom; y++) {
-		for (int x = left; x < right; x++) {
-			dst[y * pitch + x] = pal[src[y * width + x]];
-		}
-	}
-}
-
-/** Update the palette */
-void VideoDriver_CocoaQuartz::UpdatePalette(uint first_color, uint num_colors)
-{
-	if (this->buffer_depth != 8) return;
-
-	for (uint i = first_color; i < first_color + num_colors; i++) {
-		uint32 clr = 0xff000000;
-		clr |= (uint32)_local_palette.palette[i].r << 16;
-		clr |= (uint32)_local_palette.palette[i].g << 8;
-		clr |= (uint32)_local_palette.palette[i].b;
-		this->palette[i] = clr;
-	}
-
-	this->MakeDirty(0, 0, _screen.width, _screen.height);
-}
-
-void VideoDriver_CocoaQuartz::CheckPaletteAnim()
-{
-	if (!CopyPalette(_local_palette)) return;
-
-	Blitter *blitter = BlitterFactory::GetCurrentBlitter();
-
-	switch (blitter->UsePaletteAnimation()) {
-		case Blitter::PALETTE_ANIMATION_VIDEO_BACKEND:
-			this->UpdatePalette(_local_palette.first_dirty, _local_palette.count_dirty);
-			break;
-
-		case Blitter::PALETTE_ANIMATION_BLITTER:
-			blitter->PaletteAnimate(_local_palette);
-			break;
-
-		case Blitter::PALETTE_ANIMATION_NONE:
-			break;
-
-		default:
-			NOT_REACHED();
-	}
-}
-
-/** Draw window */
-void VideoDriver_CocoaQuartz::Paint()
-{
-	PerformanceMeasurer framerate(PFE_VIDEO);
-
-	/* Check if we need to do anything */
-	if (IsEmptyRect(this->dirty_rect) || [ this->window isMiniaturized ]) return;
-
-	/* We only need to blit in indexed mode since in 32bpp mode the game draws directly to the image. */
-	if (this->buffer_depth == 8) {
-		BlitIndexedToView32(
-			this->dirty_rect.left,
-			this->dirty_rect.top,
-			this->dirty_rect.right,
-			this->dirty_rect.bottom
-		);
-	}
-
-	NSRect dirtyrect;
-	dirtyrect.origin.x = this->dirty_rect.left;
-	dirtyrect.origin.y = this->window_height - this->dirty_rect.bottom;
-	dirtyrect.size.width = this->dirty_rect.right - this->dirty_rect.left;
-	dirtyrect.size.height = this->dirty_rect.bottom - this->dirty_rect.top;
-
-	/* Notify OS X that we have new content to show. */
-	[ this->cocoaview setNeedsDisplayInRect:[ this->cocoaview getVirtualRect:dirtyrect ] ];
-
-	/* Tell the OS to get our contents to screen as soon as possible. */
-	[ CATransaction flush ];
-
-	this->dirty_rect = {};
 }
 
 #endif /* WITH_COCOA */

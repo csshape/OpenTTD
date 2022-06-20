@@ -8,9 +8,10 @@
 #import "AppDelegate.h"
 
 #include "stdafx.h"
+#include "gfx_layout.h"
 #include "openttd.h"
 #include "debug.h"
-//#include "cocoa_touch_v.h"
+#include "ios_wnd.h"
 #include "factory.hpp"
 #include "gfx_func.h"
 #include "random_func.hpp"
@@ -21,6 +22,9 @@
 #include "fontcache.h"
 #include "window_func.h"
 #include "window_gui.h"
+#include "VideoDriver_OpenGLES.h"
+
+#import "ViewController.h"
 
 static unsigned int _current_mods;
 static bool _tab_is_down;
@@ -29,6 +33,8 @@ static uint32 _tEvent;
 #endif
 
 extern const char * OSErrorMessage;
+
+uint32 _realtime_tick = 0;
 
 static uint32 GetTick()
 {
@@ -60,7 +66,7 @@ static void CheckPaletteAnim()
 }
 
 @interface AppDelegate ()
-
+@property (strong, nonatomic) ViewController *viewController;
 @end
 
 @implementation AppDelegate
@@ -100,17 +106,25 @@ static void CheckPaletteAnim()
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    self.window = _cocoa_touch_driver->window;
+    self.window.clipsToBounds = true;
+    
+    self.viewController = (ViewController*)self.window.rootViewController;
+    
     if (OSErrorMessage) {
         [self showErrorMessage:@(OSErrorMessage)];
     } else {
         [self overrideDefaultSettings];
-        
+
         GfxInitPalettes();
         CheckPaletteAnim();
-//        _cocoa_touch_driver->Draw();
-        
+        _cocoa_touch_driver->Draw();
+
         [self startGameLoop];
     }
+    
+    [self.window makeKeyAndVisible];
+    
     return YES;
 }
 
@@ -127,21 +141,26 @@ static void CheckPaletteAnim()
     cur_ticks = GetTick();
     last_cur_ticks = cur_ticks;
     next_tick = cur_ticks + MILLISECONDS_PER_TICK;
+    
+    _cocoa_touch_driver->OpenGLStartGame();
+    
     NSTimeInterval gameLoopInterval = 1.0 / 60.0;
     gameLoopTimer = [NSTimer scheduledTimerWithTimeInterval:gameLoopInterval target:self selector:@selector(tick:) userInfo:nil repeats:YES];
 }
 
 - (void)stopGameLoop {
     [gameLoopTimer invalidate];
+    
+    _cocoa_touch_driver->OpenGLStopGame();
 }
 
 - (void)resizeGameView:(CGSize)size {
     CGFloat scale = [[NSUserDefaults standardUserDefaults] boolForKey:@"NativeResolution"] ? [UIScreen mainScreen].nativeScale : 1.0;
-    _resolutions[0].width = size.width * scale;
-    _resolutions[0].height = size.height * scale;
-//    if (_cocoa_touch_driver) {
-//        _cocoa_touch_driver->ChangeResolution(size.width * scale, size.height * scale);
-//    }
+//    _resolutions[0].width = size.width * scale;
+//    _resolutions[0].height = size.height * scale;
+    if (_cocoa_touch_driver) {
+        _cocoa_touch_driver->ChangeResolution(size.width * scale, size.height * scale);
+    }
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
@@ -180,53 +199,21 @@ static void CheckPaletteAnim()
 //        _cocoa_touch_driver->ExitMainLoop();
     }
     
-#if defined(_DEBUG)
-    if (_current_mods & NSShiftKeyMask)
-#else
-        if (_tab_is_down)
-#endif
-        {
-//            if (!_networking && _game_mode != GM_MENU) _fast_forward |= 2;
-//        } else if (_fast_forward & 2) {
-//            _fast_forward = 0;
-        }
-    
     cur_ticks = GetTick();
-//    if (cur_ticks >= next_tick || (_fast_forward && !_pause_mode) || cur_ticks < prev_cur_ticks) {
-//        _realtime_tick += cur_ticks - last_cur_ticks;
-//        last_cur_ticks = cur_ticks;
-//        next_tick = cur_ticks + MILLISECONDS_PER_TICK;
-//        
-//        bool old_ctrl_pressed = _ctrl_pressed;
-//        
-//        //_ctrl_pressed = !!(_current_mods & ( _settings_client.gui.right_mouse_btn_emulation != RMBE_CONTROL ? NSControlKeyMask : NSCommandKeyMask));
-//        //_shift_pressed = !!(_current_mods & NSShiftKeyMask);
-//        
-//        if (old_ctrl_pressed != _ctrl_pressed) HandleCtrlChanged();
-//        
-//        GameLoop();
-//        
-//        UpdateWindows();
-//        CheckPaletteAnim();
-//        _cocoa_touch_driver->Draw();
-//    }
+    if (cur_ticks >= next_tick || cur_ticks < prev_cur_ticks) {
+        _realtime_tick += cur_ticks - last_cur_ticks;
+        last_cur_ticks = cur_ticks;
+        next_tick = cur_ticks + MILLISECONDS_PER_TICK;
+        
+        bool old_ctrl_pressed = _ctrl_pressed;
+        
+        //_ctrl_pressed = !!(_current_mods & ( _settings_client.gui.right_mouse_btn_emulation != RMBE_CONTROL ? NSControlKeyMask : NSCommandKeyMask));
+        //_shift_pressed = !!(_current_mods & NSShiftKeyMask);
+        
+        if (old_ctrl_pressed != _ctrl_pressed) HandleCtrlChanged();
+        
+        _cocoa_touch_driver->OpenGLTick();
+    }
 }
-
-#pragma mark - UISceneSession lifecycle
-
-
-- (UISceneConfiguration *)application:(UIApplication *)application configurationForConnectingSceneSession:(UISceneSession *)connectingSceneSession options:(UISceneConnectionOptions *)options {
-    // Called when a new scene session is being created.
-    // Use this method to select a configuration to create the new scene with.
-    return [[UISceneConfiguration alloc] initWithName:@"Default Configuration" sessionRole:connectingSceneSession.role];
-}
-
-
-- (void)application:(UIApplication *)application didDiscardSceneSessions:(NSSet<UISceneSession *> *)sceneSessions {
-    // Called when the user discards a scene session.
-    // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
-    // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
-}
-
 
 @end

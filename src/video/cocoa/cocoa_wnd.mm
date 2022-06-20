@@ -11,7 +11,7 @@
  *  List available resolutions.                                               *
  ******************************************************************************/
 
-#ifdef WITH_COCOA
+#if defined(WITH_COCOA) && !defined(IOS)
 
 #include "../../stdafx.h"
 #include "../../os/macosx/macos.h"
