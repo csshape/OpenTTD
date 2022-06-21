@@ -61,6 +61,7 @@
 #include <array>
 
 #import "ViewController.h"
+#import "AppDelegate.h"
 
 /* The 10.12 SDK added new names for some enum constants and
  * deprecated the old ones. As there's no functional change in any
@@ -191,7 +192,12 @@ void VideoDriver_Cocoa::MainLoop()
     if (setjmp(main_loop_jmp) == 0) {
         UIApplication *app = [UIApplication sharedApplication];
         if (app == nil) {
-            UIApplicationMain(*_NSGetArgc(), *_NSGetArgv(), nil, @"AppDelegate");
+            NSString * appDelegateClassName;
+            @autoreleasepool {
+                // Setup code that might create autoreleased objects goes here.
+                appDelegateClassName = NSStringFromClass([AppDelegate class]);
+            }
+            UIApplicationMain(*_NSGetArgc(), *_NSGetArgv(), nil, appDelegateClassName);
         } else {
             // this only happens after bootstrap
             [app.delegate performSelector:@selector(startGameLoop)];
@@ -314,7 +320,9 @@ std::vector<int> VideoDriver_Cocoa::GetListOfMonitorRefreshRates()
 {
 	std::vector<int> rates{};
 
-#if !defined(IOS)
+#if defined(IOS)
+    rates.push_back(1);
+#else
 	if (MacOSVersionIsAtLeast(10, 6, 0)) {
 		std::array<CGDirectDisplayID, 16> displays;
 
@@ -465,7 +473,6 @@ bool VideoDriver_Cocoa::MakeWindow(int width, int height)
     
     [viewController.view addSubview:this->cocoaview];
     [this->cocoaview addSubview:draw_view ];
-    
 #else
 	/* Limit window size to screen frame. */
 	NSSize screen_size = [ [ NSScreen mainScreen ] frame ].size;
@@ -550,7 +557,6 @@ bool VideoDriver_Cocoa::MakeWindow(int width, int height)
 bool VideoDriver_Cocoa::PollEvent()
 {
 #if defined(IOS)
-    //TODO: CSE
     return false;
 #else
 #ifdef HAVE_OSX_1012_SDK

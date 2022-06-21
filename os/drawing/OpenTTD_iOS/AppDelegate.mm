@@ -26,8 +26,6 @@
 
 #import "ViewController.h"
 
-static unsigned int _current_mods;
-static bool _tab_is_down;
 #ifdef _DEBUG
 static uint32 _tEvent;
 #endif
@@ -106,10 +104,18 @@ static void CheckPaletteAnim()
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    self.window = _cocoa_touch_driver->window;
+    self.window = [[OTTD_CocoaWindow alloc] initWithFrame: [UIScreen mainScreen].bounds];
     self.window.clipsToBounds = true;
     
-    self.viewController = (ViewController*)self.window.rootViewController;
+    self.window.backgroundColor = [UIColor redColor];
+    
+    UIWindow *win = _cocoa_touch_driver->window;
+
+    self.viewController = (ViewController*)win.rootViewController;
+    
+    self.window.rootViewController = self.viewController;
+    
+    [self.window makeKeyAndVisible];
     
     if (OSErrorMessage) {
         [self showErrorMessage:@(OSErrorMessage)];
@@ -123,14 +129,13 @@ static void CheckPaletteAnim()
         [self startGameLoop];
     }
     
-    [self.window makeKeyAndVisible];
+    [self.viewController updateLayer];
     
     return YES;
 }
 
 - (void)showErrorMessage:(NSString*)errorMessage {
     UIViewController *viewController = self.window.rootViewController;
-    [self.window makeKeyAndVisible];
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Fatal Error" message:errorMessage preferredStyle:UIAlertControllerStyleAlert];
     viewController.view.userInteractionEnabled = NO;
     [viewController presentViewController:alertController animated:YES completion:nil];

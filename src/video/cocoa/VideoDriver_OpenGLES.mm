@@ -110,7 +110,6 @@ VideoDriver_OpenGLES::VideoDriver_OpenGLES()
     this->window_height = 0;
     this->window_pitch  = 0;
     this->buffer_depth  = 0;
-    this->window_buffer = nullptr;
     this->pixel_buffer  = nullptr;
 
     this->context     = nullptr;
@@ -123,12 +122,12 @@ const char *VideoDriver_OpenGLES::Start(const StringList &param)
     const char *err = this->Initialize();
     if (err != nullptr) return err;
 
-//    int bpp = BlitterFactory::GetCurrentBlitter()->GetScreenDepth();
-//    if (bpp != 8 && bpp != 32) {
-//        Stop();
-//        return "The cocoa quartz subdriver only supports 8 and 32 bpp.";
-//    }
-//
+    int bpp = BlitterFactory::GetCurrentBlitter()->GetScreenDepth();
+    if (bpp != 8 && bpp != 32) {
+        Stop();
+        return "The cocoa quartz subdriver only supports 8 and 32 bpp.";
+    }
+
     bool fullscreen = _fullscreen;
     if (!this->MakeWindow(_cur_resolution.width, _cur_resolution.height)) {
         Stop();
@@ -171,7 +170,6 @@ void VideoDriver_OpenGLES::Stop()
 
     CGContextRelease(this->context);
 
-    free(this->window_buffer);
     free(this->pixel_buffer);
 }
 
@@ -195,10 +193,10 @@ void VideoDriver_OpenGLES::AllocateBackingStore(bool force)
     this->buffer_depth = BlitterFactory::GetCurrentBlitter()->GetScreenDepth();
 
     /* Create Core Graphics Context */
-    free(this->window_buffer);
-    this->window_buffer = malloc(this->window_pitch * this->window_height * sizeof(uint32));
+    free(this->pixel_buffer);
+    this->pixel_buffer = malloc(this->window_pitch * this->window_height * sizeof(uint32));
     /* Initialize with opaque black. */
-    ClearWindowBuffer((uint32 *)this->window_buffer, this->window_pitch, this->window_height);
+    ClearWindowBuffer((uint32 *)this->pixel_buffer, this->window_pitch, this->window_height);
 
     
 #ifdef WITH_OPENGL
@@ -207,31 +205,16 @@ void VideoDriver_OpenGLES::AllocateBackingStore(bool force)
         GameSizeChanged();
     }
 #else
-    CGContextRelease(this->context);
-    this->context = CGBitmapContextCreate(
-        this->window_buffer,       // data
-        this->window_width,        // width
-        this->window_height,       // height
-        8,                         // bits per component
-        this->window_pitch * 4,    // bytes per row
-        this->color_space,         // color space
-        kCGImageAlphaNoneSkipFirst | kCGBitmapByteOrder32Host
-    );
-
-    assert(this->context != NULL);
-    CGContextSetShouldAntialias(this->context, FALSE);
-    CGContextSetAllowsAntialiasing(this->context, FALSE);
-    CGContextSetInterpolationQuality(this->context, kCGInterpolationNone);
-#endif
-
-    if (this->buffer_depth == 8) {
-        free(this->pixel_buffer);
-        this->pixel_buffer = malloc(this->window_width * this->window_height);
-        if (this->pixel_buffer == nullptr) usererror("Out of memory allocating pixel buffer");
-    } else {
-        free(this->pixel_buffer);
-        this->pixel_buffer = nullptr;
+    int bitsPerComponent = 8;
+    int bytesPerRow = window_pitch * 4;
+    CGBitmapInfo options = kCGBitmapByteOrder32Little | kCGImageAlphaNoneSkipFirst;
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    if (this->context) {
+        CGContextRelease(this->context);
     }
+    this->context = CGBitmapContextCreate(pixel_buffer, window_width, window_height, bitsPerComponent, bytesPerRow, colorSpace, options);
+    CGColorSpaceRelease(colorSpace);
+#endif
 
     /* Tell the game that the resolution has changed */
     _screen.width   = this->window_width;
@@ -255,8 +238,8 @@ void VideoDriver_OpenGLES::AllocateBackingStore(bool force)
 void VideoDriver_OpenGLES::BlitIndexedToView32(int left, int top, int right, int bottom)
 {
     const uint32 *pal   = this->palette;
-    const uint8  *src   = (uint8*)this->pixel_buffer;
-    uint32       *dst   = (uint32*)this->window_buffer;
+    const uint32  *src   = (uint32*)this->pixel_buffer;
+    uint32       *dst   = (uint32*)this->pixel_buffer;
     uint          width = this->window_width;
     uint          pitch = this->window_pitch;
 
@@ -343,6 +326,8 @@ void VideoDriver_OpenGLES::Paint()
 
 void VideoDriver_OpenGLES::Draw()
 {
+#ifdef WITH_OPENGL
+    
     if ([_cocoa_touch_layer isKindOfClass:[CAEAGLLayer class]]) {
         CAEAGLLayer *eaglLayer = (CAEAGLLayer *)_cocoa_touch_layer;
         if (![EAGLContext setCurrentContext:glContext])
@@ -385,6 +370,8 @@ void VideoDriver_OpenGLES::Draw()
         [EAGLContext setCurrentContext:nil];
         return;
     }
+    
+#endif
 
     // CoreGraphics
     CGImageRef screenImage = CGBitmapContextCreateImage(this->context);
@@ -406,7 +393,8 @@ void VideoDriver_OpenGLES::OpenGLStart() {
     
     NSString *selectedDriver = [defaults stringForKey:@"Video"];
     
-    if (_cocoa_touch_layer == NULL && ![selectedDriver isEqualToString:@"quartz"]) {
+#ifdef WITH_OPENGL
+    if (_cocoa_touch_layer == NULL ) {//&& ![selectedDriver isEqualToString:@"quartz"]) {
         glContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
         CAEAGLLayer *eaglLayer = NULL;
         if (glContext != nil) {
@@ -516,6 +504,7 @@ opengl_fail:
             glContext = nil;
         }
     }
+#endif
     
     if (_cocoa_touch_layer == NULL) {
         selectedDriver = @"quartz";

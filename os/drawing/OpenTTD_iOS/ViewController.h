@@ -9,7 +9,7 @@
 
 @interface ViewController : UIViewController
 
-- (void)draw;
+- (void)updateLayer;
 
 @end
 

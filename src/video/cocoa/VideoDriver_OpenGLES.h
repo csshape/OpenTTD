@@ -16,8 +16,7 @@ class VideoDriver_OpenGLES : public VideoDriver_Cocoa {
 private:
     int buffer_depth;     ///< Colour depth of used frame buffer
     void *pixel_buffer;   ///< used for direct pixel access
-    void *window_buffer;  ///< Colour translation from palette to screen
-
+    
     int window_width;     ///< Current window width in pixel
     int window_height;    ///< Current window height in pixel
     int window_pitch;
@@ -50,7 +49,7 @@ protected:
 
     UIView* AllocateDrawView() override;
 
-    void *GetVideoPointer() override { return this->buffer_depth == 8 ? this->pixel_buffer : this->window_buffer; }
+    void *GetVideoPointer() override { return this->pixel_buffer; }
 };
 
 class FVideoDriver_OpenGLES : public DriverFactoryBase {

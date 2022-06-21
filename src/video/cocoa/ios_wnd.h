@@ -12,8 +12,6 @@
 
 class VideoDriver_Cocoa;
 
-extern NSString *OTTDMainLaunchGameEngine;
-
 /** Subclass of NSWindow to cater our special needs */
 @interface OTTD_CocoaWindow : UIWindow
 @end

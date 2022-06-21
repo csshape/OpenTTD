@@ -34,10 +34,6 @@ extern CALayer *_cocoa_touch_layer;
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor magentaColor];
-    
-    _cocoa_touch_layer.frame = self.view.bounds;
-    [self.view.layer addSublayer:_cocoa_touch_layer];
-    [[AppDelegate sharedInstance] resizeGameView:self.view.bounds.size];
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
@@ -56,8 +52,10 @@ extern CALayer *_cocoa_touch_layer;
     return UIRectEdgeAll;
 }
 
-- (void)draw {
-    
+- (void)updateLayer {
+    _cocoa_touch_layer.frame = self.view.bounds;
+    [self.view.layer addSublayer:_cocoa_touch_layer];
+    [[AppDelegate sharedInstance] resizeGameView:self.view.bounds.size];
 }
 
 @end
