@@ -7,6 +7,7 @@
 
 #import "AppDelegate.h"
 #import "ViewController.h"
+#import "GameInputView.h"
 
 #include "ios_wnd.h"
 
@@ -14,6 +15,7 @@ extern CALayer *_cocoa_touch_layer;
 
 @interface ViewController ()
 @property (readonly, nonatomic) OTTD_CocoaView *openGLView;
+@property (strong, nonatomic) GameInputView *inputView;
 @end
 
 @implementation ViewController
@@ -34,6 +36,12 @@ extern CALayer *_cocoa_touch_layer;
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor magentaColor];
+    
+    GameInputView* inputView = [[GameInputView alloc] initWithFrame:self.view.bounds];
+    inputView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    [self.view addSubview:inputView];
+    
+    self.inputView = inputView;
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
@@ -56,6 +64,8 @@ extern CALayer *_cocoa_touch_layer;
     _cocoa_touch_layer.frame = self.view.bounds;
     [self.view.layer addSublayer:_cocoa_touch_layer];
     [[AppDelegate sharedInstance] resizeGameView:self.view.bounds.size];
+    
+    [self.view bringSubviewToFront:self.inputView];
 }
 
 @end

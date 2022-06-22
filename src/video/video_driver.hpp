@@ -197,7 +197,7 @@ public:
 	}
 
 	void GameLoopPause();
-
+    void GameLoop();
 	/**
 	 * Get the currently active instance of the video driver.
 	 */
@@ -361,7 +361,7 @@ private:
 	std::mutex cmd_queue_mutex;
 	std::vector<std::function<void()>> cmd_queue;
 
-	void GameLoop();
+//	void GameLoop();
 	void GameThread();
 };
 

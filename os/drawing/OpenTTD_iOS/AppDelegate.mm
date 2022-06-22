@@ -65,11 +65,12 @@ static void CheckPaletteAnim()
 
 @interface AppDelegate ()
 @property (strong, nonatomic) ViewController *viewController;
+@property (strong, nonatomic) CADisplayLink *displayLink;
+@property (strong, nonatomic) NSOperationQueue *queue;
 @end
 
 @implementation AppDelegate
 {
-    NSTimer *gameLoopTimer;
     uint32 cur_ticks, last_cur_ticks, next_tick;
 }
 
@@ -124,7 +125,7 @@ static void CheckPaletteAnim()
 
         GfxInitPalettes();
         CheckPaletteAnim();
-        _cocoa_touch_driver->Draw();
+//        _cocoa_touch_driver->Draw();
 
         [self startGameLoop];
     }
@@ -142,20 +143,25 @@ static void CheckPaletteAnim()
 }
 
 - (void)startGameLoop {
-    if (gameLoopTimer.valid) return;
+    if (self.displayLink != nil) return;
     cur_ticks = GetTick();
     last_cur_ticks = cur_ticks;
     next_tick = cur_ticks + MILLISECONDS_PER_TICK;
     
     _cocoa_touch_driver->OpenGLStartGame();
     
-    NSTimeInterval gameLoopInterval = 1.0 / 60.0;
-    gameLoopTimer = [NSTimer scheduledTimerWithTimeInterval:gameLoopInterval target:self selector:@selector(tick:) userInfo:nil repeats:YES];
+    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+    queue.maxConcurrentOperationCount = 1;
+    
+    self.queue = queue;
+    CADisplayLink *displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(tick:)];
+    [displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    self.displayLink = displayLink;
 }
 
 - (void)stopGameLoop {
-    [gameLoopTimer invalidate];
-    
+    [self.displayLink invalidate];
+    self.displayLink = nil;
     _cocoa_touch_driver->OpenGLStopGame();
 }
 
@@ -195,30 +201,17 @@ static void CheckPaletteAnim()
     _exit_game = true;
 }
 
-- (void)tick:(NSTimer*)timer {
-    uint32 prev_cur_ticks = cur_ticks; // to check for wrapping
+- (void)tick:(CADisplayLink*)link {
     InteractiveRandom(); // randomness
     
     if (_exit_game) {
-        [timer invalidate];
-//        _cocoa_touch_driver->ExitMainLoop();
+        [link invalidate];
+        _cocoa_touch_driver->Stop();
     }
     
-    cur_ticks = GetTick();
-    if (cur_ticks >= next_tick || cur_ticks < prev_cur_ticks) {
-        _realtime_tick += cur_ticks - last_cur_ticks;
-        last_cur_ticks = cur_ticks;
-        next_tick = cur_ticks + MILLISECONDS_PER_TICK;
-        
-        bool old_ctrl_pressed = _ctrl_pressed;
-        
-        //_ctrl_pressed = !!(_current_mods & ( _settings_client.gui.right_mouse_btn_emulation != RMBE_CONTROL ? NSControlKeyMask : NSCommandKeyMask));
-        //_shift_pressed = !!(_current_mods & NSShiftKeyMask);
-        
-        if (old_ctrl_pressed != _ctrl_pressed) HandleCtrlChanged();
-        
+    [self.queue addOperationWithBlock:^{
         _cocoa_touch_driver->OpenGLTick();
-    }
+    }];
 }
 
 @end

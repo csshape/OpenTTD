@@ -295,7 +295,7 @@ void VideoDriver_OpenGLES::Paint()
     PerformanceMeasurer framerate(PFE_VIDEO);
 
     /* Check if we need to do anything */
-//    if (IsEmptyRect(this->dirty_rect)) return; /* || [ this->window isMiniaturized ] */
+    if (IsEmptyRect(this->dirty_rect)) return; /* || [ this->window isMiniaturized ] */
 
     /* We only need to blit in indexed mode since in 32bpp mode the game draws directly to the image. */
     if (this->buffer_depth == 8) {

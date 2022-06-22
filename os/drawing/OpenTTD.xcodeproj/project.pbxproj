@@ -1127,7 +1127,6 @@
 		336E6D0C284A7A5C0057061C /* news_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241D8282BBEC7006B68EE /* news_gui.cpp */; };
 		336E6D0D284A7A5C0057061C /* newgrf_townname.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352445F282BBEC8006B68EE /* newgrf_townname.cpp */; };
 		336E6D0E284A7A5C0057061C /* network_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524189282BBEC7006B68EE /* network_client.cpp */; };
-		336E6D10284A7A670057061C /* osk_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524080282BBEC7006B68EE /* osk_gui.cpp */; };
 		336E6D11284A7A7C0057061C /* random_access_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335241D3282BBEC7006B68EE /* random_access_file.cpp */; };
 		336E6D12284A7A7C0057061C /* roadstop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FC8282BBEC7006B68EE /* roadstop.cpp */; };
 		336E6D13284A7A7C0057061C /* roadveh_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524144282BBEC7006B68EE /* roadveh_gui.cpp */; };
@@ -1342,6 +1341,8 @@
 		33A02CBF285F359D00075442 /* baseset in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B9A284A25660057061C /* baseset */; };
 		33A02CC0285F35A000075442 /* ai in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B99284A25660057061C /* ai */; };
 		33A02CC1285F35A400075442 /* scripts in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B9D284A25750057061C /* scripts */; };
+		33A02CC52861CB8500075442 /* GameInputView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33A02CC42861CB8500075442 /* GameInputView.mm */; };
+		33A02CC828630F0300075442 /* ios_s.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33A02CC628630F0300075442 /* ios_s.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -2728,6 +2729,10 @@
 		336E6DE7284B4A890057061C /* cocoa_touch_m.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cocoa_touch_m.h; sourceTree = "<group>"; };
 		336E6DE9284B4AA20057061C /* ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ios.mm; sourceTree = "<group>"; };
 		336E6DEB284B4AAB0057061C /* endian_target.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = endian_target.h; sourceTree = "<group>"; };
+		33A02CC32861CB8500075442 /* GameInputView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameInputView.h; sourceTree = "<group>"; };
+		33A02CC42861CB8500075442 /* GameInputView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GameInputView.mm; sourceTree = "<group>"; };
+		33A02CC628630F0300075442 /* ios_s.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ios_s.cpp; sourceTree = "<group>"; };
+		33A02CC728630F0300075442 /* ios_s.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ios_s.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -4304,6 +4309,8 @@
 			children = (
 				33524476282BBEC8006B68EE /* allegro_s.cpp */,
 				3352446F282BBEC8006B68EE /* allegro_s.h */,
+				33A02CC628630F0300075442 /* ios_s.cpp */,
+				33A02CC728630F0300075442 /* ios_s.hpp */,
 				33524475282BBEC8006B68EE /* cocoa_s.cpp */,
 				33524472282BBEC8006B68EE /* cocoa_s.h */,
 				33524470282BBEC8006B68EE /* null_s.cpp */,
@@ -4483,6 +4490,8 @@
 				336E6C14284A787A0057061C /* LaunchScreen.storyboard */,
 				336E6C17284A787A0057061C /* Info.plist */,
 				336E6C18284A787A0057061C /* main.mm */,
+				33A02CC32861CB8500075442 /* GameInputView.h */,
+				33A02CC42861CB8500075442 /* GameInputView.mm */,
 			);
 			path = OpenTTD_iOS;
 			sourceTree = "<group>";
@@ -5705,6 +5714,7 @@
 				336E6D0B284A7A5C0057061C /* newgrf_text.cpp in Sources */,
 				336E6C8B284A7A2F0057061C /* depot_cmd.cpp in Sources */,
 				336E6DA4284A7AF50057061C /* sdl2_s.cpp in Sources */,
+				33A02CC828630F0300075442 /* ios_s.cpp in Sources */,
 				336E6D94284A7AF50057061C /* script_admin.cpp in Sources */,
 				336E6C73284A7A2A0057061C /* rev.cpp in Sources */,
 				336E6C53284A7A2A0057061C /* autoreplace_gui.cpp in Sources */,
@@ -5817,6 +5827,7 @@
 				336E6D43284A7A980057061C /* script_info_dummy.cpp in Sources */,
 				336E6CB8284A7A520057061C /* intro_gui.cpp in Sources */,
 				336E6D74284A7AF50057061C /* script_gamesettings.cpp in Sources */,
+				33A02CC52861CB8500075442 /* GameInputView.mm in Sources */,
 				336E6D16284A7A7C0057061C /* rail_gui.cpp in Sources */,
 				336E6CDE284A7A520057061C /* linkgraph.cpp in Sources */,
 				336E6D2C284A7A980057061C /* cheat_sl.cpp in Sources */,
@@ -5932,7 +5943,6 @@
 				336E6D14284A7A7C0057061C /* aystar.cpp in Sources */,
 				336E6DB1284A7AF50057061C /* settings.cpp in Sources */,
 				336E6C49284A7A2A0057061C /* md5.cpp in Sources */,
-				336E6D10284A7A670057061C /* osk_gui.cpp in Sources */,
 				336E6C6E284A7A2A0057061C /* ai_scanner.cpp in Sources */,
 				336E6D54284A7AF50057061C /* story_gui.cpp in Sources */,
 				336E6D08284A7A5C0057061C /* newgrf_profiling.cpp in Sources */,
@@ -6408,7 +6418,7 @@
 					"-DNO_QUICKTIME",
 					"-DWITH_COCOA",
 					"-DWITH_COCOA_TOUCH",
-					"-DWITH_OPENGL_OUT",
+					"-DWITH_OPENGL",
 					"-DWITH_FREETYPE",
 					"-DWITH_ZLIB",
 					"-DWITH_LZMA",
@@ -6468,7 +6478,7 @@
 					"-DNO_QUICKTIME",
 					"-DWITH_COCOA",
 					"-DWITH_COCOA_TOUCH",
-					"-DWITH_OPENGL_OUT",
+					"-DWITH_OPENGL",
 					"-DWITH_FREETYPE",
 					"-DWITH_ZLIB",
 					"-DWITH_LZMA",
