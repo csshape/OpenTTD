@@ -315,12 +315,14 @@ void VideoDriver_OpenGLES::Paint()
 
     this->Draw();
     
-    /* Notify OS X that we have new content to show. */
-    [ this->cocoaview setNeedsDisplayInRect:[ this->cocoaview getVirtualRect:dirtyrect ] ];
-
-    /* Tell the OS to get our contents to screen as soon as possible. */
-    [ CATransaction flush ];
-
+    dispatch_async(dispatch_get_main_queue(), ^{
+        /* Notify OS X that we have new content to show. */
+        [ this->cocoaview setNeedsDisplayInRect:[ this->cocoaview getVirtualRect:dirtyrect ] ];
+        
+        /* Tell the OS to get our contents to screen as soon as possible. */
+        [ CATransaction flush ];
+    });
+    
     this->dirty_rect = {};
 }
 
@@ -384,17 +386,12 @@ void VideoDriver_OpenGLES::OpenGLStart() {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults registerDefaults:@{@"Video": @"metal",
                                  @"NativeResolution": @NO}];
-    UIScreen *mainScreen = [UIScreen mainScreen];
-    CGFloat scale = [defaults boolForKey:@"NativeResolution"] ? mainScreen.nativeScale : 1.0;
-//    _resolutions[0].width = mainScreen.bounds.size.width * scale;
-//    _resolutions[0].height = mainScreen.bounds.size.height * scale;
-//    _num_resolutions = 1;
     _fullscreen = true;
     
     NSString *selectedDriver = [defaults stringForKey:@"Video"];
     
 #ifdef WITH_OPENGL
-    if (_cocoa_touch_layer == NULL ) {//&& ![selectedDriver isEqualToString:@"quartz"]) {
+    if (_cocoa_touch_layer == NULL && ![selectedDriver isEqualToString:@"quartz"]) {
         glContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
         CAEAGLLayer *eaglLayer = NULL;
         if (glContext != nil) {
