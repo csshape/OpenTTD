@@ -2701,7 +2701,7 @@
 		336E6BDD284A5FFD0057061C /* cocoa_v.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = cocoa_v.mm; sourceTree = "<group>"; };
 		336E6BDE284A5FFD0057061C /* cocoa_v.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cocoa_v.h; sourceTree = "<group>"; };
 		336E6BFA284A62CA0057061C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		336E6C04284A78790057061C /* OpenTTD_iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenTTD_iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		336E6C04284A78790057061C /* OpenTTD.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenTTD.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		336E6C06284A78790057061C /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		336E6C07284A78790057061C /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
 		336E6C0C284A78790057061C /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
@@ -2816,7 +2816,7 @@
 			children = (
 				33523885282BAEEE006B68EE /* OpenTTD_Mac_Test */,
 				336E699F284A09360057061C /* OpenTTD_Mac.app */,
-				336E6C04284A78790057061C /* OpenTTD_iOS.app */,
+				336E6C04284A78790057061C /* OpenTTD.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -4563,7 +4563,7 @@
 			);
 			name = OpenTTD_iOS;
 			productName = OpenTTD_iOS;
-			productReference = 336E6C04284A78790057061C /* OpenTTD_iOS.app */;
+			productReference = 336E6C04284A78790057061C /* OpenTTD.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -6433,7 +6433,7 @@
 					"-l\"z\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.openttd.OpenTTD-iOS";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = OpenTTD;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -6493,7 +6493,7 @@
 					"-l\"z\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.openttd.OpenTTD-iOS";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = OpenTTD;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
