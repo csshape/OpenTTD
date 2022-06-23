@@ -24,7 +24,7 @@ extern CALayer *_cocoa_touch_layer;
 static GameInputView *_cocoa_input_view;
 
 std::string _keyboard_opt[2];
-static WChar _keyboard[2][OSK_KEYBOARD_ENTRIES * 4 + 1];
+static WChar _keyboard[2][OSK_KEYBOARD_ENTRIES];
 
 void ShowOnScreenKeyboard(Window *parent, int button) {
     [_cocoa_input_view becomeFirstResponder];
@@ -55,9 +55,7 @@ bool IsOSKOpenedFor(const Window *w, int button) {
     CGRect keyboardFrame;
 }
 
-- (void)awakeFromNib {
-    [super awakeFromNib];
-    
+- (void)startUp {
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self selector:@selector(ensureInputFieldIsVisible:) name:UIKeyboardWillChangeFrameNotification object:nil];
     

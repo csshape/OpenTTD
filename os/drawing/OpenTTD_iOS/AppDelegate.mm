@@ -8,10 +8,12 @@
 #import "AppDelegate.h"
 
 #include "stdafx.h"
-#include "gfx_layout.h"
+
 #include "openttd.h"
 #include "debug.h"
+
 #include "ios_wnd.h"
+
 #include "factory.hpp"
 #include "gfx_func.h"
 #include "random_func.hpp"
@@ -22,8 +24,9 @@
 #include "fontcache.h"
 #include "window_func.h"
 #include "window_gui.h"
-#include "VideoDriver_OpenGLES.h"
+#include <string>
 
+#include "VideoDriver_OpenGLES.h"
 #import "ViewController.h"
 
 #ifdef _DEBUG
@@ -75,18 +78,18 @@ static void CheckPaletteAnim()
 }
 
 - (void)setFontSetting:(FreeTypeSubSetting*)setting toFont:(UIFont*)font scale:(CGFloat)scale {
-//    strcpy(setting->font, font.fontDescriptor.postscriptName.UTF8String);
+    std::string settingFont = setting->font;
+    char* c = const_cast<char*>(settingFont.c_str());
+    std::strcpy(c, font.fontDescriptor.postscriptName.UTF8String);
     setting->aa = true;
     setting->size = (uint)(font.pointSize * scale);
 }
 
 - (void)overrideDefaultSettings {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     IConsoleSetSetting("hover_delay_ms", 0);
     IConsoleSetSetting("osk_activation", 3);
-    BOOL hiDPI = [defaults boolForKey:@"NativeResolution"];
-//    _gui_zoom = hiDPI ? 1 : 2;
-    CGFloat fontScale = hiDPI ? [UIScreen mainScreen].nativeScale : 1.0;
+    _gui_zoom = ZOOM_LVL_OUT_4X;
+    CGFloat fontScale = [UIScreen mainScreen].nativeScale;
     
     UIFont *smallFont = [UIFont preferredFontForTextStyle:UIFontTextStyleCaption2];
     [self setFontSetting:&_freetype.small toFont:smallFont scale:fontScale];
@@ -138,25 +141,23 @@ static void CheckPaletteAnim()
     last_cur_ticks = cur_ticks;
     next_tick = cur_ticks + MILLISECONDS_PER_TICK;
     
-    _cocoa_touch_driver->OpenGLStartGame();
-    
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
     queue.maxConcurrentOperationCount = 1;
-    
     self.queue = queue;
+    
     CADisplayLink *displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(tick:)];
     [displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     self.displayLink = displayLink;
 }
 
 - (void)stopGameLoop {
+    [self.queue cancelAllOperations];
     [self.displayLink invalidate];
     self.displayLink = nil;
-    _cocoa_touch_driver->OpenGLStopGame();
 }
 
 - (void)resizeGameView:(CGSize)size {
-    CGFloat scale = [[NSUserDefaults standardUserDefaults] boolForKey:@"NativeResolution"] ? [UIScreen mainScreen].nativeScale : 1.0;
+    CGFloat scale = [UIScreen mainScreen].nativeScale;
     
     if (_cocoa_touch_driver) {
         _cocoa_touch_driver->ChangeResolution(size.width * scale, size.height * scale);
@@ -191,6 +192,7 @@ static void CheckPaletteAnim()
 }
 
 - (void)tick:(CADisplayLink*)link {
+    uint32 prev_cur_ticks = cur_ticks;
     InteractiveRandom(); // randomness
     
     if (_exit_game) {
@@ -198,9 +200,19 @@ static void CheckPaletteAnim()
         _cocoa_touch_driver->Stop();
     }
     
-    [self.queue addOperationWithBlock:^{
+    cur_ticks = GetTick();
+    if (cur_ticks >= next_tick || !_pause_mode || cur_ticks < prev_cur_ticks) {
+        _realtime_tick += cur_ticks - last_cur_ticks;
+        last_cur_ticks = cur_ticks;
+        next_tick = cur_ticks + MILLISECONDS_PER_TICK;
+        
+        bool old_ctrl_pressed = _ctrl_pressed;
+    
+        if (old_ctrl_pressed != _ctrl_pressed) HandleCtrlChanged();
+        
+        GameLoop();
         _cocoa_touch_driver->OpenGLTick();
-    }];
+    }
 }
 
 @end

@@ -517,7 +517,7 @@ static void LoadFreeTypeFont(FontSize fs)
 		std::string full_font = FioFindFullPath(BASE_DIR, font_name);
 		if (!full_font.empty()) {
 			error = FT_New_Face(_library, full_font.c_str(), 0, &face);
-#if defined(WITH_COCOA) && !defined(IOS) //TODO: CSE
+#if defined(WITH_COCOA) && !defined(IOS)
 			if (error == FT_Err_Ok) MacOSRegisterExternalFont(full_font.c_str());
 #endif
 		}

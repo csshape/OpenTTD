@@ -11,6 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface GameInputView : UIView <UIKeyInput>
 
+- (void)startUp;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -6314,7 +6314,7 @@
 					"-ObjC",
 					"-l\"z\"",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.openttd.OpenTTD-Mac";
+				PRODUCT_BUNDLE_IDENTIFIER = org.openttd.OpenTTD;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 			};
@@ -6374,7 +6374,7 @@
 					"-ObjC",
 					"-l\"z\"",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.openttd.OpenTTD-Mac";
+				PRODUCT_BUNDLE_IDENTIFIER = org.openttd.OpenTTD;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 			};
@@ -6432,7 +6432,7 @@
 					"-ObjC",
 					"-l\"z\"",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.openttd.OpenTTD-iOS";
+				PRODUCT_BUNDLE_IDENTIFIER = org.openttd.OpenTTD;
 				PRODUCT_NAME = OpenTTD;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -6492,7 +6492,7 @@
 					"-ObjC",
 					"-l\"z\"",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.openttd.OpenTTD-iOS";
+				PRODUCT_BUNDLE_IDENTIFIER = org.openttd.OpenTTD;
 				PRODUCT_NAME = OpenTTD;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
