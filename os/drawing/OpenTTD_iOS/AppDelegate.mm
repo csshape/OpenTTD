@@ -74,15 +74,6 @@ static void CheckPaletteAnim()
     uint32 cur_ticks, last_cur_ticks, next_tick;
 }
 
-+ (AppDelegate *)sharedInstance {
-    static AppDelegate *appDelegate;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-    });
-    return appDelegate;
-}
-
 - (void)setFontSetting:(FreeTypeSubSetting*)setting toFont:(UIFont*)font scale:(CGFloat)scale {
 //    strcpy(setting->font, font.fontDescriptor.postscriptName.UTF8String);
     setting->aa = true;
@@ -125,7 +116,6 @@ static void CheckPaletteAnim()
 
         GfxInitPalettes();
         CheckPaletteAnim();
-//        _cocoa_touch_driver->Draw();
 
         [self startGameLoop];
     }

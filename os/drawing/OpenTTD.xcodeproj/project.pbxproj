@@ -33,7 +33,6 @@
 		33524512282BBEC8006B68EE /* error_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FFC282BBEC7006B68EE /* error_gui.cpp */; };
 		33524513282BBEC8006B68EE /* newgrf_engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FFF282BBEC7006B68EE /* newgrf_engine.cpp */; };
 		33524514282BBEC8006B68EE /* newgrf_generic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524003282BBEC7006B68EE /* newgrf_generic.cpp */; };
-		33524518282BBEC8006B68EE /* dedicated_v.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524010282BBEC7006B68EE /* dedicated_v.cpp */; };
 		33524519282BBEC8006B68EE /* opengl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524011282BBEC7006B68EE /* opengl.cpp */; };
 		3352451E282BBEC8006B68EE /* null_v.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3352401C282BBEC7006B68EE /* null_v.cpp */; };
 		33524520282BBEC8006B68EE /* video_driver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524022282BBEC7006B68EE /* video_driver.cpp */; };
@@ -842,7 +841,6 @@
 		336E6B54284A109C0057061C /* cocoa_s.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524475282BBEC8006B68EE /* cocoa_s.cpp */; };
 		336E6B55284A109C0057061C /* strgen_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524043282BBEC7006B68EE /* strgen_base.cpp */; };
 		336E6B56284A109C0057061C /* sound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243AC282BBEC8006B68EE /* sound.cpp */; };
-		336E6B57284A109C0057061C /* dedicated_v.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524010282BBEC7006B68EE /* dedicated_v.cpp */; };
 		336E6B58284A109C0057061C /* tgp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524466282BBEC8006B68EE /* tgp.cpp */; };
 		336E6B59284A109C0057061C /* vehiclelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335242D7282BBEC7006B68EE /* vehiclelist.cpp */; };
 		336E6B5A284A109C0057061C /* waypoint_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335242D1282BBEC7006B68EE /* waypoint_gui.cpp */; };
@@ -1291,7 +1289,6 @@
 		336E6DB3284A7B0D0057061C /* viewport_sprite_sorter_sse4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524334282BBEC8006B68EE /* viewport_sprite_sorter_sse4.cpp */; };
 		336E6DB4284A7B0D0057061C /* viewport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524460282BBEC8006B68EE /* viewport.cpp */; };
 		336E6DB5284A7B0D0057061C /* water_cmd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335240F5282BBEC7006B68EE /* water_cmd.cpp */; };
-		336E6DB6284A7B0D0057061C /* dedicated_v.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524010282BBEC7006B68EE /* dedicated_v.cpp */; };
 		336E6DB7284A7B0D0057061C /* vehicle_gui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33524199282BBEC7006B68EE /* vehicle_gui.cpp */; };
 		336E6DB8284A7B0D0057061C /* townname.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243FA282BBEC8006B68EE /* townname.cpp */; };
 		336E6DB9284A7B0D0057061C /* widget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FB1282BBEC7006B68EE /* widget.cpp */; };
@@ -1343,6 +1340,9 @@
 		33A02CC1285F35A400075442 /* scripts in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B9D284A25750057061C /* scripts */; };
 		33A02CC52861CB8500075442 /* GameInputView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33A02CC42861CB8500075442 /* GameInputView.mm */; };
 		33A02CC828630F0300075442 /* ios_s.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33A02CC628630F0300075442 /* ios_s.cpp */; };
+		33A02CCB286437FC00075442 /* dedicated_v.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33A02CC9286437FB00075442 /* dedicated_v.cpp */; };
+		33A02CCC2864381100075442 /* dedicated_v.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33A02CC9286437FB00075442 /* dedicated_v.cpp */; };
+		33A02CCD2864381200075442 /* dedicated_v.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33A02CC9286437FB00075442 /* dedicated_v.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1523,8 +1523,6 @@
 		33524004282BBEC7006B68EE /* window_gui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = window_gui.h; sourceTree = "<group>"; };
 		3352400A282BBEC7006B68EE /* video_driver.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = video_driver.hpp; sourceTree = "<group>"; };
 		3352400B282BBEC7006B68EE /* opengl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opengl.h; sourceTree = "<group>"; };
-		3352400E282BBEC7006B68EE /* dedicated_v.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dedicated_v.h; sourceTree = "<group>"; };
-		33524010282BBEC7006B68EE /* dedicated_v.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dedicated_v.cpp; sourceTree = "<group>"; };
 		33524011282BBEC7006B68EE /* opengl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = opengl.cpp; sourceTree = "<group>"; };
 		3352401C282BBEC7006B68EE /* null_v.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = null_v.cpp; sourceTree = "<group>"; };
 		33524021282BBEC7006B68EE /* null_v.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = null_v.h; sourceTree = "<group>"; };
@@ -2733,6 +2731,8 @@
 		33A02CC42861CB8500075442 /* GameInputView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GameInputView.mm; sourceTree = "<group>"; };
 		33A02CC628630F0300075442 /* ios_s.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ios_s.cpp; sourceTree = "<group>"; };
 		33A02CC728630F0300075442 /* ios_s.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ios_s.hpp; sourceTree = "<group>"; };
+		33A02CC9286437FB00075442 /* dedicated_v.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dedicated_v.cpp; sourceTree = "<group>"; };
+		33A02CCA286437FB00075442 /* dedicated_v.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dedicated_v.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2869,6 +2869,25 @@
 			children = (
 				33524404282BBEC8006B68EE /* 3rdparty */,
 				3352438E282BBEC8006B68EE /* ai */,
+				335241AB282BBEC7006B68EE /* blitter */,
+				3352404A282BBEC7006B68EE /* core */,
+				335241DD282BBEC7006B68EE /* game */,
+				335242DA282BBEC7006B68EE /* lang */,
+				335241EC282BBEC7006B68EE /* linkgraph */,
+				33523FB6282BBEC7006B68EE /* misc */,
+				33523FC9282BBEC7006B68EE /* music */,
+				33524145282BBEC7006B68EE /* network */,
+				335243D3282BBEC8006B68EE /* os */,
+				335240FB282BBEC7006B68EE /* pathfinder */,
+				3352408C282BBEC7006B68EE /* saveload */,
+				33524214282BBEC7006B68EE /* script */,
+				335243A7282BBEC8006B68EE /* settingsgen */,
+				33524469282BBEC8006B68EE /* sound */,
+				335244EB282BBEC8006B68EE /* spriteloader */,
+				33524042282BBEC7006B68EE /* strgen */,
+				33524347282BBEC8006B68EE /* table */,
+				33524005282BBEC7006B68EE /* video */,
+				3352449C282BBEC8006B68EE /* widgets */,
 				33524329282BBEC8006B68EE /* aircraft_cmd.cpp */,
 				33524468282BBEC8006B68EE /* aircraft_cmd.h */,
 				335241A7282BBEC7006B68EE /* aircraft_gui.cpp */,
@@ -2896,7 +2915,6 @@
 				335240DC282BBEC7006B68EE /* base_media_func.h */,
 				33523FEC282BBEC7006B68EE /* base_station_base.h */,
 				335241A5282BBEC7006B68EE /* bitmap_type.h */,
-				335241AB282BBEC7006B68EE /* blitter */,
 				33524085282BBEC7006B68EE /* bmp.cpp */,
 				33524132282BBEC7006B68EE /* bmp.h */,
 				33524030282BBEC7006B68EE /* bootstrap_gui.cpp */,
@@ -2939,7 +2957,6 @@
 				3352402A282BBEC7006B68EE /* console_internal.h */,
 				33523FEA282BBEC7006B68EE /* console_type.h */,
 				335240F0282BBEC7006B68EE /* console.cpp */,
-				3352404A282BBEC7006B68EE /* core */,
 				33524456282BBEC8006B68EE /* cpu.cpp */,
 				335243AA282BBEC8006B68EE /* cpu.h */,
 				33524074282BBEC7006B68EE /* crashlog.cpp */,
@@ -3001,7 +3018,6 @@
 				33523FFD282BBEC7006B68EE /* fontdetection.h */,
 				33524451282BBEC8006B68EE /* framerate_gui.cpp */,
 				335241A2282BBEC7006B68EE /* framerate_type.h */,
-				335241DD282BBEC7006B68EE /* game */,
 				335243CE282BBEC8006B68EE /* gamelog_internal.h */,
 				33524485282BBEC8006B68EE /* gamelog.cpp */,
 				335240DD282BBEC7006B68EE /* gamelog.h */,
@@ -3056,25 +3072,20 @@
 				33523FFE282BBEC7006B68EE /* landscape_type.h */,
 				3352448C282BBEC8006B68EE /* landscape.cpp */,
 				33523FE2282BBEC7006B68EE /* landscape.h */,
-				335242DA282BBEC7006B68EE /* lang */,
 				33524139282BBEC7006B68EE /* language.h */,
-				335241EC282BBEC7006B68EE /* linkgraph */,
 				33524461282BBEC8006B68EE /* livery.h */,
 				3352403F282BBEC7006B68EE /* main_gui.cpp */,
 				3352406A282BBEC7006B68EE /* map_func.h */,
 				33524481282BBEC8006B68EE /* map_type.h */,
 				3352432F282BBEC8006B68EE /* map.cpp */,
-				33523FB6282BBEC7006B68EE /* misc */,
 				33523FAD282BBEC7006B68EE /* misc_cmd.cpp */,
 				335242C8282BBEC7006B68EE /* misc_cmd.h */,
 				33524482282BBEC8006B68EE /* misc_gui.cpp */,
 				335240E8282BBEC7006B68EE /* misc.cpp */,
 				33524198282BBEC7006B68EE /* mixer.cpp */,
 				335242D4282BBEC7006B68EE /* mixer.h */,
-				33523FC9282BBEC7006B68EE /* music */,
 				33524072282BBEC7006B68EE /* music_gui.cpp */,
 				335242CF282BBEC7006B68EE /* music.cpp */,
-				33524145282BBEC7006B68EE /* network */,
 				335240E7282BBEC7006B68EE /* newgrf_airport.cpp */,
 				3352411E282BBEC7006B68EE /* newgrf_airport.h */,
 				33524204282BBEC7006B68EE /* newgrf_airporttiles.cpp */,
@@ -3152,9 +3163,7 @@
 				335240E0282BBEC7006B68EE /* order_func.h */,
 				335243B3282BBEC8006B68EE /* order_gui.cpp */,
 				33524496282BBEC8006B68EE /* order_type.h */,
-				335243D3282BBEC8006B68EE /* os */,
 				33524080282BBEC7006B68EE /* osk_gui.cpp */,
-				335240FB282BBEC7006B68EE /* pathfinder */,
 				3352413C282BBEC7006B68EE /* pbs.cpp */,
 				3352412D282BBEC7006B68EE /* pbs.h */,
 				335243D1282BBEC8006B68EE /* progress.cpp */,
@@ -3190,12 +3199,10 @@
 				33524144282BBEC7006B68EE /* roadveh_gui.cpp */,
 				335243A2282BBEC8006B68EE /* roadveh.h */,
 				3352402C282BBEC7006B68EE /* safeguards.h */,
-				3352408C282BBEC7006B68EE /* saveload */,
 				3352412A282BBEC7006B68EE /* screenshot_gui.cpp */,
 				33524346282BBEC8006B68EE /* screenshot_gui.h */,
 				335243C7282BBEC8006B68EE /* screenshot.cpp */,
 				3352407F282BBEC7006B68EE /* screenshot.h */,
-				33524214282BBEC7006B68EE /* script */,
 				33524122282BBEC7006B68EE /* settings_cmd.h */,
 				335241AA282BBEC7006B68EE /* settings_func.h */,
 				335243A3282BBEC8006B68EE /* settings_gui.cpp */,
@@ -3205,7 +3212,6 @@
 				335242C9282BBEC7006B68EE /* settings_table.h */,
 				3352439F282BBEC8006B68EE /* settings_type.h */,
 				33524495282BBEC8006B68EE /* settings.cpp */,
-				335243A7282BBEC8006B68EE /* settingsgen */,
 				33523FE1282BBEC7006B68EE /* ship_cmd.cpp */,
 				33524203282BBEC7006B68EE /* ship_cmd.h */,
 				33524494282BBEC8006B68EE /* ship_gui.cpp */,
@@ -3225,7 +3231,6 @@
 				33524140282BBEC7006B68EE /* smallmap_gui.cpp */,
 				3352444D282BBEC8006B68EE /* smallmap_gui.h */,
 				33524480282BBEC8006B68EE /* sortlist_type.h */,
-				33524469282BBEC8006B68EE /* sound */,
 				33524087282BBEC7006B68EE /* sound_func.h */,
 				335244E4282BBEC8006B68EE /* sound_type.h */,
 				335243AC282BBEC8006B68EE /* sound.cpp */,
@@ -3233,7 +3238,6 @@
 				33524336282BBEC8006B68EE /* sprite.h */,
 				33523FAA282BBEC7006B68EE /* spritecache.cpp */,
 				33523FAC282BBEC7006B68EE /* spritecache.h */,
-				335244EB282BBEC8006B68EE /* spriteloader */,
 				335240E6282BBEC7006B68EE /* station_base.h */,
 				335243BB282BBEC8006B68EE /* station_cmd.cpp */,
 				33524333282BBEC8006B68EE /* station_cmd.h */,
@@ -3252,7 +3256,6 @@
 				3352445C282BBEC8006B68EE /* story_gui.cpp */,
 				33524073282BBEC7006B68EE /* story_type.h */,
 				3352407D282BBEC7006B68EE /* story.cpp */,
-				33524042282BBEC7006B68EE /* strgen */,
 				33524207282BBEC7006B68EE /* string_base.h */,
 				335240F4282BBEC7006B68EE /* string_func.h */,
 				33524324282BBEC8006B68EE /* string_type.h */,
@@ -3268,7 +3271,6 @@
 				33523FC7282BBEC7006B68EE /* subsidy_gui.cpp */,
 				3352406D282BBEC7006B68EE /* subsidy_type.h */,
 				33524462282BBEC8006B68EE /* subsidy.cpp */,
-				33524347282BBEC8006B68EE /* table */,
 				33524325282BBEC8006B68EE /* tar_type.h */,
 				33523FF1282BBEC7006B68EE /* terraform_cmd.cpp */,
 				3352448D282BBEC8006B68EE /* terraform_cmd.h */,
@@ -3341,7 +3343,6 @@
 				33524083282BBEC7006B68EE /* vehicle.cpp */,
 				335242D7282BBEC7006B68EE /* vehiclelist.cpp */,
 				3352438D282BBEC8006B68EE /* vehiclelist.h */,
-				33524005282BBEC7006B68EE /* video */,
 				33524344282BBEC8006B68EE /* viewport_cmd.h */,
 				335240F3282BBEC7006B68EE /* viewport_func.h */,
 				335240D8282BBEC7006B68EE /* viewport_gui.cpp */,
@@ -3365,7 +3366,6 @@
 				33524401282BBEC8006B68EE /* waypoint.cpp */,
 				33524195282BBEC7006B68EE /* widget_type.h */,
 				33523FB1282BBEC7006B68EE /* widget.cpp */,
-				3352449C282BBEC8006B68EE /* widgets */,
 				335243B7282BBEC8006B68EE /* window_func.h */,
 				33524004282BBEC7006B68EE /* window_gui.h */,
 				335242C6282BBEC7006B68EE /* window_type.h */,
@@ -3419,14 +3419,14 @@
 			isa = PBXGroup;
 			children = (
 				33524012282BBEC7006B68EE /* cocoa */,
-				33524022282BBEC7006B68EE /* video_driver.cpp */,
-				3352400A282BBEC7006B68EE /* video_driver.hpp */,
-				33524011282BBEC7006B68EE /* opengl.cpp */,
-				3352400B282BBEC7006B68EE /* opengl.h */,
-				3352400E282BBEC7006B68EE /* dedicated_v.h */,
-				33524010282BBEC7006B68EE /* dedicated_v.cpp */,
+				33A02CC9286437FB00075442 /* dedicated_v.cpp */,
+				33A02CCA286437FB00075442 /* dedicated_v.h */,
 				3352401C282BBEC7006B68EE /* null_v.cpp */,
 				33524021282BBEC7006B68EE /* null_v.h */,
+				33524011282BBEC7006B68EE /* opengl.cpp */,
+				3352400B282BBEC7006B68EE /* opengl.h */,
+				33524022282BBEC7006B68EE /* video_driver.cpp */,
+				3352400A282BBEC7006B68EE /* video_driver.hpp */,
 			);
 			path = video;
 			sourceTree = "<group>";
@@ -4879,6 +4879,7 @@
 				33524603282BBEC9006B68EE /* script_event_types.cpp in Sources */,
 				33524530282BBEC8006B68EE /* random_func.cpp in Sources */,
 				3352465F282BBEC9006B68EE /* vehicle_cmd.cpp in Sources */,
+				33A02CCD2864381200075442 /* dedicated_v.cpp in Sources */,
 				3352459F282BBEC8006B68EE /* network_chat_gui.cpp in Sources */,
 				3352455C282BBEC8006B68EE /* town_sl.cpp in Sources */,
 				3352460B282BBEC9006B68EE /* script_road.cpp in Sources */,
@@ -5069,7 +5070,6 @@
 				335245B6282BBEC8006B68EE /* string.cpp in Sources */,
 				3352462F282BBEC9006B68EE /* newgrf_object.cpp in Sources */,
 				33524544282BBEC8006B68EE /* storage_sl.cpp in Sources */,
-				33524518282BBEC8006B68EE /* dedicated_v.cpp in Sources */,
 				33524535282BBEC8006B68EE /* cheat_gui.cpp in Sources */,
 				33524644282BBEC9006B68EE /* textfile_gui.cpp in Sources */,
 				33524539282BBEC8006B68EE /* story.cpp in Sources */,
@@ -5258,6 +5258,7 @@
 				336E6B64284A109C0057061C /* slider.cpp in Sources */,
 				336E6AF7284A10810057061C /* script_companymode.cpp in Sources */,
 				336E6BE0284A5FFE0057061C /* cocoa_wnd.mm in Sources */,
+				33A02CCC2864381100075442 /* dedicated_v.cpp in Sources */,
 				336E6B40284A10810057061C /* script_road.cpp in Sources */,
 				336E6B44284A109C0057061C /* tree_gui.cpp in Sources */,
 				336E69DC284A0F090057061C /* autoreplace_gui.cpp in Sources */,
@@ -5491,7 +5492,6 @@
 				336E6AE5284A104A0057061C /* rail_gui.cpp in Sources */,
 				336E6B55284A109C0057061C /* strgen_base.cpp in Sources */,
 				336E6B39284A10810057061C /* script_text.cpp in Sources */,
-				336E6B57284A109C0057061C /* dedicated_v.cpp in Sources */,
 				336E6A58284A0FAE0057061C /* flowmapper.cpp in Sources */,
 				336E69DD284A0F090057061C /* sqtable.cpp in Sources */,
 				336E6A1C284A0F3B0057061C /* pool_func.cpp in Sources */,
@@ -5719,6 +5719,7 @@
 				336E6C73284A7A2A0057061C /* rev.cpp in Sources */,
 				336E6C53284A7A2A0057061C /* autoreplace_gui.cpp in Sources */,
 				336E6D03284A7A5C0057061C /* newgrf_town.cpp in Sources */,
+				33A02CCB286437FC00075442 /* dedicated_v.cpp in Sources */,
 				336E6D4F284A7A980057061C /* depot_sl.cpp in Sources */,
 				336E6D9B284A7AF50057061C /* script_bridgelist.cpp in Sources */,
 				336E6D88284A7AF50057061C /* signal.cpp in Sources */,
@@ -5759,7 +5760,6 @@
 				336E6C89284A7A2F0057061C /* currency.cpp in Sources */,
 				336E6D31284A7A980057061C /* script_instance.cpp in Sources */,
 				336E6D3C284A7A980057061C /* vehicle_sl.cpp in Sources */,
-				336E6DB6284A7B0D0057061C /* dedicated_v.cpp in Sources */,
 				336E6DA3284A7AF50057061C /* script_cargo.cpp in Sources */,
 				336E6CF8284A7A5C0057061C /* newgrf_airporttiles.cpp in Sources */,
 				336E6CD3284A7A520057061C /* gfx.cpp in Sources */,
