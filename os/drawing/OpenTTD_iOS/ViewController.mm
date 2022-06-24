@@ -68,4 +68,8 @@ extern CALayer *_cocoa_touch_layer;
     [self.view bringSubviewToFront:self.inputView];
 }
 
+- (void)pressesBegan:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
+    [self.inputView pressesBegan:presses withEvent:event];
+}
+
 @end

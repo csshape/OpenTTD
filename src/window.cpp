@@ -3372,7 +3372,7 @@ void ReInitAllWindows(bool zoom_changed)
  * @param setting The actual setting used for the window's position.
  * @return X coordinate of left edge of the repositioned window.
  */
-static int PositionWindow(Window *w, WindowClass clss, int setting)
+static int PositionWindow(Window *w, WindowClass clss, int setting, int offset = 0)
 {
 	if (w == nullptr || w->window_class != clss) {
 		w = FindWindowById(clss, 0);
@@ -3383,6 +3383,9 @@ static int PositionWindow(Window *w, WindowClass clss, int setting)
 	switch (setting) {
 		case 1:  w->left = (_screen.width - w->width) / 2; break;
 		case 2:  w->left = _screen.width - w->width; break;
+        case 3:  w->left = (_screen.width - w->width) / 2; w->top = offset; break;
+        case 4:  w->left = (_screen.width - w->width) / 2; w->top = _screen.height - w->height - offset; break;
+            
 		default: w->left = 0; break;
 	}
 	if (w->viewport != nullptr) w->viewport->left += w->left - old_left;
@@ -3398,7 +3401,7 @@ static int PositionWindow(Window *w, WindowClass clss, int setting)
 int PositionMainToolbar(Window *w)
 {
 	Debug(misc, 5, "Repositioning Main Toolbar...");
-	return PositionWindow(w, WC_MAIN_TOOLBAR, _settings_client.gui.toolbar_pos);
+	return PositionWindow(w, WC_MAIN_TOOLBAR, _settings_client.gui.toolbar_pos, _settings_client.gui.toolbar_pos_offset);
 }
 
 /**
@@ -3409,7 +3412,7 @@ int PositionMainToolbar(Window *w)
 int PositionStatusbar(Window *w)
 {
 	Debug(misc, 5, "Repositioning statusbar...");
-	return PositionWindow(w, WC_STATUS_BAR, _settings_client.gui.statusbar_pos);
+	return PositionWindow(w, WC_STATUS_BAR, _settings_client.gui.statusbar_pos, _settings_client.gui.statusbar_pos_offset);
 }
 
 /**

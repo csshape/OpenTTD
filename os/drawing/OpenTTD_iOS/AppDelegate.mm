@@ -210,6 +210,12 @@ static void CheckPaletteAnim()
     
         if (old_ctrl_pressed != _ctrl_pressed) HandleCtrlChanged();
         
+        _settings_client.gui.statusbar_pos = 4;
+        _settings_client.gui.statusbar_pos_offset = self.window.safeAreaInsets.bottom;
+        
+        _settings_client.gui.toolbar_pos = 3;
+        _settings_client.gui.toolbar_pos_offset = self.window.safeAreaInsets.top;
+        
         GameLoop();
         _cocoa_touch_driver->OpenGLTick();
     }

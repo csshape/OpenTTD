@@ -125,8 +125,10 @@ struct GUISettings {
 	uint8  advanced_vehicle_list;            ///< use the "advanced" vehicle list
 	uint8  loading_indicators;               ///< show loading indicators
 	uint8  default_rail_type;                ///< the default rail type for the rail GUI
-	uint8  toolbar_pos;                      ///< position of toolbars, 0=left, 1=center, 2=right
-	uint8  statusbar_pos;                    ///< position of statusbar, 0=left, 1=center, 2=right
+	uint8  toolbar_pos;                      ///< position of toolbars, 0=left, 1=center, 2=right, 3=center + top offset, 4=center + buttom offset
+	uint8  statusbar_pos;                    ///< position of statusbar, 0=left, 1=center, 2=right, 3=center + top offset, 4=center + buttom offset
+    uint8  toolbar_pos_offset;               ///< offset on position of toolbars
+    uint8  statusbar_pos_offset;             ///< offset onposition of statusbar
 	uint8  window_snap_radius;               ///< windows snap at each other if closer than this
 	uint8  window_soft_limit;                ///< soft limit of maximum number of non-stickied non-vital windows (0 = no limit)
 	ZoomLevel zoom_min;                      ///< minimum zoom out level

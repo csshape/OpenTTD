@@ -288,6 +288,11 @@ bool IsOSKOpenedFor(const Window *w, int button) {
     HandleKeypress(WKC_BACKSPACE, '\x08');
 }
 
+- (void)handleKeypress:(uint)keycode {
+//    [self ensureInputFieldIsVisible:nil];
+    HandleKeypress(keycode, 0);
+}
+
 - (BOOL)hasText {
     if (_focused_window) {
         return _focused_window->GetFocusedText() != NULL;
@@ -308,6 +313,56 @@ bool IsOSKOpenedFor(const Window *w, int button) {
     return UITextSpellCheckingTypeNo;
 }
 
+- (void)pressesBegan:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
+    __block BOOL isShift = false;
+    [event.allPresses enumerateObjectsUsingBlock:^(UIPress * _Nonnull obj, BOOL * _Nonnull stop) {
+        switch ([obj key].keyCode) {
+            case 40:
+                [self insertText:@"\n"];
+                break;
+            case 42:
+                [self deleteBackward];
+                break;
+            case 80:
+                if (isShift) {
+                    [self handleKeypress:WKC_LEFT | WKC_SHIFT];
+                } else {
+                    [self handleKeypress:WKC_LEFT];
+                }
+                break;
+            case 79:
+                if (isShift) {
+                    [self handleKeypress:WKC_RIGHT | WKC_SHIFT];
+                } else {
+                    [self handleKeypress:WKC_RIGHT];
+                }
+                break;
+            case 82:
+                if (isShift) {
+                    [self handleKeypress:WKC_UP | WKC_SHIFT];
+                } else {
+                    [self handleKeypress:WKC_UP];
+                }
+                break;
+            case 81:
+                if (isShift) {
+                    [self handleKeypress:WKC_DOWN | WKC_SHIFT];
+                } else {
+                    [self handleKeypress:WKC_DOWN];
+                }
+                break;
+            case 225:
+                isShift = true;
+                break;
+            default:
+                [self insertText:[obj key].characters];
+                break;
+        }
+        
+        NSLog(@"key: %@, %@", [obj key], [obj key].characters);
+        
+    }];
+}
 
 @end
 
