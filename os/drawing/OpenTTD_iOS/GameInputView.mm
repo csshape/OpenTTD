@@ -342,14 +342,12 @@ bool IsOSKOpenedFor(const Window *w, int button) {
     
     [event.allPresses enumerateObjectsUsingBlock:^(UIPress * _Nonnull obj, BOOL * _Nonnull stop) {
         [self keyDown:obj];
-        NSLog(@"Being key: %@, %@, 0x%02X", [obj key], [obj key].characters, [obj key].keyCode);
     }];
 }
 
 - (void)pressesEnded:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
     [event.allPresses enumerateObjectsUsingBlock:^(UIPress * _Nonnull obj, BOOL * _Nonnull stop) {
         [self keyUp:obj];
-        NSLog(@"End key: %@, %@", [obj key], [obj key].characters);
     }];
 }
 
