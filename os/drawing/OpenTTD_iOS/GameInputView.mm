@@ -20,11 +20,21 @@
 #include "window_gui.h"
 #include "zoom_func.h"
 
+/* Table data for key mapping. */
+#include "ios_keys.h"
+
 extern CALayer *_cocoa_touch_layer;
 static GameInputView *_cocoa_input_view;
 
 std::string _keyboard_opt[2];
 static WChar _keyboard[2][OSK_KEYBOARD_ENTRIES];
+
+/* Right Mouse Button Emulation enum */
+enum RightMouseButtonEmulationState {
+    RMBE_COMMAND = 0,
+    RMBE_CONTROL = 1,
+    RMBE_OFF     = 2,
+};
 
 void ShowOnScreenKeyboard(Window *parent, int button) {
     [_cocoa_input_view becomeFirstResponder];
@@ -53,6 +63,10 @@ bool IsOSKOpenedFor(const Window *w, int button) {
     CGFloat wheelLevel;
     Window *panWindow;
     CGRect keyboardFrame;
+    NSTimer *keyTimer;
+    NSMutableArray *keys;
+    
+    BOOL _tab_is_down;
 }
 
 - (void)startUp {
@@ -288,9 +302,18 @@ bool IsOSKOpenedFor(const Window *w, int button) {
     HandleKeypress(WKC_BACKSPACE, '\x08');
 }
 
-- (void)handleKeypress:(uint)keycode {
-//    [self ensureInputFieldIsVisible:nil];
-    HandleKeypress(keycode, 0);
+- (void)handleKeypress:(unsigned short)keycode chars:(NSString*)chars {
+    [self ensureInputFieldIsVisible:nil];
+    
+    switch (keycode) {
+        case IOS_UP:    HandleKeypress(WKC_UP, 0); break;
+        case IOS_DOWN:  HandleKeypress(WKC_DOWN, 0); break;
+        case IOS_LEFT:  HandleKeypress(WKC_LEFT, 0); break;
+        case IOS_RIGHT: HandleKeypress(WKC_RIGHT, 0); break;
+        case IOS_RETURN: HandleKeypress(WKC_RETURN, '\n'); break;
+        case IOS_BACKSPACE: HandleKeypress(WKC_BACKSPACE, '\x08'); break;
+        default: HandleTextInput(chars.UTF8String); break;
+    }
 }
 
 - (BOOL)hasText {
@@ -314,54 +337,134 @@ bool IsOSKOpenedFor(const Window *w, int button) {
 }
 
 - (void)pressesBegan:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
-    __block BOOL isShift = false;
+    if (keyTimer != nil) [keyTimer invalidate];
+    keys = @[].mutableCopy;
+    
     [event.allPresses enumerateObjectsUsingBlock:^(UIPress * _Nonnull obj, BOOL * _Nonnull stop) {
-        switch ([obj key].keyCode) {
-            case 40:
-                [self insertText:@"\n"];
-                break;
-            case 42:
-                [self deleteBackward];
-                break;
-            case 80:
-                if (isShift) {
-                    [self handleKeypress:WKC_LEFT | WKC_SHIFT];
-                } else {
-                    [self handleKeypress:WKC_LEFT];
-                }
-                break;
-            case 79:
-                if (isShift) {
-                    [self handleKeypress:WKC_RIGHT | WKC_SHIFT];
-                } else {
-                    [self handleKeypress:WKC_RIGHT];
-                }
-                break;
-            case 82:
-                if (isShift) {
-                    [self handleKeypress:WKC_UP | WKC_SHIFT];
-                } else {
-                    [self handleKeypress:WKC_UP];
-                }
-                break;
-            case 81:
-                if (isShift) {
-                    [self handleKeypress:WKC_DOWN | WKC_SHIFT];
-                } else {
-                    [self handleKeypress:WKC_DOWN];
-                }
-                break;
-            case 225:
-                isShift = true;
-                break;
-            default:
-                [self insertText:[obj key].characters];
-                break;
-        }
-        
-        NSLog(@"key: %@, %@", [obj key], [obj key].characters);
-        
+        [self keyDown:obj];
+        NSLog(@"Being key: %@, %@, 0x%02X", [obj key], [obj key].characters, [obj key].keyCode);
     }];
+}
+
+- (void)pressesEnded:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
+    [event.allPresses enumerateObjectsUsingBlock:^(UIPress * _Nonnull obj, BOOL * _Nonnull stop) {
+        [self keyUp:obj];
+        NSLog(@"End key: %@, %@", [obj key], [obj key].characters);
+    }];
+}
+
+- (void)keyDown:(UIPress *)presse
+{
+    /* Convert UTF-16 characters to UCS-4 chars. */
+    std::vector<WChar> unicode_str = NSStringToUTF32([ presse.key characters ]);
+    if (unicode_str.empty()) unicode_str.push_back(0);
+
+    if (EditBoxInGlobalFocus()) {
+        if ([ self internalHandleKeycode:presse.key.keyCode unicode:unicode_str[0] pressed:YES modifiers:presse.key.modifierFlags ]) {
+            [self handleKeypress:presse.key.keyCode chars:[ presse.key characters ]];
+        }
+    } else {
+        [ self internalHandleKeycode:presse.key.keyCode unicode:unicode_str[0] pressed:YES modifiers:presse.key.modifierFlags ];
+        for (size_t i = 1; i < unicode_str.size(); i++) {
+            [ self internalHandleKeycode:0 unicode:unicode_str[i] pressed:YES modifiers:presse.key.modifierFlags ];
+        }
+    }
+}
+
+- (void)keyUp:(UIPress *)presse
+{
+    /* Convert UTF-16 characters to UCS-4 chars. */
+    std::vector<WChar> unicode_str = NSStringToUTF32([ presse.key characters ]);
+    if (unicode_str.empty()) unicode_str.push_back(0);
+
+    [ self internalHandleKeycode:presse.key.keyCode unicode:unicode_str[0] pressed:NO modifiers:presse.key.modifierFlags ];
+}
+
+- (BOOL)internalHandleKeycode:(unsigned short)keycode unicode:(WChar)unicode pressed:(BOOL)down modifiers:(NSUInteger)modifiers
+{
+    switch (keycode) {
+        case IOS_UP:    SB(_dirkeys, 1, 1, down); break;
+        case IOS_DOWN:  SB(_dirkeys, 3, 1, down); break;
+        case IOS_LEFT:  SB(_dirkeys, 0, 1, down); break;
+        case IOS_RIGHT: SB(_dirkeys, 2, 1, down); break;
+
+        case IOS_TAB: _tab_is_down = down; break;
+
+        case IOS_RETURN:
+        case IOS_f:
+            if (down && (modifiers & OTTD_EventModifierFlagCommand)) {
+                VideoDriver::GetInstance()->ToggleFullscreen(!_fullscreen);
+            }
+            break;
+
+        case IOS_v:
+            if (down && EditBoxInGlobalFocus() && (modifiers & (OTTD_EventModifierFlagCommand | OTTD_EventModifierFlagControl))) {
+                HandleKeypress(WKC_CTRL | 'V', unicode);
+            }
+            break;
+        case IOS_u:
+            if (down && EditBoxInGlobalFocus() && (modifiers & (OTTD_EventModifierFlagCommand | OTTD_EventModifierFlagControl))) {
+                HandleKeypress(WKC_CTRL | 'U', unicode);
+            }
+            break;
+    }
+    
+    BOOL interpret_keys = YES;
+    if (down) {
+        /* Map keycode to OTTD code. */
+        auto vk = std::find_if(std::begin(_vk_mapping), std::end(_vk_mapping), [=](const IOSVkMapping &m) { return m.vk_from == keycode; });
+        uint32 pressed_key = vk != std::end(_vk_mapping) ? vk->map_to : 0;
+
+        if (modifiers & OTTD_EventModifierFlagShift)   pressed_key |= WKC_SHIFT;
+        if (modifiers & OTTD_EventModifierFlagControl) pressed_key |= (_settings_client.gui.right_mouse_btn_emulation != RMBE_CONTROL ? WKC_CTRL : WKC_META);
+        if (modifiers & OTTD_EventModifierFlagOption)  pressed_key |= WKC_ALT;
+        if (modifiers & OTTD_EventModifierFlagCommand) pressed_key |= (_settings_client.gui.right_mouse_btn_emulation != RMBE_CONTROL ? WKC_META : WKC_CTRL);
+
+        static bool console = false;
+
+        /* The second backquote may have a character, which we don't want to interpret. */
+        if (pressed_key == WKC_BACKQUOTE && (console || unicode == 0)) {
+            if (!console) {
+                /* Backquote is a dead key, require a double press for hotkey behaviour (i.e. console). */
+                console = true;
+                return YES;
+            } else {
+                /* Second backquote, don't interpret as text input. */
+                interpret_keys = NO;
+            }
+        }
+        console = false;
+
+        /* Don't handle normal characters if an edit box has the focus. */
+        if (!EditBoxInGlobalFocus() || IsInsideMM(pressed_key & ~WKC_SPECIAL_KEYS, WKC_F1, WKC_PAUSE + 1)) {
+            HandleKeypress(pressed_key, unicode);
+        }
+        Debug(driver, 3, "iOS: IOS_KeyEvent: {:x} ({:x}), down, mapping: {:x}", keycode, (int)unicode, pressed_key);
+    } else {
+        Debug(driver, 3, "iOS: IOS_KeyEvent: {:x} ({:x}), up", keycode, (int)unicode);
+    }
+
+    return interpret_keys;
+}
+
+static std::vector<WChar> NSStringToUTF32(NSString *s)
+{
+    std::vector<WChar> unicode_str;
+
+    unichar lead = 0;
+    for (NSUInteger i = 0; i < s.length; i++) {
+        unichar c = [ s characterAtIndex:i ];
+        if (Utf16IsLeadSurrogate(c)) {
+            lead = c;
+            continue;
+        } else if (Utf16IsTrailSurrogate(c)) {
+            if (lead != 0) unicode_str.push_back(Utf16DecodeSurrogate(lead, c));
+        } else {
+            unicode_str.push_back(c);
+        }
+    }
+
+    return unicode_str;
 }
 
 @end

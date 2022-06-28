@@ -2733,6 +2733,7 @@
 		33A02CC728630F0300075442 /* ios_s.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ios_s.hpp; sourceTree = "<group>"; };
 		33A02CC9286437FB00075442 /* dedicated_v.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dedicated_v.cpp; sourceTree = "<group>"; };
 		33A02CCA286437FB00075442 /* dedicated_v.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dedicated_v.h; sourceTree = "<group>"; };
+		33A02CCE286B06B000075442 /* ios_keys.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ios_keys.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -3447,6 +3448,7 @@
 				33560DBA284E1F6000B6B8C4 /* VideoDriver_OpenGLES.mm */,
 				33560DBD28534B6400B6B8C4 /* ios_wnd.h */,
 				33560DBE28534B6400B6B8C4 /* ios_wnd.mm */,
+				33A02CCE286B06B000075442 /* ios_keys.h */,
 			);
 			path = cocoa;
 			sourceTree = "<group>";
