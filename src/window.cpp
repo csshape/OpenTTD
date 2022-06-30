@@ -3423,7 +3423,7 @@ int PositionStatusbar(Window *w)
 int PositionNewsMessage(Window *w)
 {
 	Debug(misc, 5, "Repositioning news message...");
-	return PositionWindow(w, WC_NEWS_WINDOW, _settings_client.gui.statusbar_pos);
+	return PositionWindow(w, WC_NEWS_WINDOW, _settings_client.gui.statusbar_pos, _settings_client.gui.statusbar_pos_offset);
 }
 
 /**
@@ -3434,7 +3434,7 @@ int PositionNewsMessage(Window *w)
 int PositionNetworkChatWindow(Window *w)
 {
 	Debug(misc, 5, "Repositioning network chat window...");
-	return PositionWindow(w, WC_SEND_NETWORK_MSG, _settings_client.gui.statusbar_pos);
+	return PositionWindow(w, WC_SEND_NETWORK_MSG, _settings_client.gui.statusbar_pos, _settings_client.gui.statusbar_pos_offset);
 }
 
 

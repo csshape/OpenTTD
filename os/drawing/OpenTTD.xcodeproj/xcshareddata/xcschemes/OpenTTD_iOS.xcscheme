@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "336E6C03284A78790057061C"
-               BuildableName = "OpenTTD_iOS.app"
+               BuildableName = "OpenTTD.app"
                BlueprintName = "OpenTTD_iOS"
                ReferencedContainer = "container:OpenTTD.xcodeproj">
             </BuildableReference>
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "336E6C03284A78790057061C"
-            BuildableName = "OpenTTD_iOS.app"
+            BuildableName = "OpenTTD.app"
             BlueprintName = "OpenTTD_iOS"
             ReferencedContainer = "container:OpenTTD.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "336E6C03284A78790057061C"
-            BuildableName = "OpenTTD_iOS.app"
+            BuildableName = "OpenTTD.app"
             BlueprintName = "OpenTTD_iOS"
             ReferencedContainer = "container:OpenTTD.xcodeproj">
          </BuildableReference>
