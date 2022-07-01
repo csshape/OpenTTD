@@ -1344,6 +1344,7 @@
 		33A02CCC2864381100075442 /* dedicated_v.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33A02CC9286437FB00075442 /* dedicated_v.cpp */; };
 		33A02CCD2864381200075442 /* dedicated_v.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33A02CC9286437FB00075442 /* dedicated_v.cpp */; };
 		33A02CD0286C9B6800075442 /* InhouseConfig.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 33A02CCF286C9B6800075442 /* InhouseConfig.xcconfig */; };
+		33A02CD8286EE9C400075442 /* DevConfig.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 33A02CD7286EE9C400075442 /* DevConfig.xcconfig */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -2736,6 +2737,7 @@
 		33A02CCA286437FB00075442 /* dedicated_v.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dedicated_v.h; sourceTree = "<group>"; };
 		33A02CCE286B06B000075442 /* ios_keys.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ios_keys.h; sourceTree = "<group>"; };
 		33A02CCF286C9B6800075442 /* InhouseConfig.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = InhouseConfig.xcconfig; sourceTree = "<group>"; };
+		33A02CD7286EE9C400075442 /* DevConfig.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DevConfig.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -4497,6 +4499,7 @@
 				33A02CC32861CB8500075442 /* GameInputView.h */,
 				33A02CC42861CB8500075442 /* GameInputView.mm */,
 				33A02CCF286C9B6800075442 /* InhouseConfig.xcconfig */,
+				33A02CD7286EE9C400075442 /* DevConfig.xcconfig */,
 			);
 			path = OpenTTD_iOS;
 			sourceTree = "<group>";
@@ -4689,6 +4692,7 @@
 				33560DA3284CC87800B6B8C4 /* gs_instruments.dls in Resources */,
 				33A02CBF285F359D00075442 /* baseset in Resources */,
 				33A02CC1285F35A400075442 /* scripts in Resources */,
+				33A02CD8286EE9C400075442 /* DevConfig.xcconfig in Resources */,
 				33A02CD0286C9B6800075442 /* InhouseConfig.xcconfig in Resources */,
 				336E6C16284A787A0057061C /* LaunchScreen.storyboard in Resources */,
 				33A02CC0285F35A000075442 /* ai in Resources */,
@@ -6388,10 +6392,13 @@
 		};
 		336E6C1A284A787A0057061C /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33A02CD7286EE9C400075442 /* DevConfig.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LIBRARY = "libc++";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
@@ -6439,6 +6446,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.openttd.OpenTTD;
 				PRODUCT_NAME = OpenTTD;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -6454,7 +6462,6 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 74K7CXXP43;
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../src/script/api/game",
