@@ -185,8 +185,8 @@ void VideoDriver_OpenGLES::AllocateBackingStore(bool force)
 
     this->UpdatePalette(0, 256);
 
-    CGRect newframe = [ this->cocoaview getRealRect:[ this->cocoaview bounds ] ];
-
+    CGRect newframe = [this->cocoaview getRealRect:[this->cocoaview bounds]];
+    
     this->window_width = (int)newframe.size.width;
     this->window_height = (int)newframe.size.height;
     this->window_pitch = Align(this->window_width, 16 / sizeof(uint32)); // Quartz likes lines that are multiple of 16-byte.

@@ -223,14 +223,9 @@ void VideoDriver_Cocoa::MainLoop()
 bool VideoDriver_Cocoa::ChangeResolution(int w, int h)
 {
 #if defined(IOS)
-    CGSize screen_size = [ [ UIScreen mainScreen ] bounds ].size;
-    w = std::min(w, (int)screen_size.width);
-    h = std::min(h, (int)screen_size.height);
-    
     CGRect contentRect = CGRectMake(0, 0, w, h);
     
     if (this->cocoaview != nil) {
-        h = (int)contentRect.size.height;
         [this->cocoaview setFrame:contentRect];
     }
 #else

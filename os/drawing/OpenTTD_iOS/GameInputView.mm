@@ -386,6 +386,12 @@ bool IsOSKOpenedFor(const Window *w, int button) {
         case IOS_LEFT:  SB(_dirkeys, 0, 1, down); break;
         case IOS_RIGHT: SB(_dirkeys, 2, 1, down); break;
 
+        case IOS_LCTRL:
+        case IOS_RCTRL: _ctrl_pressed = down; break;
+            
+        case IOS_LSHIFT:
+        case IOS_RSHIFT: _shift_pressed = down; break;
+            
         case IOS_TAB: _tab_is_down = down; break;
 
         case IOS_RETURN:

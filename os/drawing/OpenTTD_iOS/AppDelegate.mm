@@ -89,7 +89,7 @@ static void CheckPaletteAnim()
     IConsoleSetSetting("hover_delay_ms", 0);
     IConsoleSetSetting("osk_activation", 3);
     _gui_zoom = ZOOM_LVL_OUT_4X;
-    CGFloat fontScale = [UIScreen mainScreen].nativeScale;
+    CGFloat fontScale = 1; //[UIScreen mainScreen].nativeScale;
     
     UIFont *smallFont = [UIFont preferredFontForTextStyle:UIFontTextStyleCaption2];
     [self setFontSetting:&_freetype.small toFont:smallFont scale:fontScale];
@@ -157,7 +157,7 @@ static void CheckPaletteAnim()
 }
 
 - (void)resizeGameView:(CGSize)size {
-    CGFloat scale = [UIScreen mainScreen].nativeScale;
+    CGFloat scale = 1; //[UIScreen mainScreen].nativeScale;
     
     if (_cocoa_touch_driver) {
         _cocoa_touch_driver->ChangeResolution(size.width * scale, size.height * scale);
