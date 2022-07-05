@@ -80,8 +80,26 @@ bool IsOSKOpenedFor(const Window *w, int button) {
     UIPinchGestureRecognizer *pinchRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinchGesture:)];
     [self addGestureRecognizer:pinchRecognizer];
     
+    if (@available(iOS 13.0, *)) {
+        UIHoverGestureRecognizer *hoverGestureRecognizer = [[UIHoverGestureRecognizer alloc] initWithTarget:self action:@selector(handleHoverGesture:)];
+        [self addGestureRecognizer:hoverGestureRecognizer];
+    }
+    
     _cocoa_input_view = self;
     keyboardFrame = CGRectZero;
+}
+
+- (void)handleHoverGesture:(UIGestureRecognizer*)recognizer {
+    switch (recognizer.state) {
+        case UIGestureRecognizerStateChanged: {
+            Point point = [self gamePoint:[recognizer locationInView:self]];
+            _cursor.UpdateCursorPosition(point.x, point.y, false);
+            _left_button_down = true;
+            HandleMouseEvents();
+        }
+        default:
+            break;
+    }
 }
 
 - (void)handlePanGesture:(UIPanGestureRecognizer*)recognizer {
