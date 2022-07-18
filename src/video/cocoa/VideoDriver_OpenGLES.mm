@@ -88,6 +88,18 @@ VideoDriver_OpenGLES *_cocoa_touch_driver = NULL;
     CGImageRelease(fullImage);
 }
 
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    
+    if ([self.layer.sublayers containsObject:_cocoa_touch_layer] == false) {
+        _cocoa_touch_layer.frame = self.bounds;
+        [self.layer addSublayer:_cocoa_touch_layer];
+    }
+    
+    _cocoa_touch_layer.frame = self.bounds;
+    NSLog(@"%@", NSStringFromCGRect(_cocoa_touch_layer.frame));
+}
+
 @end
 
 

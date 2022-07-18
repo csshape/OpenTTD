@@ -463,13 +463,10 @@ bool VideoDriver_Cocoa::MakeWindow(int width, int height)
 #if defined(IOS)
     this->window = [[OTTD_CocoaWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     CGRect view_frame = [this->window bounds];
-    this->cocoaview = [ [OTTD_CocoaView alloc] initWithFrame:view_frame];
-    
-    [this->cocoaview setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
+    OTTD_CocoaView *cocoaview = [ [OTTD_CocoaView alloc] initWithFrame:view_frame];
+    this->cocoaview = cocoaview;
     
     UIView *draw_view = this->AllocateDrawView();
-    
-    [draw_view setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
     
     ViewController *viewController = [[ViewController alloc] init];
     viewController.view.frame = this->window.bounds;
@@ -477,6 +474,15 @@ bool VideoDriver_Cocoa::MakeWindow(int width, int height)
     
     [viewController.view addSubview:this->cocoaview];
     [this->cocoaview addSubview:draw_view ];
+    
+    cocoaview.translatesAutoresizingMaskIntoConstraints = false;
+    draw_view.translatesAutoresizingMaskIntoConstraints = false;
+    
+    NSDictionary *views = NSDictionaryOfVariableBindings(cocoaview, draw_view);
+    [viewController.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0-[cocoaview]-0-|" options:0 metrics:nil views:views]];
+    [viewController.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-0-[cocoaview]-0-|" options:0 metrics:nil views:views]];
+    [cocoaview addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0-[draw_view]-0-|" options:0 metrics:nil views:views]];
+    [cocoaview addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-0-[draw_view]-0-|" options:0 metrics:nil views:views]];
 #else
 	/* Limit window size to screen frame. */
 	NSSize screen_size = [ [ NSScreen mainScreen ] frame ].size;

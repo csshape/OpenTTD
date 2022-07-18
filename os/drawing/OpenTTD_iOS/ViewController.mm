@@ -11,8 +11,6 @@
 
 #include "ios_wnd.h"
 
-extern CALayer *_cocoa_touch_layer;
-
 @interface ViewController ()
 @property (readonly, nonatomic) AppDelegate *appDelegate;
 @property (strong, nonatomic) GameInputView *inputView;
@@ -48,10 +46,6 @@ extern CALayer *_cocoa_touch_layer;
     [self.appDelegate resizeGameView:size];
 }
 
-- (void)viewDidLayoutSubviews {
-    _cocoa_touch_layer.frame = self.view.bounds;
-}
-
 - (BOOL)prefersStatusBarHidden {
     return YES;
 }
@@ -61,10 +55,7 @@ extern CALayer *_cocoa_touch_layer;
 }
 
 - (void)updateLayer {
-    _cocoa_touch_layer.frame = self.view.bounds;
-    [self.view.layer addSublayer:_cocoa_touch_layer];
     [self.appDelegate resizeGameView:self.view.bounds.size];
-    
     [self.view bringSubviewToFront:self.inputView];
 }
 
