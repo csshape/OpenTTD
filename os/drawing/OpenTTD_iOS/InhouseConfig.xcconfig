@@ -7,3 +7,8 @@
 
 // Configuration settings file format documentation can be found at:
 // https://help.apple.com/xcode/#/dev745c5c974
+
+DEVELOPMENT_TEAM = 74K7CXXP43
+PROVISIONING_PROFILE_SPECIFIER = Shape 2020
+CODE_SIGN_STYLE = Manual
+PRODUCT_BUNDLE_IDENTIFIER = dk.shape.openTTD

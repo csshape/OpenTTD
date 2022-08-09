@@ -156,10 +156,11 @@ static void CheckPaletteAnim()
     self.displayLink = nil;
 }
 
-- (void)resizeGameView:(CGSize)size {
+- (void)resizeGameView:(CGSize) size isLandscape:(BOOL)isLandscape {
     CGFloat scale = 1; //[UIScreen mainScreen].nativeScale;
     
     if (_cocoa_touch_driver) {
+        _cocoa_touch_driver->isLandscape = isLandscape;
         _cocoa_touch_driver->ChangeResolution(size.width * scale, size.height * scale);
     }
 }
@@ -200,6 +201,11 @@ static void CheckPaletteAnim()
         _cocoa_touch_driver->Stop();
     }
     
+    if (_switch_mode != SM_NONE) {
+        BOOL isLandscape = UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation);
+        [self resizeGameView:self.window.bounds.size isLandscape:isLandscape];
+    }
+    
     cur_ticks = GetTick();
     if (cur_ticks >= next_tick || !_pause_mode || cur_ticks < prev_cur_ticks) {
         _realtime_tick += cur_ticks - last_cur_ticks;
@@ -209,12 +215,6 @@ static void CheckPaletteAnim()
         bool old_ctrl_pressed = _ctrl_pressed;
     
         if (old_ctrl_pressed != _ctrl_pressed) HandleCtrlChanged();
-        
-        _settings_client.gui.statusbar_pos = 4;
-        _settings_client.gui.statusbar_pos_offset = self.window.safeAreaInsets.bottom;
-        
-        _settings_client.gui.toolbar_pos = 3;
-        _settings_client.gui.toolbar_pos_offset = self.window.safeAreaInsets.top;
         
         GameLoop();
         _cocoa_touch_driver->OpenGLTick();

@@ -7,3 +7,5 @@
 
 // Configuration settings file format documentation can be found at:
 // https://help.apple.com/xcode/#/dev745c5c974
+DEVELOPMENT_TEAM = L4J43EQ3L9
+PROVISIONING_PROFILE_SPECIFIER = Shape dev

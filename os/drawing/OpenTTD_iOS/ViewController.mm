@@ -43,7 +43,8 @@
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
-    [self.appDelegate resizeGameView:size];
+    BOOL isLandscape = UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation);
+    [self.appDelegate resizeGameView:size isLandscape:isLandscape];
 }
 
 - (BOOL)prefersStatusBarHidden {
@@ -55,7 +56,9 @@
 }
 
 - (void)updateLayer {
-    [self.appDelegate resizeGameView:self.view.bounds.size];
+    BOOL isLandscape = UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation);
+    
+    [self.appDelegate resizeGameView:self.view.bounds.size isLandscape:isLandscape];
     [self.view bringSubviewToFront:self.inputView];
 }
 

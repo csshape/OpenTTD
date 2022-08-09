@@ -12,7 +12,7 @@
 
 @property (strong, nonatomic) UIWindow *window;
 
-- (void)resizeGameView:(CGSize)size;
+- (void)resizeGameView:(CGSize)size isLandscape:(BOOL)isLandscape;
 - (void)startGameLoop;
 - (void)showErrorMessage:(NSString*)message;
 

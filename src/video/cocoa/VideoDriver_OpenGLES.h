@@ -31,6 +31,8 @@ public:
 
     CGContextRef context;
     
+    BOOL isLandscape;
+    
     const char *Start(const StringList &param) override;
     void Stop() override;
 

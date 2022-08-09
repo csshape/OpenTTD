@@ -97,7 +97,6 @@ VideoDriver_OpenGLES *_cocoa_touch_driver = NULL;
     }
     
     _cocoa_touch_layer.frame = self.bounds;
-    NSLog(@"%@", NSStringFromCGRect(_cocoa_touch_layer.frame));
 }
 
 @end
@@ -234,8 +233,18 @@ void VideoDriver_OpenGLES::AllocateBackingStore(bool force)
     _screen.pitch   = this->buffer_depth == 8 ? this->window_width : this->window_pitch;
     _screen.dst_ptr = this->GetVideoPointer();
 
+    UIEdgeInsets safeAreaInsets = this->window.safeAreaInsets;
+    
+    CGFloat offset = MAX(safeAreaInsets.top, MAX(safeAreaInsets.left, safeAreaInsets.right));
+    
+    _settings_client.gui.toolbar_pos = 3;
+    _settings_client.gui.toolbar_pos_offset = this->isLandscape ? 1 : offset;
+    
+    _settings_client.gui.statusbar_pos = 4;
+    _settings_client.gui.statusbar_pos_offset = this->window.safeAreaInsets.bottom;
+    
     /* Redraw screen */
-    this->MakeDirty(0, 0, _screen.width, _screen.height);
+    this->MakeDirty(0, 0, _screen.width , _screen.height);
     this->GameSizeChanged();
 }
 
@@ -394,7 +403,6 @@ void VideoDriver_OpenGLES::Draw()
 }
 
 void VideoDriver_OpenGLES::OpenGLStart() {
-    // TODO: detect start in landscape
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults registerDefaults:@{@"Video": @"metal",
                                  @"NativeResolution": @NO}];
@@ -527,6 +535,13 @@ opengl_fail:
 
 
 void VideoDriver_OpenGLES::OpenGLTick() {
+    
+//    _settings_client.gui.toolbar_pos = 3;
+//    _settings_client.gui.toolbar_pos_offset = this->isLandscape ? 0 : this->window.safeAreaInsets.top;
+//
+//    _settings_client.gui.statusbar_pos = 4;
+//    _settings_client.gui.statusbar_pos_offset = this->window.safeAreaInsets.bottom;
+    
     @autoreleasepool {
         this->Tick();
         this->SleepTillNextTick();

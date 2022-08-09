@@ -3423,7 +3423,7 @@ int PositionStatusbar(Window *w)
 int PositionNewsMessage(Window *w)
 {
 	Debug(misc, 5, "Repositioning news message...");
-	return PositionWindow(w, WC_NEWS_WINDOW, _settings_client.gui.statusbar_pos, _settings_client.gui.statusbar_pos_offset);
+	return PositionWindow(w, WC_NEWS_WINDOW, _settings_client.gui.statusbar_pos, _settings_client.gui.statusbar_pos_offset + 50);
 }
 
 /**
@@ -3434,7 +3434,7 @@ int PositionNewsMessage(Window *w)
 int PositionNetworkChatWindow(Window *w)
 {
 	Debug(misc, 5, "Repositioning network chat window...");
-	return PositionWindow(w, WC_SEND_NETWORK_MSG, _settings_client.gui.statusbar_pos, _settings_client.gui.statusbar_pos_offset);
+	return PositionWindow(w, WC_SEND_NETWORK_MSG, _settings_client.gui.statusbar_pos, _settings_client.gui.statusbar_pos_offset + 50);
 }
 
 
@@ -3465,6 +3465,7 @@ void RelocateAllWindows(int neww, int newh)
 
 	for (Window *w : Window::Iterate()) {
 		int left, top;
+        int offset = _settings_client.gui.statusbar_pos_offset;
 		/* XXX - this probably needs something more sane. For example specifying
 		 * in a 'backup'-desc that the window should always be centered. */
 		switch (w->window_class) {
@@ -3476,26 +3477,26 @@ void RelocateAllWindows(int neww, int newh)
 			case WC_MAIN_TOOLBAR:
 				ResizeWindow(w, std::min<uint>(neww, _toolbar_width) - w->width, 0, false);
 
-				top = w->top;
+				top = _settings_client.gui.toolbar_pos_offset > 0 ? _settings_client.gui.toolbar_pos_offset : w->top;
 				left = PositionMainToolbar(w); // changes toolbar orientation
 				break;
 
 			case WC_NEWS_WINDOW:
-				top = newh - w->height;
+				top = newh - w->height - offset;
 				left = PositionNewsMessage(w);
 				break;
 
 			case WC_STATUS_BAR:
 				ResizeWindow(w, std::min<uint>(neww, _toolbar_width) - w->width, 0, false);
 
-				top = newh - w->height;
+				top = newh - w->height - offset;
 				left = PositionStatusbar(w);
 				break;
 
 			case WC_SEND_NETWORK_MSG:
 				ResizeWindow(w, std::min<uint>(neww, _toolbar_width) - w->width, 0, false);
 
-				top = newh - w->height - FindWindowById(WC_STATUS_BAR, 0)->height;
+				top = newh - w->height - FindWindowById(WC_STATUS_BAR, 0)->height - offset;
 				left = PositionNetworkChatWindow(w);
 				break;
 
