@@ -346,7 +346,7 @@ static CommandCost BuildReplacementVehicle(Vehicle *old_veh, Vehicle **new_vehic
 
 	/* Build the new vehicle */
 	VehicleID new_veh_id;
-	std::tie(cost, new_veh_id, std::ignore, std::ignore) = Command<CMD_BUILD_VEHICLE>::Do(DC_EXEC | DC_AUTOREPLACE, old_veh->tile, e, true, CT_INVALID, INVALID_CLIENT_ID);
+	std::tie(cost, new_veh_id, std::ignore, std::ignore, std::ignore) = Command<CMD_BUILD_VEHICLE>::Do(DC_EXEC | DC_AUTOREPLACE, old_veh->tile, e, true, CT_INVALID, INVALID_CLIENT_ID);
 	if (cost.Failed()) return cost;
 
 	Vehicle *new_veh = Vehicle::Get(new_veh_id);
@@ -422,6 +422,7 @@ static CommandCost CopyHeadSpecificThings(Vehicle *old_head, Vehicle *new_head, 
 	if (cost.Succeeded() && old_head != new_head && (flags & DC_EXEC) != 0) {
 		/* Copy other things which cannot be copied by a command and which shall not stay resetted from the build vehicle command */
 		new_head->CopyVehicleConfigAndStatistics(old_head);
+		GroupStatistics::AddProfitLastYear(new_head);
 
 		/* Switch vehicle windows/news to the new vehicle, so they are not closed/deleted when the old vehicle is sold */
 		ChangeVehicleViewports(old_head->index, new_head->index);
@@ -725,7 +726,6 @@ CommandCost CmdAutoreplaceVehicle(DoCommandFlag flags, VehicleID veh_id)
 	CommandCost ret = CheckOwnership(v->owner);
 	if (ret.Failed()) return ret;
 
-	if (!v->IsChainInDepot()) return CMD_ERROR;
 	if (v->vehstatus & VS_CRASHED) return CMD_ERROR;
 
 	bool free_wagon = false;
@@ -737,6 +737,7 @@ CommandCost CmdAutoreplaceVehicle(DoCommandFlag flags, VehicleID veh_id)
 	} else {
 		if (!v->IsPrimaryVehicle()) return CMD_ERROR;
 	}
+	if (!v->IsChainInDepot()) return CMD_ERROR;
 
 	const Company *c = Company::Get(_current_company);
 	bool wagon_removal = c->settings.renew_keep_length;
@@ -780,7 +781,6 @@ CommandCost CmdAutoreplaceVehicle(DoCommandFlag flags, VehicleID veh_id)
 		RestoreRandomSeeds(saved_seeds);
 
 		if (cost.Succeeded() && (flags & DC_EXEC) != 0) {
-			CommandCost ret;
 			if (free_wagon) {
 				ret = ReplaceFreeUnit(&v, flags, &nothing_to_do);
 			} else {
@@ -815,6 +815,7 @@ CommandCost CmdSetAutoReplace(DoCommandFlag flags, GroupID id_g, EngineID old_en
 
 	if (Group::IsValidID(id_g) ? Group::Get(id_g)->owner != _current_company : !IsAllGroupID(id_g) && !IsDefaultGroupID(id_g)) return CMD_ERROR;
 	if (!Engine::IsValidID(old_engine_type)) return CMD_ERROR;
+	if (Group::IsValidID(id_g) && Group::Get(id_g)->vehicle_type != Engine::Get(old_engine_type)->type) return CMD_ERROR;
 
 	if (new_engine_type != INVALID_ENGINE) {
 		if (!Engine::IsValidID(new_engine_type)) return CMD_ERROR;

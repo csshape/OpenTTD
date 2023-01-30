@@ -61,6 +61,9 @@ void AIInstance::Died()
 {
 	ScriptInstance::Died();
 
+	/* Intro is not supposed to use AI, but it may have 'dummy' AI which instant dies. */
+	if (_game_mode == GM_MENU) return;
+
 	ShowAIDebugWindow(_current_company);
 
 	const AIInfo *info = AIConfig::GetConfig(_current_company, AIConfig::SSS_FORCE_GAME)->GetInfo();
@@ -77,7 +80,6 @@ void AIInstance::Died()
 void AIInstance::LoadDummyScript()
 {
 	ScriptAllocatorScope alloc_scope(this->engine);
-	extern void Script_CreateDummy(HSQUIRRELVM vm, StringID string, const char *type);
 	Script_CreateDummy(this->engine->GetVM(), STR_ERROR_AI_NO_AI_FOUND, "AI");
 }
 

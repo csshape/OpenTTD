@@ -15,6 +15,7 @@
 #include "../../rail_type.h"
 #include "../../string_func.h"
 #include "../../command_func.h"
+#include "../../core/random_func.hpp"
 
 #include "script_types.hpp"
 #include "../script_suspend.hpp"
@@ -72,6 +73,18 @@ public:
 	 * @return The instance.
 	 */
 	static class ScriptInstance *GetActiveInstance();
+
+	/**
+	 * Get a reference of the randomizer that brings this script random values.
+	 * @param owner The owner/script to get the randomizer for. This defaults to ScriptObject::GetRootCompany()
+	 */
+	static Randomizer &GetRandomizer(Owner owner = ScriptObject::GetRootCompany());
+
+	/**
+	 * Initialize/reset the script random states. The state of the scripts are
+	 * based on the current _random seed, but _random does not get changed.
+	 */
+	static void InitializeRandomizers();
 
 protected:
 	template<Commands TCmd, typename T> struct ScriptDoCommandHelper;
@@ -273,6 +286,7 @@ private:
 	static std::tuple<bool, bool, bool> DoCommandPrep();
 	static bool DoCommandProcessResult(const CommandCost &res, Script_SuspendCallbackProc *callback, bool estimate_only);
 	static CommandCallbackData *GetDoCommandCallback();
+	static Randomizer random_states[OWNER_END]; ///< Random states for each of the scripts (game script uses OWNER_DEITY)
 };
 
 namespace ScriptObjectInternal {
@@ -332,6 +346,9 @@ bool ScriptObject::ScriptDoCommandHelper<Tcmd, Tret(*)(DoCommandFlag, Targs...)>
 	if constexpr (std::is_same_v<TileIndex, std::tuple_element_t<0, decltype(args)>>) {
 		tile = std::get<0>(args);
 	}
+
+	/* Do not even think about executing out-of-bounds tile-commands. */
+	if (tile != 0 && (tile >= Map::Size() || (!IsValidTile(tile) && (GetCommandFlags<Tcmd>() & CMD_ALL_TILES) == 0))) return false;
 
 	/* Only set ClientID parameters when the command does not come from the network. */
 	if constexpr ((::GetCommandFlags<Tcmd>() & CMD_CLIENT_ID) != 0) ScriptObjectInternal::SetClientIds(args, std::index_sequence_for<Targs...>{});

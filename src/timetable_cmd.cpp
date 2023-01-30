@@ -30,6 +30,7 @@
 static void ChangeTimetable(Vehicle *v, VehicleOrderID order_number, uint16 val, ModifyTimetableFlags mtf, bool timetabled)
 {
 	Order *order = v->GetOrder(order_number);
+	assert(order != nullptr);
 	int total_delta = 0;
 	int timetable_delta = 0;
 
@@ -174,6 +175,39 @@ CommandCost CmdChangeTimetable(DoCommandFlag flags, VehicleID veh, VehicleOrderI
 }
 
 /**
+ * Change timetable data of all orders of a vehicle.
+ * @param flags Operation to perform.
+ * @param veh Vehicle with the orders to change.
+ * @param mtf Timetable data to change (@see ModifyTimetableFlags)
+ * @param data The data to modify as specified by \c mtf.
+ *             0 to clear times, UINT16_MAX to clear speed limit.
+ * @return the cost of this operation or an error
+ */
+CommandCost CmdBulkChangeTimetable(DoCommandFlag flags, VehicleID veh, ModifyTimetableFlags mtf, uint16 data)
+{
+	Vehicle *v = Vehicle::GetIfValid(veh);
+	if (v == nullptr || !v->IsPrimaryVehicle()) return CMD_ERROR;
+
+	CommandCost ret = CheckOwnership(v->owner);
+	if (ret.Failed()) return ret;
+
+	if (mtf >= MTF_END) return CMD_ERROR;
+
+	if (v->GetNumOrders() == 0) return CMD_ERROR;
+
+	if (flags & DC_EXEC) {
+		for (VehicleOrderID order_number = 0; order_number < v->GetNumOrders(); order_number++) {
+			Order *order = v->GetOrder(order_number);
+			if (order == nullptr || order->IsType(OT_IMPLICIT)) continue;
+
+			Command<CMD_CHANGE_TIMETABLE>::Do(DC_EXEC, v->index, order_number, mtf, data);
+		}
+	}
+
+	return CommandCost();
+}
+
+/**
  * Clear the lateness counter to make the vehicle on time.
  * @param flags Operation to perform.
  * @param veh Vehicle with the orders to change.
@@ -249,11 +283,14 @@ CommandCost CmdSetTimetableStart(DoCommandFlag flags, VehicleID veh_id, bool tim
 	CommandCost ret = CheckOwnership(v->owner);
 	if (ret.Failed()) return ret;
 
+	int total_duration = v->orders->GetTimetableTotalDuration();
+
 	/* Don't let a timetable start more than 15 years into the future or 1 year in the past. */
 	if (start_date < 0 || start_date > MAX_DAY) return CMD_ERROR;
 	if (start_date - _date > 15 * DAYS_IN_LEAP_YEAR) return CMD_ERROR;
 	if (_date - start_date > DAYS_IN_LEAP_YEAR) return CMD_ERROR;
 	if (timetable_all && !v->orders->IsCompleteTimetable()) return CMD_ERROR;
+	if (timetable_all && start_date + total_duration / DAY_TICKS > MAX_DAY) return CMD_ERROR;
 
 	if (flags & DC_EXEC) {
 		std::vector<Vehicle *> vehs;
@@ -266,14 +303,13 @@ CommandCost CmdSetTimetableStart(DoCommandFlag flags, VehicleID veh_id, bool tim
 			vehs.push_back(v);
 		}
 
-		int total_duration = v->orders->GetTimetableTotalDuration();
 		int num_vehs = (uint)vehs.size();
 
 		if (num_vehs >= 2) {
 			std::sort(vehs.begin(), vehs.end(), &VehicleTimetableSorter);
 		}
 
-		int idx = vehs.begin() - std::find(vehs.begin(), vehs.end(), v);
+		int idx = 0;
 
 		for (Vehicle *w : vehs) {
 
@@ -355,6 +391,7 @@ void UpdateVehicleTimetable(Vehicle *v, bool travelling)
 
 	if (v->cur_real_order_index >= v->GetNumOrders()) return;
 	Order *real_current_order = v->GetOrder(v->cur_real_order_index);
+	assert(real_current_order != nullptr);
 
 	VehicleOrderID first_manual_order = 0;
 	for (Order *o = v->GetFirstOrder(); o != nullptr && o->IsType(OT_IMPLICIT); o = o->next) {

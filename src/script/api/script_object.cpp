@@ -103,7 +103,7 @@ ScriptObject::ActiveInstance::~ActiveInstance()
 
 /* static */ void ScriptObject::SetDoCommandCosts(Money value)
 {
-	GetStorage()->costs = CommandCost(value);
+	GetStorage()->costs = CommandCost(INVALID_EXPENSES, value); // Expense type is never read.
 }
 
 /* static */ void ScriptObject::IncreaseDoCommandCosts(Money value)
@@ -310,4 +310,20 @@ bool ScriptObject::DoCommandProcessResult(const CommandCost &res, Script_Suspend
 	}
 
 	NOT_REACHED();
+}
+
+
+/* static */ Randomizer ScriptObject::random_states[OWNER_END];
+
+Randomizer &ScriptObject::GetRandomizer(Owner owner)
+{
+	return ScriptObject::random_states[owner];
+}
+
+void ScriptObject::InitializeRandomizers()
+{
+	Randomizer random = _random;
+	for (Owner owner = OWNER_BEGIN; owner < OWNER_END; owner++) {
+		ScriptObject::GetRandomizer(owner).SetSeed(random.Next());
+	}
 }

@@ -340,6 +340,9 @@ enum SaveLoadVersion : uint16 {
 	SLV_LINKGRAPH_TRAVEL_TIME,              ///< 297  PR#9457 v12.0-RC1  Store travel time in the linkgraph.
 	SLV_DOCK_DOCKINGTILES,                  ///< 298  PR#9578 All tiles around docks may be docking tiles.
 	SLV_REPAIR_OBJECT_DOCKING_TILES,        ///< 299  PR#9594 v12.0  Fixing issue with docking tiles overlapping objects.
+	SLV_U64_TICK_COUNTER,                   ///< 300  PR#10035 Make _tick_counter 64bit to avoid wrapping.
+	SLV_LAST_LOADING_TICK,                  ///< 301  PR#9693 Store tick of last loading for vehicles.
+	SLV_MULTITRACK_LEVEL_CROSSINGS,         ///< 302  PR#9931 v13.0  Multi-track level crossings.
 
 	SL_MAX_VERSION,                         ///< Highest possible saveload version
 };
@@ -1064,7 +1067,7 @@ static inline bool SlIsObjectCurrentlyValid(SaveLoadVersion version_from, SaveLo
  */
 static inline VarType GetVarMemType(VarType type)
 {
-	return type & 0xF0; // GB(type, 4, 4) << 4;
+	return GB(type, 4, 4) << 4;
 }
 
 /**
@@ -1075,7 +1078,7 @@ static inline VarType GetVarMemType(VarType type)
  */
 static inline VarType GetVarFileType(VarType type)
 {
-	return type & 0xF; // GB(type, 0, 4);
+	return GB(type, 0, 4);
 }
 
 /**
@@ -1131,7 +1134,6 @@ std::vector<SaveLoad> SlCompatTableHeader(const SaveLoadTable &slt, const SaveLo
 void SlObject(void *object, const SaveLoadTable &slt);
 void NORETURN SlError(StringID string, const char *extra_msg = nullptr);
 void NORETURN SlErrorCorrupt(const char *msg);
-void NORETURN SlErrorCorruptFmt(const char *format, ...) WARN_FORMAT(1, 2);
 
 bool SaveloadCrashWithMissingNewGRFs();
 

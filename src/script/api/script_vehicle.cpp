@@ -12,6 +12,7 @@
 #include "script_cargo.hpp"
 #include "script_gamesettings.hpp"
 #include "script_group.hpp"
+#include "script_map.hpp"
 #include "../script_instance.hpp"
 #include "../../string_func.h"
 #include "../../strings_func.h"
@@ -94,7 +95,7 @@
 	if (!ScriptEngine::IsBuildable(engine_id)) return -1;
 	if (!ScriptCargo::IsValidCargo(cargo)) return -1;
 
-	auto [res, veh_id, refit_capacity, refit_mail] = ::Command<CMD_BUILD_VEHICLE>::Do(DC_QUERY_COST, depot, engine_id, true, cargo, INVALID_CLIENT_ID);
+	auto [res, veh_id, refit_capacity, refit_mail, cargo_capacities] = ::Command<CMD_BUILD_VEHICLE>::Do(DC_QUERY_COST, depot, engine_id, true, cargo, INVALID_CLIENT_ID);
 	return res.Succeeded() ? refit_capacity : -1;
 }
 
@@ -143,7 +144,7 @@
 	if (!IsValidVehicle(vehicle_id)) return -1;
 	if (!ScriptCargo::IsValidCargo(cargo)) return -1;
 
-	auto [res, refit_capacity, refit_mail] = ::Command<CMD_REFIT_VEHICLE>::Do(DC_QUERY_COST, vehicle_id, cargo, 0, false, false, 0);
+	auto [res, refit_capacity, refit_mail, cargo_capacities] = ::Command<CMD_REFIT_VEHICLE>::Do(DC_QUERY_COST, vehicle_id, cargo, 0, false, false, 0);
 	return res.Succeeded() ? refit_capacity : -1;
 }
 
@@ -256,8 +257,8 @@
 
 	const Vehicle *v = ::Vehicle::Get(vehicle_id);
 	if (v->type == VEH_AIRCRAFT) {
-		uint x = Clamp(v->x_pos / TILE_SIZE, 0, ::MapSizeX() - 2);
-		uint y = Clamp(v->y_pos / TILE_SIZE, 0, ::MapSizeY() - 2);
+		uint x = Clamp(v->x_pos / TILE_SIZE, 0, ScriptMap::GetMapSizeX() - 2);
+		uint y = Clamp(v->y_pos / TILE_SIZE, 0, ScriptMap::GetMapSizeY() - 2);
 		return ::TileXY(x, y);
 	}
 
