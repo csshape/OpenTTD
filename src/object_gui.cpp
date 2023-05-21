@@ -242,9 +242,8 @@ public:
 				for (auto object_class_id : this->object_classes) {
 					ObjectClass *objclass = ObjectClass::Get(object_class_id);
 					if (objclass->GetUISpecCount() == 0) continue;
-					size->width = std::max(size->width, GetStringBoundingBox(objclass->name).width);
+					size->width = std::max(size->width, GetStringBoundingBox(objclass->name).width + padding.width);
 				}
-				size->width += padding.width;
 				this->line_height = FONT_HEIGHT_NORMAL + padding.height;
 				resize->height = this->line_height;
 				size->height = 5 * this->line_height;
@@ -275,11 +274,10 @@ public:
 				uint height[2] = {0, 0}; // The height for the different views; in this case views 1/2 and 4.
 
 				/* Get the height and view information. */
-				for (int i = 0; i < NUM_OBJECTS; i++) {
-					const ObjectSpec *spec = ObjectSpec::Get(i);
-					if (!spec->IsEverAvailable()) continue;
-					two_wide |= spec->views >= 2;
-					height[spec->views / 4] = std::max<int>(ObjectSpec::Get(i)->height, height[spec->views / 4]);
+				for (const auto &spec : ObjectSpec::Specs()) {
+					if (!spec.IsEverAvailable()) continue;
+					two_wide |= spec.views >= 2;
+					height[spec.views / 4] = std::max<int>(spec.height, height[spec.views / 4]);
 				}
 
 				/* Determine the pixel heights. */
@@ -565,20 +563,17 @@ public:
 	{
 		if (pt.x == -1) return;
 
-		switch (select_proc) {
-			default: NOT_REACHED();
-			case DDSP_BUILD_OBJECT:
-				if (!_settings_game.construction.freeform_edges) {
-					/* When end_tile is MP_VOID, the error tile will not be visible to the
-						* user. This happens when terraforming at the southern border. */
-					if (TileX(end_tile) == Map::MaxX()) end_tile += TileDiffXY(-1, 0);
-					if (TileY(end_tile) == Map::MaxY()) end_tile += TileDiffXY(0, -1);
-				}
-				const ObjectSpec *spec = ObjectClass::Get(_selected_object_class)->GetSpec(_selected_object_index);
-				Command<CMD_BUILD_OBJECT_AREA>::Post(STR_ERROR_CAN_T_BUILD_OBJECT, CcPlaySound_CONSTRUCTION_OTHER,
-					end_tile, start_tile, spec->Index(), _selected_object_view, (_ctrl_pressed ? true : false));
-				break;
+		assert(select_proc == DDSP_BUILD_OBJECT);
+
+		if (!_settings_game.construction.freeform_edges) {
+			/* When end_tile is MP_VOID, the error tile will not be visible to the
+			 * user. This happens when terraforming at the southern border. */
+			if (TileX(end_tile) == Map::MaxX()) end_tile += TileDiffXY(-1, 0);
+			if (TileY(end_tile) == Map::MaxY()) end_tile += TileDiffXY(0, -1);
 		}
+		const ObjectSpec *spec = ObjectClass::Get(_selected_object_class)->GetSpec(_selected_object_index);
+		Command<CMD_BUILD_OBJECT_AREA>::Post(STR_ERROR_CAN_T_BUILD_OBJECT, CcPlaySound_CONSTRUCTION_OTHER,
+			end_tile, start_tile, spec->Index(), _selected_object_view, (_ctrl_pressed ? true : false));
 	}
 
 	void OnPlaceObjectAbort() override

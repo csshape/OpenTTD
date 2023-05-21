@@ -140,7 +140,7 @@ void FioFCloseFile(FILE *f)
  * @param filename Filename to look for.
  * @return String containing the path if the path was found, else an empty string.
  */
-std::string FioFindFullPath(Subdirectory subdir, const char *filename)
+std::string FioFindFullPath(Subdirectory subdir, const std::string &filename)
 {
 	assert(subdir < NUM_SUBDIRS);
 
@@ -538,7 +538,7 @@ bool TarScanner::AddFile(const std::string &filename, size_t basepath_length, co
 
 		/* Calculate the size of the file.. for some strange reason this is stored as a string */
 		strecpy(buf, th.size, lastof(buf));
-		size_t skip = strtoul(buf, &end, 8);
+		size_t skip = std::strtoul(buf, &end, 8);
 
 		switch (th.typeflag) {
 			case '\0':

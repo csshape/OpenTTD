@@ -15,6 +15,7 @@
 #include "../core/math_func.hpp"
 #include "../zoom_func.h"
 #include "../fileio_func.h"
+#include "../error_func.h"
 #include "truetypefontcache.h"
 
 #include "../table/control_codes.h"
@@ -128,7 +129,7 @@ void LoadFreeTypeFont(FontSize fs)
 
 	if (_library == nullptr) {
 		if (FT_Init_FreeType(&_library) != FT_Err_Ok) {
-			ShowInfoF("Unable to initialize FreeType, using sprite fonts instead");
+			ShowInfo("Unable to initialize FreeType, using sprite fonts instead");
 			return;
 		}
 
@@ -190,7 +191,7 @@ void LoadFreeTypeFont(FontSize fs)
 
 	FT_Done_Face(face);
 
-	ShowInfoF("Unable to use '%s' for %s font, FreeType reported error 0x%X, using sprite font instead", font_name, FontSizeToName(fs), error);
+	ShowInfo("Unable to use '{}' for {} font, FreeType reported error 0x{:X}, using sprite font instead", font_name, FontSizeToName(fs), error);
 	return;
 
 found_face:
@@ -236,12 +237,12 @@ const Sprite *FreeTypeFontCache::InternalGetGlyph(GlyphID key, bool aa)
 	uint height = std::max(1U, (uint)slot->bitmap.rows  + shadow);
 
 	/* Limit glyph size to prevent overflows later on. */
-	if (width > MAX_GLYPH_DIM || height > MAX_GLYPH_DIM) usererror("Font glyph is too large");
+	if (width > MAX_GLYPH_DIM || height > MAX_GLYPH_DIM) UserError("Font glyph is too large");
 
 	/* FreeType has rendered the glyph, now we allocate a sprite and copy the image into it */
 	SpriteLoader::Sprite sprite;
 	sprite.AllocateData(ZOOM_LVL_NORMAL, static_cast<size_t>(width) * height);
-	sprite.type = ST_FONT;
+	sprite.type = SpriteType::Font;
 	sprite.colours = (aa ? SCC_PAL | SCC_ALPHA : SCC_PAL);
 	sprite.width = width;
 	sprite.height = height;

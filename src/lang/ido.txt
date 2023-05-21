@@ -552,6 +552,7 @@ STR_CONFIG_SETTING_NONE                                         :Nulo
 
 ###length 3
 
+###setting-zero-is-special
 
 
 
@@ -742,6 +743,7 @@ STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR_VIOLET                  :Violkolora
 ###length 3
 
 
+###setting-zero-is-special
 
 
 
@@ -777,7 +779,7 @@ STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR_VIOLET                  :Violkolora
 
 
 
-###length 4
+###length 5
 
 ###length 3
 
@@ -1452,7 +1454,7 @@ STR_AI_DEBUG_NAME_AND_VERSION                                   :{BLACK}{STRING}
 
 
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
 
 
@@ -1581,6 +1583,8 @@ STR_ERROR_TOO_MANY_VEHICLES_IN_GAME                             :{WHITE}Tro mult
 # Order related errors
 
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+
 # Timetable related errors
 
 # Sign related errors
@@ -1623,10 +1627,10 @@ STR_SV_STNAME_WAYPOINT                                          :{STRING}
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 
 ###length 2
@@ -1692,7 +1696,7 @@ STR_JUST_RAW_STRING                                             :{STRING}
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

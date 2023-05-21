@@ -983,10 +983,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Selecci�
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Desactivado
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Cada mes
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Cada 3 meses
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Cada 6 meses
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Cada 12 meses
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Idioma
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Selecciona el idioma a emplear en interfaz del juego
@@ -1207,6 +1203,9 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Derecha
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Préstamo máximo inicial: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Cantidad máxima que una empresa puede recibir como préstamo (sin tener en cuenta la inflación)
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_VALUE                   :{CURRENCY_LONG}
+###setting-zero-is-special
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_DISABLED                :Sin préstamo {RED} Se necesita un script de juego para proporcionar fondos iniciales
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Porcentaje de interés: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Porcentaje de interés de los préstamos; también controla la inflación, en caso de que esté activada
@@ -1806,6 +1805,7 @@ STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :Cuando se activ
 
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :Edad mínima de una empresa para comerciar con sus acciones: {STRING}
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_HELPTEXT                :Edad mínima que tiene que tener una empresa para poder comprar y vender sus acciones.
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Porcentaje del beneficio total a pagar en transferencias: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Porcentaje de los beneficios entregados a los transportes intermedios en sistemas de transferencias, dando un mayor control sobre el beneficio de cada vehículo
@@ -1920,10 +1920,6 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :Ninguna
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Multiplicador inicial del tamaño de ciudad: {STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :Tamaño medio de las ciudades en relación a los pueblos normales al comienzo de la partida
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :Actualizar el grafo de distribución cada {STRING}{NBSP}día{P 0:2 "" s}
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL_HELPTEXT                  :Periodo de tiempo entre cálculos consecutivos del grafo de distribución. Esta opción se refiere a los cálculos para cada uno de los componentes del grafo, por lo cual fijar un valor no quiere decir que el grafo completo se actualice tras ese número de días. Cuanto menor sea, mayor tiempo de CPU será necesario para calcular el grafo de distribución. Cuanto mayor sea, más tardará el grafo de distribución en adaptarse a nuevas rutas.
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :Usar {STRING}{NBSP}día{P 0:2 "" s} para el cálculo del grafo de distribución
-STR_CONFIG_SETTING_LINKGRAPH_TIME_HELPTEXT                      :Tiempo a emplear en el cálculo de cada uno de los componentes del grafo de distribución. Cuanto menor sea este valor, más probable es que se produzca ralentización en el juego. Cuanto mayor sea, más tiempo tardará la distribución en actualizarse cuando se producen cambios en las rutas.
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :Modo de distribución para pasajeros: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :En una distribución "Simétrica", se envía la misma cantidad de pasajeros de la estación A a la B que de la B a la A. En una distribución "Asimétrica" se pueden enviar cantidades arbitrarias de pasajeros en ambas direcciones. "Manual" significa que no se realiza una distribución automática para los pasajeros.
@@ -1951,7 +1947,7 @@ STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :Frecuentemente 
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Unidad de velocidad: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Cada vez que se muestra una velocidad en la interfaz de usuario, se empleará la unidad seleccionada
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :Imperial (mph)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :Métrico (km/h)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (m/s)
@@ -2356,7 +2352,6 @@ STR_NETWORK_CLIENT_LIST_NEW_COMPANY                             :(Nueva empresa)
 STR_NETWORK_CLIENT_LIST_NEW_COMPANY_TOOLTIP                     :{BLACK}Crea una nueva empresa y te une a ella
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_SELF_TOOLTIP                :{BLACK}Éste eres tú
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_HOST_TOOLTIP                :{BLACK}Éste es el servidor de la partida
-STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} cliente{P "" s} / {NUM} empresa{P "" s}
 
 # Matches ConnectionType
 ###length 5
@@ -3350,8 +3345,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Atención: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Error: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Error Fatal: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Ha ocurrido un error fatal de NewGRF:{}{STRING}
-STR_NEWGRF_ERROR_POPUP                                          :{WHITE}Ha ocurrido un error de NewGRF:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} no funcionará con la con la versión de TTDPatch informada por OpenTTD
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} es para la versión {2:STRING} of TTD
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} está diseñado para ser usado con {2:STRING}
@@ -4621,12 +4614,11 @@ STR_SCREENSHOT_WORLD_SCREENSHOT                                 :{BLACK}Mapa com
 STR_SCREENSHOT_HEIGHTMAP_SCREENSHOT                             :{BLACK}Mapa de alturas
 STR_SCREENSHOT_MINIMAP_SCREENSHOT                               :{BLACK}Minimapa
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :{WHITE}Parámetros de IA
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Cerrar
 STR_AI_SETTINGS_RESET                                           :{BLACK}Reiniciar
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Número de días (aproximados) de espera antes de comenzar esta IA desde el momento en el que empezó la anterior: {ORANGE}{STRING}
 
 
 # Textfile window
@@ -5080,6 +5072,8 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}No se pu
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... demasiado lejos del destino anterior
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... la aeronave no tiene suficiente alcance
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}No se puede asignar horario al vehículo...
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Los vehículos sólo pueden esperar en estaciones
@@ -5495,10 +5489,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Helicóptero Po
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Empresa {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Grupo {COMMA}
@@ -5580,7 +5574,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

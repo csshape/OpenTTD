@@ -901,10 +901,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Tíðni 
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Aldrei
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Mánaðarlega
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Ársfjórðungslega
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Hálfsárslega
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Árlega
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Tungumál
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Tungumál viðmóts
@@ -1086,6 +1082,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Hægri
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Hámarkslán: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Hámarks upphæð sem fyrirtæki getur fengið lánað (ekki er gert ráð fyrir verðbólgu)
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Vextir: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Vextir á lánum, stjórnar einnig verðbólgu, ef hún er virk
@@ -1601,6 +1598,7 @@ STR_CONFIG_SETTING_STARTING_YEAR                                :Upphafsár: {ST
 STR_CONFIG_SETTING_ALLOW_SHARES                                 :Leyfa hlutabréfakaup í öðrum fyrirtækjum: {STRING}
 STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :Ef þessi stilling er virk er hægt að kaupa og selja hlutabréf í fyrirtækjum. Hlutabréf eru aðeins aðgengileg fyrir fyrirtæki sem hafa náð ákveðnum aldri
 
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Hlutfall hagnaðar sem greiðist til tengiþjónustu: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Hlutfall hagnaðar sem greiðist til tengiþjónustu, farartækja sem eru milliliðir. Gefur meiri stjórn á tekjunum
@@ -1704,7 +1702,7 @@ STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :Meðalstærð b
 
 
 
-###length 4
+###length 5
 
 ###length 3
 
@@ -2823,7 +2821,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Aðvörun: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Villa: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Banvænt: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Alvarleg NewGRF villa átti sér stað:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} Mun ekki virka með útgáfu TTDPatch sem OpenTTD gefur til kynna.
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} er fyrir {STRING} útgáfu af TTD.
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} er hannað til að notast með {STRING}
@@ -3917,12 +3914,11 @@ STR_AI_LIST_CANCEL                                              :{BLACK}Hætta v
 STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}Hætta við breytingar forskriftar
 
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :Gervigreindar
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Loka
 STR_AI_SETTINGS_RESET                                           :{BLACK}Frumstilla
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Hversu mörgum dögum eftir síðustu gervigreind á að hlaða þessari (sirka): {ORANGE}{STRING}
 
 
 # Textfile window
@@ -4349,6 +4345,8 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Get ekki
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... of langt frá fyrri stað
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... flugvél hefur ekki næga drægni
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Get ekki gert áætlun farartækis...
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Farartæki getur aðeins beðið við stöð
@@ -4762,10 +4760,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Powernaut Þyrl
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Fyrirtæki {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Hópur {COMMA}
@@ -4844,7 +4842,7 @@ STR_JUST_RAW_STRING                                             :{STRING}
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

@@ -17,6 +17,7 @@
 
 #include "fontcache.h"
 #include "error.h"
+#include "error_func.h"
 #include "gui.h"
 
 #include "base_media_base.h"
@@ -39,7 +40,6 @@
 #include "genworld.h"
 #include "progress.h"
 #include "strings_func.h"
-#include "date_func.h"
 #include "vehicle_func.h"
 #include "gamelog.h"
 #include "animated_tile_func.h"
@@ -68,6 +68,10 @@
 #include "industry.h"
 #include "network/network_gui.h"
 #include "misc_cmd.h"
+#include "timer/timer.h"
+#include "timer/timer_game_calendar.h"
+#include "timer/timer_game_realtime.h"
+#include "timer/timer_game_tick.h"
 
 #include "linkgraph/linkgraphschedule.h"
 
@@ -82,7 +86,6 @@
 #endif
 
 void CallLandscapeTick();
-void IncreaseDate();
 void DoPaletteAnimations();
 void MusicLoop();
 void ResetMusic();
@@ -100,21 +103,23 @@ bool _save_config = false;
 bool _request_newgrf_scan = false;
 NewGRFScanCallback *_request_newgrf_scan_callback = nullptr;
 
+/** Available settings for autosave intervals. */
+static const std::chrono::milliseconds _autosave_ticks[] = {
+	std::chrono::minutes::zero(), ///< never
+	std::chrono::minutes(10),
+	std::chrono::minutes(30),
+	std::chrono::minutes(60),
+	std::chrono::minutes(120),
+};
+
 /**
  * Error handling for fatal user errors.
- * @param s the string to print.
+ * @param str the string to print.
  * @note Does NEVER return.
  */
-void CDECL usererror(const char *s, ...)
+void UserErrorI(const std::string &str)
 {
-	va_list va;
-	char buf[512];
-
-	va_start(va, s);
-	vseprintf(buf, lastof(buf), s, va);
-	va_end(va);
-
-	ShowOSErrorBox(buf, false);
+	ShowOSErrorBox(str.c_str(), false);
 	if (VideoDriver::GetInstance() != nullptr) VideoDriver::GetInstance()->Stop();
 
 #ifdef __EMSCRIPTEN__
@@ -131,39 +136,18 @@ void CDECL usererror(const char *s, ...)
 
 /**
  * Error handling for fatal non-user errors.
- * @param s the string to print.
+ * @param str the string to print.
  * @note Does NEVER return.
  */
-void CDECL error(const char *s, ...)
+void FatalErrorI(const std::string &str)
 {
-	va_list va;
-	char buf[2048];
-
-	va_start(va, s);
-	vseprintf(buf, lastof(buf), s, va);
-	va_end(va);
-
 	if (VideoDriver::GetInstance() == nullptr || VideoDriver::GetInstance()->HasGUI()) {
-		ShowOSErrorBox(buf, true);
+		ShowOSErrorBox(str.c_str(), true);
 	}
 
 	/* Set the error message for the crash log and then invoke it. */
-	CrashLog::SetErrorMessage(buf);
+	CrashLog::SetErrorMessage(str);
 	abort();
-}
-
-/**
- * Shows some information on the console/a popup box depending on the OS.
- * @param str the text to show.
- */
-void CDECL ShowInfoF(const char *str, ...)
-{
-	va_list va;
-	char buf[1024];
-	va_start(va, str);
-	vseprintf(buf, lastof(buf), str, va);
-	va_end(va);
-	ShowInfo(buf);
 }
 
 /**
@@ -246,7 +230,7 @@ static void ShowHelp()
 #if !defined(_WIN32)
 	printf("%s\n", buf);
 #else
-	ShowInfo(buf);
+	ShowInfoI(buf);
 #endif
 }
 
@@ -284,7 +268,7 @@ static void WriteSavegameInfo(const char *name)
 #if !defined(_WIN32)
 	printf("%s\n", buf);
 #else
-	ShowInfo(buf);
+	ShowInfoI(buf);
 #endif
 }
 
@@ -299,12 +283,12 @@ static void ParseResolution(Dimension *res, const char *s)
 {
 	const char *t = strchr(s, 'x');
 	if (t == nullptr) {
-		ShowInfoF("Invalid resolution '%s'", s);
+		ShowInfo("Invalid resolution '{}'", s);
 		return;
 	}
 
-	res->width  = std::max(strtoul(s, nullptr, 0), 64UL);
-	res->height = std::max(strtoul(t + 1, nullptr, 0), 64UL);
+	res->width  = std::max(std::strtoul(s, nullptr, 0), 64UL);
+	res->height = std::max(std::strtoul(t + 1, nullptr, 0), 64UL);
 }
 
 
@@ -410,7 +394,7 @@ void OpenBrowser(const char *url)
 
 /** Callback structure of statements to be executed after the NewGRF scan. */
 struct AfterNewGRFScan : NewGRFScanCallback {
-	Year startyear = INVALID_YEAR;              ///< The start year.
+	TimerGameCalendar::Year startyear = INVALID_YEAR; ///< The start year.
 	uint32 generation_seed = GENERATE_NEW_SEED; ///< Seed for the new game.
 	std::string dedicated_host;                 ///< Hostname for the dedicated server.
 	uint16 dedicated_port = 0;                  ///< Port for the dedicated server.
@@ -570,7 +554,7 @@ int openttd_main(int argc, char *argv[])
 			videodriver = "dedicated";
 			blitter = "null";
 			dedicated = true;
-			SetDebugString("net=4", ShowInfo);
+			SetDebugString("net=4", ShowInfoI);
 			if (mgo.opt != nullptr) {
 				scanner->dedicated_host = ParseFullConnectionString(mgo.opt, scanner->dedicated_port);
 			}
@@ -594,7 +578,7 @@ int openttd_main(int argc, char *argv[])
 #if defined(_WIN32)
 				CreateConsole();
 #endif
-				if (mgo.opt != nullptr) SetDebugString(mgo.opt, ShowInfo);
+				if (mgo.opt != nullptr) SetDebugString(mgo.opt, ShowInfoI);
 				break;
 			}
 		case 'e': _switch_mode = (_switch_mode == SM_LOAD_GAME || _switch_mode == SM_LOAD_SCENARIO ? SM_LOAD_SCENARIO : SM_EDITOR); break;
@@ -654,7 +638,7 @@ int openttd_main(int argc, char *argv[])
 			_skip_all_newgrf_scanning += 1;
 			break;
 		}
-		case 'G': scanner->generation_seed = strtoul(mgo.opt, nullptr, 10); break;
+		case 'G': scanner->generation_seed = std::strtoul(mgo.opt, nullptr, 10); break;
 		case 'c': _config_file = mgo.opt; break;
 		case 'x': scanner->save_config = false; break;
 		case 'X': only_local_path = true; break;
@@ -746,8 +730,8 @@ int openttd_main(int argc, char *argv[])
 			BlitterFactory::SelectBlitter("32bpp-anim") == nullptr) {
 		if (BlitterFactory::SelectBlitter(blitter) == nullptr) {
 			blitter.empty() ?
-				usererror("Failed to autoprobe blitter") :
-				usererror("Failed to select requested blitter '%s'; does it exist?", blitter.c_str());
+				UserError("Failed to autoprobe blitter") :
+				UserError("Failed to select requested blitter '{}'; does it exist?", blitter.c_str());
 		}
 	}
 
@@ -782,7 +766,7 @@ int openttd_main(int argc, char *argv[])
 	if (sounds_set.empty() && !BaseSounds::ini_set.empty()) sounds_set = BaseSounds::ini_set;
 	if (!BaseSounds::SetSet(sounds_set)) {
 		if (sounds_set.empty() || !BaseSounds::SetSet({})) {
-			usererror("Failed to find a sounds set. Please acquire a sounds set for OpenTTD. See section 1.4 of README.md.");
+			UserError("Failed to find a sounds set. Please acquire a sounds set for OpenTTD. See section 1.4 of README.md.");
 		} else {
 			ErrorMessageData msg(STR_CONFIG_ERROR, STR_CONFIG_ERROR_INVALID_BASE_SOUNDS_NOT_FOUND);
 			msg.SetDParamStr(0, sounds_set);
@@ -794,7 +778,7 @@ int openttd_main(int argc, char *argv[])
 	if (music_set.empty() && !BaseMusic::ini_set.empty()) music_set = BaseMusic::ini_set;
 	if (!BaseMusic::SetSet(music_set)) {
 		if (music_set.empty() || !BaseMusic::SetSet({})) {
-			usererror("Failed to find a music set. Please acquire a music set for OpenTTD. See section 1.4 of README.md.");
+			UserError("Failed to find a music set. Please acquire a music set for OpenTTD. See section 1.4 of README.md.");
 		} else {
 			ErrorMessageData msg(STR_CONFIG_ERROR, STR_CONFIG_ERROR_INVALID_BASE_MUSIC_NOT_FOUND);
 			msg.SetDParamStr(0, music_set);
@@ -855,7 +839,7 @@ static void OnStartScenario()
 
 	/* Make sure all industries were built "this year", to avoid too early closures. (#9918) */
 	for (Industry *i : Industry::Iterate()) {
-		i->last_prod_year = _cur_year;
+		i->last_prod_year = TimerGameCalendar::year;
 	}
 }
 
@@ -969,37 +953,51 @@ bool SafeLoad(const std::string &filename, SaveLoadOperation fop, DetailedFileTy
 
 	_game_mode = newgm;
 
-	switch (lf == nullptr ? SaveOrLoad(filename, fop, dft, subdir) : LoadWithFilter(lf)) {
-		case SL_OK: return true;
+	SaveOrLoadResult result = (lf == nullptr) ? SaveOrLoad(filename, fop, dft, subdir) : LoadWithFilter(lf);
+	if (result == SL_OK) return true;
 
-		case SL_REINIT:
-			if (_network_dedicated) {
-				/*
-				 * We need to reinit a network map...
-				 * We can't simply load the intro game here as that game has many
-				 * special cases which make clients desync immediately. So we fall
-				 * back to just generating a new game with the current settings.
-				 */
-				Debug(net, 0, "Loading game failed, so a new (random) game will be started");
-				MakeNewGame(false, true);
-				return false;
-			}
-			if (_network_server) {
-				/* We can't load the intro game as server, so disconnect first. */
-				NetworkDisconnect();
-			}
-
-			switch (ogm) {
-				default:
-				case GM_MENU:   LoadIntroGame();      break;
-				case GM_EDITOR: MakeNewEditorWorld(); break;
-			}
-			return false;
-
-		default:
-			_game_mode = ogm;
-			return false;
+	if (_network_dedicated && ogm == GM_MENU) {
+		/*
+		 * If we are a dedicated server *and* we just were in the menu, then we
+		 * are loading the first savegame. If that fails, not starting the
+		 * server is a better reaction than starting the server with a newly
+		 * generated map as it is quite likely to be started from a script.
+		 */
+		Debug(net, 0, "Loading requested map failed; closing server.");
+		_exit_game = true;
+		return false;
 	}
+
+	if (result != SL_REINIT) {
+		_game_mode = ogm;
+		return false;
+	}
+
+	if (_network_dedicated) {
+		/*
+		 * If we are a dedicated server, have already loaded/started a game,
+		 * and then loading the savegame fails in a manner that we need to
+		 * reinitialize everything. We must not fall back into the menu mode
+		 * with the intro game, as that is unjoinable by clients. So there is
+		 * nothing else to do than start a new game, as it might have failed
+		 * trying to reload the originally loaded savegame/scenario.
+		 */
+		Debug(net, 0, "Loading game failed, so a new (random) game will be started");
+		MakeNewGame(false, true);
+		return false;
+	}
+
+	if (_network_server) {
+		/* We can't load the intro game as server, so disconnect first. */
+		NetworkDisconnect();
+	}
+
+	switch (ogm) {
+		default:
+		case GM_MENU:   LoadIntroGame();      break;
+		case GM_EDITOR: MakeNewEditorWorld(); break;
+	}
+	return false;
 }
 
 void SwitchToMode(SwitchMode new_mode)
@@ -1036,6 +1034,9 @@ void SwitchToMode(SwitchMode new_mode)
 	/* Make sure all AI controllers are gone at quitting game */
 	if (new_mode != SM_SAVE_GAME) AI::KillAll();
 
+	/* When we change mode, reset the autosave. */
+	if (new_mode != SM_SAVE_GAME) ChangeAutosaveFrequency(true);
+
 	switch (new_mode) {
 		case SM_EDITOR: // Switch to scenario editor
 			MakeNewEditorWorld();
@@ -1068,7 +1069,7 @@ void SwitchToMode(SwitchMode new_mode)
 
 			if (!SafeLoad(_file_to_saveload.name, _file_to_saveload.file_op, _file_to_saveload.detail_ftype, GM_NORMAL, NO_DIRECTORY)) {
 				SetDParamStr(0, GetSaveLoadErrorString());
-				ShowErrorMessage(STR_JUST_RAW_STRING, INVALID_STRING_ID, WL_ERROR);
+				ShowErrorMessage(STR_JUST_RAW_STRING, INVALID_STRING_ID, WL_CRITICAL);
 			} else {
 				if (_file_to_saveload.abstract_ftype == FT_SCENARIO) {
 					OnStartScenario();
@@ -1095,12 +1096,12 @@ void SwitchToMode(SwitchMode new_mode)
 		case SM_LOAD_SCENARIO: { // Load scenario from scenario editor
 			if (SafeLoad(_file_to_saveload.name, _file_to_saveload.file_op, _file_to_saveload.detail_ftype, GM_EDITOR, NO_DIRECTORY)) {
 				SetLocalCompany(OWNER_NONE);
-				_settings_newgame.game_creation.starting_year = _cur_year;
+				_settings_newgame.game_creation.starting_year = TimerGameCalendar::year;
 				/* Cancel the saveload pausing */
 				Command<CMD_PAUSE>::Post(PM_PAUSED_SAVELOAD, false);
 			} else {
 				SetDParamStr(0, GetSaveLoadErrorString());
-				ShowErrorMessage(STR_JUST_RAW_STRING, INVALID_STRING_ID, WL_ERROR);
+				ShowErrorMessage(STR_JUST_RAW_STRING, INVALID_STRING_ID, WL_CRITICAL);
 			}
 			break;
 		}
@@ -1379,10 +1380,10 @@ void StateGameLoop()
 		CallWindowGameTickEvent();
 		NewsLoop();
 	} else {
-		if (_debug_desync_level > 2 && _date_fract == 0 && (_date & 0x1F) == 0) {
+		if (_debug_desync_level > 2 && TimerGameCalendar::date_fract == 0 && (TimerGameCalendar::date & 0x1F) == 0) {
 			/* Save the desync savegame if needed. */
 			char name[MAX_PATH];
-			seprintf(name, lastof(name), "dmp_cmds_%08x_%08x.sav", _settings_game.game_creation.generation_seed, _date);
+			seprintf(name, lastof(name), "dmp_cmds_%08x_%08x.sav", _settings_game.game_creation.generation_seed, TimerGameCalendar::date);
 			SaveOrLoad(name, SLO_SAVE, DFT_GAME_FILE, AUTOSAVE_DIR, false);
 		}
 
@@ -1394,7 +1395,8 @@ void StateGameLoop()
 
 		BasePersistentStorageArray::SwitchMode(PSM_ENTER_GAMELOOP);
 		AnimateAnimatedTiles();
-		IncreaseDate();
+		TimerManager<TimerGameCalendar>::Elapsed(1);
+		TimerManager<TimerGameTick>::Elapsed(1);
 		RunTileLoop();
 		CallVehicleTicks();
 		CallLandscapeTick();
@@ -1417,14 +1419,35 @@ void StateGameLoop()
 	assert(IsLocalCompany());
 }
 
-/**
- * Create an autosave. The default name is "autosave#.sav". However with
- * the setting 'keep_all_autosave' the name defaults to company-name + date
- */
-static void DoAutosave()
+/** Interval for regular autosaves. Initialized at zero to disable till settings are loaded. */
+static IntervalTimer<TimerGameRealtime> _autosave_interval({std::chrono::milliseconds::zero(), TimerGameRealtime::AUTOSAVE}, [](auto)
 {
+	/* We reset the command-during-pause mode here, so we don't continue
+	 * to make auto-saves when nothing more is changing. */
+	_pause_mode &= ~PM_COMMAND_DURING_PAUSE;
+
+	_do_autosave = true;
+	SetWindowDirty(WC_STATUS_BAR, 0);
+
 	static FiosNumberedSaveName _autosave_ctr("autosave");
 	DoAutoOrNetsave(_autosave_ctr);
+
+	_do_autosave = false;
+	SetWindowDirty(WC_STATUS_BAR, 0);
+});
+
+/**
+ * Reset the interval of the autosave.
+ *
+ * If reset is not set, this does not set the elapsed time on the timer,
+ * so if the interval is smaller, it might result in an autosave being done
+ * immediately.
+ *
+ * @param reset Whether to reset the timer back to zero, or to continue.
+ */
+void ChangeAutosaveFrequency(bool reset)
+{
+	_autosave_interval.SetInterval({_autosave_ticks[_settings_client.gui.autosave], TimerGameRealtime::AUTOSAVE}, reset);
 }
 
 /**
@@ -1462,11 +1485,14 @@ void GameLoop()
 
 	ProcessAsyncSaveFinish();
 
-	/* autosave game? */
-	if (_do_autosave) {
-		DoAutosave();
-		_do_autosave = false;
-		SetWindowDirty(WC_STATUS_BAR, 0);
+	if (_game_mode == GM_NORMAL) {
+		static auto last_time = std::chrono::steady_clock::now();
+		auto now = std::chrono::steady_clock::now();
+		auto delta_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_time);
+		if (delta_ms.count() != 0) {
+			TimerManager<TimerGameRealtime>::Elapsed(delta_ms);
+			last_time = now;
+		}
 	}
 
 	/* switch game mode? */

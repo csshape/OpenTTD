@@ -16,10 +16,13 @@
 #include "cargotype.h"
 #include "strings_func.h"
 #include "window_func.h"
-#include "date_func.h"
+#include "date_type.h"
+#include "timer/timer_game_calendar.h"
 #include "gfx_func.h"
 #include "core/geometry_func.hpp"
 #include "currency.h"
+#include "timer/timer.h"
+#include "timer/timer_window.h"
 #include "zoom_func.h"
 
 #include "widgets/graph_widget.h"
@@ -181,10 +184,11 @@ protected:
 	byte num_on_x_axis;
 	byte num_vert_lines;
 
-	/* The starting month and year that values are plotted against. If month is
-	 * 0xFF, use x_values_start and x_values_increment below instead. */
-	byte month;
-	Year year;
+	/* The starting month and year that values are plotted against. */
+	TimerGameCalendar::Month month;
+	TimerGameCalendar::Year year;
+
+	bool draw_dates = true; ///< Should we draw months and years on the time axis?
 
 	/* These values are used if the graph is being plotted against values
 	 * rather than the dates specified by month and year. */
@@ -299,7 +303,7 @@ protected:
 		/* Rect r will be adjusted to contain just the graph, with labels being
 		 * placed outside the area. */
 		r.top    += ScaleGUITrad(5) + GetCharacterHeight(FS_SMALL) / 2;
-		r.bottom -= (this->month == 0xFF ? 1 : 2) * GetCharacterHeight(FS_SMALL) + ScaleGUITrad(4);
+		r.bottom -= (this->draw_dates ? 2 : 1) * GetCharacterHeight(FS_SMALL) + ScaleGUITrad(4);
 		r.left   += ScaleGUITrad(9);
 		r.right  -= ScaleGUITrad(5);
 
@@ -378,11 +382,11 @@ protected:
 		}
 
 		/* Draw x-axis labels and markings for graphs based on financial quarters and years.  */
-		if (this->month != 0xFF) {
+		if (this->draw_dates) {
 			x = r.left;
 			y = r.bottom + ScaleGUITrad(2);
-			byte month = this->month;
-			Year year  = this->year;
+			TimerGameCalendar::Month month = this->month;
+			TimerGameCalendar::Year year = this->year;
 			for (int i = 0; i < this->num_on_x_axis; i++) {
 				SetDParam(0, month + STR_MONTH_ABBREV_JAN);
 				SetDParam(1, year);
@@ -497,9 +501,9 @@ public:
 		uint x_label_width = 0;
 
 		/* Draw x-axis labels and markings for graphs based on financial quarters and years.  */
-		if (this->month != 0xFF) {
-			byte month = this->month;
-			Year year  = this->year;
+		if (this->draw_dates) {
+			TimerGameCalendar::Month month = this->month;
+			TimerGameCalendar::Year year = this->year;
 			for (int i = 0; i < this->num_on_x_axis; i++) {
 				SetDParam(0, month + STR_MONTH_ABBREV_JAN);
 				SetDParam(1, year);
@@ -522,7 +526,7 @@ public:
 		uint y_label_width = GetStringBoundingBox(STR_GRAPH_Y_LABEL).width;
 
 		size->width  = std::max<uint>(size->width,  ScaleGUITrad(5) + y_label_width + this->num_on_x_axis * (x_label_width + ScaleGUITrad(5)) + ScaleGUITrad(9));
-		size->height = std::max<uint>(size->height, ScaleGUITrad(5) + (1 + MIN_GRAPH_NUM_LINES_Y * 2 + (this->month != 0xFF ? 3 : 1)) * FONT_HEIGHT_SMALL + ScaleGUITrad(4));
+		size->height = std::max<uint>(size->height, ScaleGUITrad(5) + (1 + MIN_GRAPH_NUM_LINES_Y * 2 + (this->draw_dates ? 3 : 1)) * FONT_HEIGHT_SMALL + ScaleGUITrad(4));
 		size->height = std::max<uint>(size->height, size->width / 3);
 	}
 
@@ -578,8 +582,8 @@ public:
 			nums = std::min(this->num_vert_lines, std::max(nums, c->num_valid_stat_ent));
 		}
 
-		int mo = (_cur_month / 3 - nums) * 3;
-		int yr = _cur_year;
+		int mo = (TimerGameCalendar::month / 3 - nums) * 3;
+		int yr = TimerGameCalendar::year;
 		while (mo < 0) {
 			yr--;
 			mo += 12;
@@ -882,7 +886,7 @@ struct PaymentRatesGraphWindow : BaseGraphWindow {
 	{
 		this->num_on_x_axis = 20;
 		this->num_vert_lines = 20;
-		this->month = 0xFF;
+		this->draw_dates = false;
 		this->x_values_start     = 10;
 		this->x_values_increment = 10;
 
@@ -891,7 +895,7 @@ struct PaymentRatesGraphWindow : BaseGraphWindow {
 		this->vscroll->SetCount(static_cast<int>(_sorted_standard_cargo_specs.size()));
 
 		/* Initialise the dataset */
-		this->OnHundredthTick();
+		this->UpdatePaymentRates();
 
 		this->FinishInitNested(window_number);
 	}
@@ -1029,10 +1033,18 @@ struct PaymentRatesGraphWindow : BaseGraphWindow {
 	void OnInvalidateData(int data = 0, bool gui_scope = true) override
 	{
 		if (!gui_scope) return;
-		this->OnHundredthTick();
+		this->UpdatePaymentRates();
 	}
 
-	void OnHundredthTick() override
+	/** Update the payment rates on a regular interval. */
+	IntervalTimer<TimerWindow> update_payment_interval = {std::chrono::seconds(3), [this](auto) {
+		this->UpdatePaymentRates();
+	}};
+
+	/**
+	 * Update the payment rates according to the latest information.
+	 */
+	void UpdatePaymentRates()
 	{
 		this->UpdateExcludedData();
 

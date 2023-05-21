@@ -16,26 +16,223 @@
 #include "direction_func.h"
 
 /**
- * Pointer to the tile-array.
+ * Wrapper class to abstract away the way the tiles are stored. It is
+ * intended to be used to access the "map" data of a single tile.
  *
- * This variable points to the tile-array which contains the tiles of
- * the map.
+ * The wrapper is expected to be fully optimized away by the compiler, even
+ * with low optimization levels except when completely disabling it.
  */
-extern Tile *_m;
+class Tile {
+private:
+	friend struct Map;
+	/**
+	 * Data that is stored per tile. Also used TileExtended for this.
+	 * Look at docs/landscape.html for the exact meaning of the members.
+	 */
+	struct TileBase {
+		byte   type;   ///< The type (bits 4..7), bridges (2..3), rainforest/desert (0..1)
+		byte   height; ///< The height of the northern corner.
+		uint16 m2;     ///< Primarily used for indices to towns, industries and stations
+		byte   m1;     ///< Primarily used for ownership information
+		byte   m3;     ///< General purpose
+		byte   m4;     ///< General purpose
+		byte   m5;     ///< General purpose
+	};
 
-/**
- * Pointer to the extended tile-array.
- *
- * This variable points to the extended tile-array which contains the tiles
- * of the map.
- */
-extern TileExtended *_me;
+	static_assert(sizeof(TileBase) == 8);
+
+	/**
+	 * Data that is stored per tile. Also used TileBase for this.
+	 * Look at docs/landscape.html for the exact meaning of the members.
+	 */
+	struct TileExtended {
+		byte m6;   ///< General purpose
+		byte m7;   ///< Primarily used for newgrf support
+		uint16 m8; ///< General purpose
+	};
+
+	static TileBase *base_tiles;         ///< Pointer to the tile-array.
+	static TileExtended *extended_tiles; ///< Pointer to the extended tile-array.
+
+	TileIndex tile; ///< The tile to access the map data for.
+
+public:
+	/**
+	 * Create the tile wrapper for the given tile.
+	 * @param tile The tile to access the map for.
+	 */
+	debug_inline Tile(TileIndex tile) : tile(tile) {}
+
+	/**
+	 * Create the tile wrapper for the given tile.
+	 * @param tile The tile to access the map for.
+	 */
+	Tile(uint tile) : tile(tile) {}
+
+	/**
+	 * Implicit conversion to the TileIndex.
+	 */
+	debug_inline constexpr operator TileIndex() const { return tile; }
+
+	/**
+	 * Implicit conversion to the uint for bounds checking.
+	 */
+	debug_inline constexpr operator uint() const { return tile; }
+
+	/**
+	 * The type (bits 4..7), bridges (2..3), rainforest/desert (0..1)
+	 *
+	 * Look at docs/landscape.html for the exact meaning of the data.
+	 * @param tile The tile to get the data for.
+	 * @return reference to the byte holding the data.
+	 */
+	debug_inline byte &type()
+	{
+		return base_tiles[tile].type;
+	}
+
+	/**
+	 * The height of the northern corner
+	 *
+	 * Look at docs/landscape.html for the exact meaning of the data.
+	 * @param tile The tile to get the height for.
+	 * @return reference to the byte holding the height.
+	 */
+	debug_inline byte &height()
+	{
+		return base_tiles[tile].height;
+	}
+
+	/**
+	 * Primarily used for ownership information
+	 *
+	 * Look at docs/landscape.html for the exact meaning of the data.
+	 * @param tile The tile to get the data for.
+	 * @return reference to the byte holding the data.
+	 */
+	debug_inline byte &m1()
+	{
+		return base_tiles[tile].m1;
+	}
+
+	/**
+	 * Primarily used for indices to towns, industries and stations
+	 *
+	 * Look at docs/landscape.html for the exact meaning of the data.
+	 * @param tile The tile to get the data for.
+	 * @return reference to the uint16 holding the data.
+	 */
+	debug_inline uint16 &m2()
+	{
+		return base_tiles[tile].m2;
+	}
+
+	/**
+	 * General purpose
+	 *
+	 * Look at docs/landscape.html for the exact meaning of the data.
+	 * @param tile The tile to get the data for.
+	 * @return reference to the byte holding the data.
+	 */
+	debug_inline byte &m3()
+	{
+		return base_tiles[tile].m3;
+	}
+
+	/**
+	 * General purpose
+	 *
+	 * Look at docs/landscape.html for the exact meaning of the data.
+	 * @param tile The tile to get the data for.
+	 * @return reference to the byte holding the data.
+	 */
+	debug_inline byte &m4()
+	{
+		return base_tiles[tile].m4;
+	}
+
+	/**
+	 * General purpose
+	 *
+	 * Look at docs/landscape.html for the exact meaning of the data.
+	 * @param tile The tile to get the data for.
+	 * @return reference to the byte holding the data.
+	 */
+	debug_inline byte &m5()
+	{
+		return base_tiles[tile].m5;
+	}
+
+	/**
+	 * General purpose
+	 *
+	 * Look at docs/landscape.html for the exact meaning of the data.
+	 * @param tile The tile to get the data for.
+	 * @return reference to the byte holding the data.
+	 */
+	debug_inline byte &m6()
+	{
+		return extended_tiles[tile].m6;
+	}
+
+	/**
+	 * Primarily used for newgrf support
+	 *
+	 * Look at docs/landscape.html for the exact meaning of the data.
+	 * @param tile The tile to get the data for.
+	 * @return reference to the byte holding the data.
+	 */
+	debug_inline byte &m7()
+	{
+		return extended_tiles[tile].m7;
+	}
+
+	/**
+	 * General purpose
+	 *
+	 * Look at docs/landscape.html for the exact meaning of the data.
+	 * @param tile The tile to get the data for.
+	 * @return reference to the uint16 holding the data.
+	 */
+	debug_inline uint16 &m8()
+	{
+		return extended_tiles[tile].m8;
+	}
+};
 
 /**
  * Size related data of the map.
  */
 struct Map {
 private:
+	/**
+	 * Iterator to iterate all Tiles
+	 */
+	struct Iterator {
+		typedef Tile value_type;
+		typedef Tile *pointer;
+		typedef Tile &reference;
+		typedef size_t difference_type;
+		typedef std::forward_iterator_tag iterator_category;
+
+		explicit Iterator(TileIndex index) : index(index) {}
+		bool operator==(const Iterator &other) const { return this->index == other.index; }
+		bool operator!=(const Iterator &other) const { return !(*this == other); }
+		Tile operator*() const { return this->index; }
+		Iterator & operator++() { this->index++; return *this; }
+	private:
+		TileIndex index;
+	};
+
+	/*
+	 * Iterable ensemble of all Tiles
+	 */
+	struct IterateWrapper {
+		Iterator begin() { return Iterator(0); }
+		Iterator end() { return Iterator(Map::Size()); }
+		bool empty() { return false; }
+	};
+
 	static uint log_x;     ///< 2^_map_log_x == _map_size_x
 	static uint log_y;     ///< 2^_map_log_y == _map_size_y
 	static uint size_x;    ///< Size of the map along the X
@@ -156,8 +353,14 @@ public:
 	 */
 	static bool IsInitialized()
 	{
-		return _m != nullptr;
+		return Tile::base_tiles != nullptr;
 	}
+
+	/**
+	 * Returns an iterable ensemble of all Tiles
+	 * @return an iterable ensemble of all Tiles
+	 */
+	static IterateWrapper Iterate() { return IterateWrapper(); }
 };
 
 /**

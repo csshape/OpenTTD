@@ -19,7 +19,6 @@
 #include "company_base.h"
 #include "strings_func.h"
 #include "window_func.h"
-#include "date_func.h"
 #include "sound_func.h"
 #include "company_func.h"
 #include "widgets/dropdown_type.h"
@@ -40,6 +39,8 @@
 #include "tunnelbridge_cmd.h"
 #include "waypoint_cmd.h"
 #include "rail_cmd.h"
+#include "timer/timer.h"
+#include "timer/timer_game_calendar.h"
 
 #include "station_map.h"
 #include "tunnelbridge_map.h"
@@ -248,7 +249,7 @@ static void GenericPlaceSignals(TileIndex tile)
 			Command<CMD_BUILD_SIGNALS>::Post(_convert_signal_button ? STR_ERROR_SIGNAL_CAN_T_CONVERT_SIGNALS_HERE : STR_ERROR_CAN_T_BUILD_SIGNALS_HERE, CcPlaySound_CONSTRUCTION_RAIL,
 				tile, track, _cur_signal_type, _cur_signal_variant, _convert_signal_button, false, _ctrl_pressed, cycle_start, SIGTYPE_LAST, 0, 0);
 		} else {
-			SignalVariant sigvar = _cur_year < _settings_client.gui.semaphore_build_before ? SIG_SEMAPHORE : SIG_ELECTRIC;
+			SignalVariant sigvar = TimerGameCalendar::year < _settings_client.gui.semaphore_build_before ? SIG_SEMAPHORE : SIG_ELECTRIC;
 			Command<CMD_BUILD_SIGNALS>::Post(STR_ERROR_CAN_T_BUILD_SIGNALS_HERE, CcPlaySound_CONSTRUCTION_RAIL,
 				tile, track, _settings_client.gui.default_signal_type, sigvar, false, false, _ctrl_pressed, cycle_start, SIGTYPE_LAST, 0, 0);
 
@@ -397,7 +398,7 @@ static void HandleAutoSignalPlacement()
 	} else {
 		bool sig_gui = FindWindowById(WC_BUILD_SIGNAL, 0) != nullptr;
 		SignalType sigtype = sig_gui ? _cur_signal_type : _settings_client.gui.default_signal_type;
-		SignalVariant sigvar = sig_gui ? _cur_signal_variant : (_cur_year < _settings_client.gui.semaphore_build_before ? SIG_SEMAPHORE : SIG_ELECTRIC);
+		SignalVariant sigvar = sig_gui ? _cur_signal_variant : (TimerGameCalendar::year < _settings_client.gui.semaphore_build_before ? SIG_SEMAPHORE : SIG_ELECTRIC);
 		Command<CMD_BUILD_SIGNAL_TRACK>::Post(STR_ERROR_CAN_T_BUILD_SIGNALS_HERE, CcPlaySound_CONSTRUCTION_RAIL,
 				TileVirtXY(_thd.selstart.x, _thd.selstart.y), TileVirtXY(_thd.selend.x, _thd.selend.y), track, sigtype, sigvar, false, _ctrl_pressed, !_settings_client.gui.drag_signals_fixed_distance, _settings_client.gui.drag_signals_density);
 	}
@@ -493,7 +494,7 @@ struct BuildRailToolbarWindow : Window {
 			if (rti->max_speed > 0) {
 				SetDParam(0, STR_TOOLBAR_RAILTYPE_VELOCITY);
 				SetDParam(1, rti->strings.toolbar_caption);
-				SetDParam(2, rti->max_speed);
+				SetDParam(2, PackVelocity(rti->max_speed, VEH_TRAIN));
 			} else {
 				SetDParam(0, rti->strings.toolbar_caption);
 			}
@@ -1505,6 +1506,10 @@ public:
 		CheckRedrawStationCoverage(this);
 	}
 
+	IntervalTimer<TimerGameCalendar> yearly_interval = {{TimerGameCalendar::YEAR, TimerGameCalendar::Priority::NONE}, [this](auto) {
+		this->SetDirty();
+	}};
+
 	static HotkeyList hotkeys;
 };
 
@@ -2189,7 +2194,7 @@ static void SetDefaultRailGui()
  */
 void ResetSignalVariant(int32 new_value)
 {
-	SignalVariant new_variant = (_cur_year < _settings_client.gui.semaphore_build_before ? SIG_SEMAPHORE : SIG_ELECTRIC);
+	SignalVariant new_variant = (TimerGameCalendar::year < _settings_client.gui.semaphore_build_before ? SIG_SEMAPHORE : SIG_ELECTRIC);
 
 	if (new_variant != _cur_signal_variant) {
 		Window *w = FindWindowById(WC_BUILD_SIGNAL, 0);
@@ -2200,6 +2205,13 @@ void ResetSignalVariant(int32 new_value)
 		_cur_signal_variant = new_variant;
 	}
 }
+
+static IntervalTimer<TimerGameCalendar> _check_reset_signal({TimerGameCalendar::YEAR, TimerGameCalendar::Priority::NONE}, [](auto)
+{
+	if (TimerGameCalendar::year != _settings_client.gui.semaphore_build_before) return;
+
+	ResetSignalVariant();
+});
 
 /**
  * Resets the rail GUI - sets default railtype to build

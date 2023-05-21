@@ -154,11 +154,12 @@ public:
  * location. These versions assist with situations like that.
  */
 enum IniFileVersion : uint32 {
-	IFV_0,               ///< 0  All versions prior to introduction.
-	IFV_PRIVATE_SECRETS, ///< 1  PR#9298  Moving of settings from openttd.cfg to private.cfg / secrets.cfg.
-	IFV_GAME_TYPE,       ///< 2  PR#9515  Convert server_advertise to server_game_type.
+	IFV_0,                 ///< 0  All versions prior to introduction.
+	IFV_PRIVATE_SECRETS,   ///< 1  PR#9298  Moving of settings from openttd.cfg to private.cfg / secrets.cfg.
+	IFV_GAME_TYPE,         ///< 2  PR#9515  Convert server_advertise to server_game_type.
+	IFV_LINKGRAPH_SECONDS, ///< 3  PR#10610 Store linkgraph update intervals in seconds instead of days.
 
-	IFV_MAX_VERSION,     ///< Highest possible ini-file version.
+	IFV_MAX_VERSION,       ///< Highest possible ini-file version.
 };
 
 const uint16 INIFILE_VERSION = (IniFileVersion)(IFV_MAX_VERSION - 1); ///< Current ini-file version of OpenTTD.
@@ -173,7 +174,7 @@ const uint16 INIFILE_VERSION = (IniFileVersion)(IFV_MAX_VERSION - 1); ///< Curre
 size_t OneOfManySettingDesc::ParseSingleValue(const char *str, size_t len, const std::vector<std::string> &many)
 {
 	/* check if it's an integer */
-	if (isdigit(*str)) return strtoul(str, nullptr, 0);
+	if (isdigit(*str)) return std::strtoul(str, nullptr, 0);
 
 	size_t idx = 0;
 	for (auto one : many) {
@@ -244,7 +245,7 @@ static int ParseIntList(const char *p, T *items, int maxitems)
 			default: {
 				if (n == maxitems) return -1; // we don't accept that many numbers
 				char *end;
-				unsigned long v = strtoul(p, &end, 0);
+				unsigned long v = std::strtoul(p, &end, 0);
 				if (p == end) return -1; // invalid character (not a number)
 				if (sizeof(T) < sizeof(v)) v = Clamp<unsigned long>(v, std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
 				items[n++] = v;
@@ -376,7 +377,7 @@ void ManyOfManySettingDesc::FormatValue(char *buf, const char *last, const void 
 size_t IntSettingDesc::ParseValue(const char *str) const
 {
 	char *end;
-	size_t val = strtoul(str, &end, 0);
+	size_t val = std::strtoul(str, &end, 0);
 	if (end == str) {
 		ErrorMessageData msg(STR_CONFIG_ERROR, STR_CONFIG_ERROR_INVALID_VALUE);
 		msg.SetDParamStr(0, str);
@@ -1236,6 +1237,11 @@ void LoadFromConfig(bool startup)
 			}
 		}
 
+		if (generic_version < IFV_LINKGRAPH_SECONDS) {
+			_settings_newgame.linkgraph.recalc_interval *= SECONDS_PER_DAY;
+			_settings_newgame.linkgraph.recalc_time     *= SECONDS_PER_DAY;
+		}
+
 		_grfconfig_newgame = GRFLoadConfig(generic_ini, "newgrf", false);
 		_grfconfig_static  = GRFLoadConfig(generic_ini, "newgrf-static", true);
 		AILoadConfig(generic_ini, "ai_players");
@@ -1339,12 +1345,11 @@ StringList GetGRFPresetList()
  */
 GRFConfig *LoadGRFPresetFromConfig(const char *config_name)
 {
-	size_t len = strlen(config_name) + 8;
-	char *section = (char*)alloca(len);
-	seprintf(section, section + len - 1, "preset-%s", config_name);
+	std::string section("preset-");
+	section += config_name;
 
 	ConfigIniFile ini(_config_file);
-	GRFConfig *config = GRFLoadConfig(ini, section, false);
+	GRFConfig *config = GRFLoadConfig(ini, section.c_str(), false);
 
 	return config;
 }
@@ -1357,12 +1362,11 @@ GRFConfig *LoadGRFPresetFromConfig(const char *config_name)
  */
 void SaveGRFPresetToConfig(const char *config_name, GRFConfig *config)
 {
-	size_t len = strlen(config_name) + 8;
-	char *section = (char*)alloca(len);
-	seprintf(section, section + len - 1, "preset-%s", config_name);
+	std::string section("preset-");
+	section += config_name;
 
 	ConfigIniFile ini(_config_file);
-	GRFSaveConfig(ini, section, config);
+	GRFSaveConfig(ini, section.c_str(), config);
 	ini.SaveToDisk(_config_file);
 }
 
@@ -1372,12 +1376,11 @@ void SaveGRFPresetToConfig(const char *config_name, GRFConfig *config)
  */
 void DeleteGRFPresetFromConfig(const char *config_name)
 {
-	size_t len = strlen(config_name) + 8;
-	char *section = (char*)alloca(len);
-	seprintf(section, section + len - 1, "preset-%s", config_name);
+	std::string section("preset-");
+	section += config_name;
 
 	ConfigIniFile ini(_config_file);
-	ini.RemoveGroup(section);
+	ini.RemoveGroup(section.c_str());
 	ini.SaveToDisk(_config_file);
 }
 

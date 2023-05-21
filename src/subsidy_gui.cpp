@@ -13,6 +13,7 @@
 #include "window_gui.h"
 #include "strings_func.h"
 #include "date_func.h"
+#include "timer/timer_game_calendar.h"
 #include "viewport_func.h"
 #include "gui.h"
 #include "subsidy_func.h"
@@ -77,8 +78,8 @@ struct SubsidyListWindow : Window {
 		/* determine src coordinate for subsidy and try to scroll to it */
 		TileIndex xy;
 		switch (s->src_type) {
-			case ST_INDUSTRY: xy = Industry::Get(s->src)->location.tile; break;
-			case ST_TOWN:     xy =     Town::Get(s->src)->xy; break;
+			case SourceType::Industry: xy = Industry::Get(s->src)->location.tile; break;
+			case SourceType::Town:     xy =     Town::Get(s->src)->xy; break;
 			default: NOT_REACHED();
 		}
 
@@ -87,8 +88,8 @@ struct SubsidyListWindow : Window {
 
 			/* otherwise determine dst coordinate for subsidy and scroll to it */
 			switch (s->dst_type) {
-				case ST_INDUSTRY: xy = Industry::Get(s->dst)->location.tile; break;
-				case ST_TOWN:     xy =     Town::Get(s->dst)->xy; break;
+				case SourceType::Industry: xy = Industry::Get(s->dst)->location.tile; break;
+				case SourceType::Town:     xy =     Town::Get(s->dst)->xy; break;
 				default: NOT_REACHED();
 			}
 
@@ -143,7 +144,7 @@ struct SubsidyListWindow : Window {
 		if (widget != WID_SUL_PANEL) return;
 
 		YearMonthDay ymd;
-		ConvertDateToYMD(_date, &ymd);
+		ConvertDateToYMD(TimerGameCalendar::date, &ymd);
 
 		Rect tr = r.Shrink(WidgetDimensions::scaled.framerect);
 
@@ -160,7 +161,7 @@ struct SubsidyListWindow : Window {
 				if (IsInsideMM(pos, 0, cap)) {
 					/* Displays the two offered towns */
 					SetupSubsidyDecodeParam(s, SubsidyDecodeParamType::Gui);
-					SetDParam(7, _date - ymd.day + s->remaining * 32);
+					SetDParam(7, TimerGameCalendar::date - ymd.day + s->remaining * 32);
 					DrawString(tr.left, tr.right, tr.top + pos * FONT_HEIGHT_NORMAL, STR_SUBSIDIES_OFFERED_FROM_TO);
 				}
 				pos++;
@@ -184,7 +185,7 @@ struct SubsidyListWindow : Window {
 				if (IsInsideMM(pos, 0, cap)) {
 					SetupSubsidyDecodeParam(s, SubsidyDecodeParamType::Gui);
 					SetDParam(7, s->awarded);
-					SetDParam(8, _date - ymd.day + s->remaining * 32);
+					SetDParam(8, TimerGameCalendar::date - ymd.day + s->remaining * 32);
 
 					/* Displays the two connected stations */
 					DrawString(tr.left, tr.right, tr.top + pos * FONT_HEIGHT_NORMAL, STR_SUBSIDIES_SUBSIDISED_FROM_TO);

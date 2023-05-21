@@ -59,14 +59,12 @@ void NetworkClientSendRcon(const std::string &password, const std::string &comma
 void NetworkClientSendChat(NetworkAction action, DestType type, int dest, const std::string &msg, int64 data = 0);
 bool NetworkClientPreferTeamChat(const NetworkClientInfo *cio);
 bool NetworkCompanyIsPassworded(CompanyID company_id);
+uint NetworkMaxCompaniesAllowed();
 bool NetworkMaxCompaniesReached();
 void NetworkPrintClients();
 void NetworkHandlePauseChange(PauseMode prev_mode, PauseMode changed_mode);
 
 /*** Commands ran by the server ***/
-void NetworkServerDailyLoop();
-void NetworkServerMonthlyLoop();
-void NetworkServerYearlyLoop();
 void NetworkServerSendConfigUpdate();
 void NetworkServerUpdateGameInfo();
 void NetworkServerShowStatusToConsole();
@@ -88,7 +86,6 @@ void NetworkInitChatMessage();
 void NetworkReInitChatBoxSize();
 void CDECL NetworkAddChatMessage(TextColour colour, uint duration, const std::string &message);
 void NetworkUndrawChatMessage();
-void NetworkChatMessageLoop();
 
 void NetworkAfterNewGRFScan();
 

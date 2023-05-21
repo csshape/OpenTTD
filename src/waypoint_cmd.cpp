@@ -19,7 +19,7 @@
 #include "viewport_func.h"
 #include "viewport_kdtree.h"
 #include "window_func.h"
-#include "date_func.h"
+#include "timer/timer_game_calendar.h"
 #include "vehicle_func.h"
 #include "string_func.h"
 #include "company_func.h"
@@ -191,6 +191,14 @@ CommandCost CmdBuildRailWaypoint(DoCommandFlag flags, TileIndex start_tile, Axis
 
 	if (distant_join && (!_settings_game.station.distant_join_stations || !Waypoint::IsValidID(station_to_join))) return CMD_ERROR;
 
+	TileArea new_location(start_tile, width, height);
+
+	/* only AddCost for non-existing waypoints */
+	CommandCost cost(EXPENSES_CONSTRUCTION);
+	for (TileIndex cur_tile : new_location) {
+		if (!IsRailWaypointTile(cur_tile)) cost.AddCost(_price[PR_BUILD_WAYPOINT_RAIL]);
+	}
+
 	/* Make sure the area below consists of clear tiles. (OR tiles belonging to a certain rail station) */
 	StationID est = INVALID_STATION;
 
@@ -203,7 +211,6 @@ CommandCost CmdBuildRailWaypoint(DoCommandFlag flags, TileIndex start_tile, Axis
 	}
 
 	Waypoint *wp = nullptr;
-	TileArea new_location(start_tile, width, height);
 	CommandCost ret = FindJoiningWaypoint(est, station_to_join, adjacent, new_location, &wp);
 	if (ret.Failed()) return ret;
 
@@ -241,7 +248,7 @@ CommandCost CmdBuildRailWaypoint(DoCommandFlag flags, TileIndex start_tile, Axis
 
 		wp->delete_ctr = 0;
 		wp->facilities |= FACIL_TRAIN;
-		wp->build_date = _date;
+		wp->build_date = TimerGameCalendar::date;
 		wp->string_id = STR_SV_STNAME_WAYPOINT;
 		wp->train_station = new_location;
 
@@ -250,7 +257,7 @@ CommandCost CmdBuildRailWaypoint(DoCommandFlag flags, TileIndex start_tile, Axis
 		wp->UpdateVirtCoord();
 
 		const StationSpec *spec = StationClass::Get(spec_class)->GetSpec(spec_index);
-		byte *layout_ptr = AllocaM(byte, count);
+		byte *layout_ptr = new byte[count];
 		if (spec == nullptr) {
 			/* The layout must be 0 for the 'normal' waypoints by design. */
 			memset(layout_ptr, 0, count);
@@ -277,9 +284,10 @@ CommandCost CmdBuildRailWaypoint(DoCommandFlag flags, TileIndex start_tile, Axis
 			YapfNotifyTrackLayoutChange(tile, AxisToTrack(axis));
 		}
 		DirtyCompanyInfrastructureWindows(wp->owner);
+		delete[] layout_ptr;
 	}
 
-	return CommandCost(EXPENSES_CONSTRUCTION, count * _price[PR_BUILD_WAYPOINT_RAIL]);
+	return cost;
 }
 
 /**
@@ -321,7 +329,7 @@ CommandCost CmdBuildBuoy(DoCommandFlag flags, TileIndex tile)
 		wp->facilities |= FACIL_DOCK;
 		wp->owner = OWNER_NONE;
 
-		wp->build_date = _date;
+		wp->build_date = TimerGameCalendar::date;
 
 		if (wp->town == nullptr) MakeDefaultName(wp);
 

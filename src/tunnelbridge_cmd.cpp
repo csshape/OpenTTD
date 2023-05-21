@@ -24,7 +24,7 @@
 #include "autoslope.h"
 #include "tunnelbridge_map.h"
 #include "strings_func.h"
-#include "date_func.h"
+#include "timer/timer_game_calendar.h"
 #include "clear_func.h"
 #include "vehicle_func.h"
 #include "sound_func.h"
@@ -206,7 +206,7 @@ CommandCost CheckBridgeAvailability(BridgeType bridge_type, uint bridge_len, DoC
 	if (bridge_type >= MAX_BRIDGES) return CMD_ERROR;
 
 	const BridgeSpec *b = GetBridgeSpec(bridge_type);
-	if (b->avail_year > _cur_year) return CMD_ERROR;
+	if (b->avail_year > TimerGameCalendar::year) return CMD_ERROR;
 
 	uint max = std::min(b->max_length, _settings_game.construction.max_bridge_length);
 
@@ -1663,7 +1663,7 @@ void DrawBridgeMiddle(const TileInfo *ti)
 }
 
 
-static int GetSlopePixelZ_TunnelBridge(TileIndex tile, uint x, uint y)
+static int GetSlopePixelZ_TunnelBridge(TileIndex tile, uint x, uint y, bool ground_vehicle)
 {
 	int z;
 	Slope tileh = GetTilePixelSlope(tile, &z);
@@ -1672,30 +1672,23 @@ static int GetSlopePixelZ_TunnelBridge(TileIndex tile, uint x, uint y)
 	y &= 0xF;
 
 	if (IsTunnel(tile)) {
-		uint pos = (DiagDirToAxis(GetTunnelBridgeDirection(tile)) == AXIS_X ? y : x);
-
 		/* In the tunnel entrance? */
-		if (5 <= pos && pos <= 10) return z;
+		if (ground_vehicle) return z;
 	} else { // IsBridge(tile)
 		DiagDirection dir = GetTunnelBridgeDirection(tile);
-		uint pos = (DiagDirToAxis(dir) == AXIS_X ? y : x);
-
 		z += ApplyPixelFoundationToSlope(GetBridgeFoundation(tileh, DiagDirToAxis(dir)), &tileh);
 
 		/* On the bridge ramp? */
-		if (5 <= pos && pos <= 10) {
-			int delta;
-
+		if (ground_vehicle) {
 			if (tileh != SLOPE_FLAT) return z + TILE_HEIGHT;
 
 			switch (dir) {
 				default: NOT_REACHED();
-				case DIAGDIR_NE: delta = (TILE_SIZE - 1 - x) / 2; break;
-				case DIAGDIR_SE: delta = y / 2; break;
-				case DIAGDIR_SW: delta = x / 2; break;
-				case DIAGDIR_NW: delta = (TILE_SIZE - 1 - y) / 2; break;
+				case DIAGDIR_NE: tileh = SLOPE_NE; break;
+				case DIAGDIR_SE: tileh = SLOPE_SE; break;
+				case DIAGDIR_SW: tileh = SLOPE_SW; break;
+				case DIAGDIR_NW: tileh = SLOPE_NW; break;
 			}
-			return z + 1 + delta;
 		}
 	}
 
@@ -1863,6 +1856,29 @@ static void ChangeTileOwner_TunnelBridge(TileIndex tile, Owner old_owner, Owner 
 }
 
 /**
+ * Helper to prepare the ground vehicle when entering a bridge. This get called
+ * when entering the bridge, at the last frame of travel on the bridge head.
+ * Our calling function gets called before UpdateInclination/UpdateZPosition,
+ * which normally controls the Z-coordinate. However, in the wormhole of the
+ * bridge the vehicle is in a strange state so UpdateInclination does not get
+ * called for the wormhole of the bridge and as such the going up/down bits
+ * would remain set. As such, this function clears those. In doing so, the call
+ * to UpdateInclination will not update the Z-coordinate, so that has to be
+ * done here as well.
+ * @param gv The ground vehicle entering the bridge.
+ */
+template <typename T>
+static void PrepareToEnterBridge(T *gv)
+{
+	if (HasBit(gv->gv_flags, GVF_GOINGUP_BIT)) {
+		gv->z_pos++;
+		ClrBit(gv->gv_flags, GVF_GOINGUP_BIT);
+	} else {
+		ClrBit(gv->gv_flags, GVF_GOINGDOWN_BIT);
+	}
+}
+
+/**
  * Frame when the 'enter tunnel' sound should be played. This is the second
  * frame on a tile, so the sound is played shortly after entering the tunnel
  * tile, while the vehicle is still visible.
@@ -1881,7 +1897,7 @@ extern const byte _tunnel_visibility_frame[DIAGDIR_END] = {12, 8, 8, 12};
 
 static VehicleEnterTileStatus VehicleEnter_TunnelBridge(Vehicle *v, TileIndex tile, int x, int y)
 {
-	int z = GetSlopePixelZ(x, y) - v->z_pos;
+	int z = GetSlopePixelZ(x, y, true) - v->z_pos;
 
 	if (abs(z) > 2) return VETSB_CANNOT_ENTER;
 	/* Direction into the wormhole */
@@ -1963,17 +1979,14 @@ static VehicleEnterTileStatus VehicleEnter_TunnelBridge(Vehicle *v, TileIndex ti
 				case VEH_TRAIN: {
 					Train *t = Train::From(v);
 					t->track = TRACK_BIT_WORMHOLE;
-					ClrBit(t->gv_flags, GVF_GOINGUP_BIT);
-					ClrBit(t->gv_flags, GVF_GOINGDOWN_BIT);
+					PrepareToEnterBridge(t);
 					break;
 				}
 
 				case VEH_ROAD: {
 					RoadVehicle *rv = RoadVehicle::From(v);
 					rv->state = RVSB_WORMHOLE;
-					/* There are no slopes inside bridges / tunnels. */
-					ClrBit(rv->gv_flags, GVF_GOINGUP_BIT);
-					ClrBit(rv->gv_flags, GVF_GOINGDOWN_BIT);
+					PrepareToEnterBridge(rv);
 					break;
 				}
 

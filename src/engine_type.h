@@ -14,7 +14,7 @@
 #include "rail_type.h"
 #include "road_type.h"
 #include "cargo_type.h"
-#include "date_type.h"
+#include "timer/timer_game_calendar.h"
 #include "sound_type.h"
 #include "strings_type.h"
 
@@ -141,19 +141,19 @@ DECLARE_ENUM_AS_BIT_SET(ExtraEngineFlags);
  *  @see table/engines.h
  */
 struct EngineInfo {
-	Date base_intro;    ///< Basic date of engine introduction (without random parts).
-	Year lifelength;    ///< Lifetime of a single vehicle
-	Year base_life;     ///< Basic duration of engine availability (without random parts). \c 0xFF means infinite life.
+	TimerGameCalendar::Date base_intro;    ///< Basic date of engine introduction (without random parts).
+	TimerGameCalendar::Year lifelength;    ///< Lifetime of a single vehicle
+	TimerGameCalendar::Year base_life;     ///< Basic duration of engine availability (without random parts). \c 0xFF means infinite life.
 	byte decay_speed;
 	byte load_amount;
 	byte climates;      ///< Climates supported by the engine.
 	CargoID cargo_type;
 	CargoTypes refit_mask;
 	byte refit_cost;
-	byte misc_flags;    ///< Miscellaneous flags. @see EngineMiscFlags
-	byte callback_mask; ///< Bitmask of vehicle callbacks that have to be called
-	int8 retire_early;  ///< Number of years early to retire vehicle
-	StringID string_id; ///< Default name of engine
+	byte misc_flags;         ///< Miscellaneous flags. @see EngineMiscFlags
+	uint16 callback_mask;    ///< Bitmask of vehicle callbacks that have to be called
+	int8 retire_early;       ///< Number of years early to retire vehicle
+	StringID string_id;      ///< Default name of engine
 	uint16 cargo_age_period; ///< Number of ticks before carried cargo is aged.
 	EngineID variant_id;     ///< Engine variant ID. If set, will be treated specially in purchase lists.
 	ExtraEngineFlags extra_flags;
@@ -181,6 +181,23 @@ enum EngineFlags {
 	ENGINE_AVAILABLE         = 1, ///< This vehicle is available to everyone.
 	ENGINE_EXCLUSIVE_PREVIEW = 2, ///< This vehicle is in the exclusive preview stage, either being used or being offered to a company.
 };
+
+/**
+ * Contexts an engine name can be shown in.
+ */
+enum EngineNameContext : uint8 {
+	Generic                 = 0x00, ///< No specific context available.
+	VehicleDetails          = 0x11, ///< Name is shown in the vehicle details GUI.
+	PurchaseList            = 0x20, ///< Name is shown in the purchase list (including autoreplace window 'Available vehicles' panel).
+	PreviewNews             = 0x21, ///< Name is shown in exclusive preview or newspaper.
+	AutoreplaceVehicleInUse = 0x22, ///< Name is show in the autoreplace window 'Vehicles in use' panel.
+};
+
+/** Combine an engine ID and a name context to an engine name dparam. */
+inline uint64 PackEngineNameDParam(EngineID engine_id, EngineNameContext context, uint32 extra_data = 0)
+{
+	return engine_id | (static_cast<uint64>(context) << 32) | (static_cast<uint64>(extra_data) << 40);
+}
 
 static const uint MAX_LENGTH_ENGINE_NAME_CHARS = 32; ///< The maximum length of an engine name in characters including '\0'
 

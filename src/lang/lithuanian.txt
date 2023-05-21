@@ -1182,10 +1182,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Pasirink
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Išjungta
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Kiekvieną mėnesį
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Kas 3 mėnesius
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Kas 6 mėnesius
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Kas 12 mėnesių
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Kalba
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Pasirinkite aplinkos kalbą
@@ -1399,6 +1395,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Dešinėje
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Didžiausia pradinė paskola: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Didžiausia paskola, kokią kompanija gali gauti iš banko (neatsižvelgiant į infliaciją)
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Palūkanų norma: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Paskolos palūkanų norma. Taip pat įtakoja infliaciją (jei ji įgalinta)
@@ -1993,6 +1990,7 @@ STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :Leisti pirkti b
 
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :Mažiausias kompanijos amžius metais, kuomet bus leista prekiauti jos akcijomis: {STRING}
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_HELPTEXT                :Kompanijos akcijomis leidžiama prekiauti tik jai sulaukus tam tikro amžiaus
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Grynojo pelno dalis, mokama tiekėjų sistemoms: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Pelno dalis, tenkanti tarpinėms tiekėjų sistemoms
@@ -2107,10 +2105,6 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :Nenaudojamas
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Pradinis miestų dydžio daugiklis: {STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :Vidutinis miestų dydis santykiu su normaliais miestais žaidimo pradžioje
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :Pasiskirstymo grafą atnaujinti kas {STRING}{NBSP}dien{P 0:2 ą as ų}
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL_HELPTEXT                  :Laiko trukmė tarp grafo mazgų perskaičiavimo operacijų. Kiekviena operacija perskaičiuoja tik vieną mazgą, o ne visą grafą; tad jei šioje nuostatoje nurodytą, kad, pavyzdžiui, grafas bus atnaujinamas kas 4-ias dienas, tai nereiškia, kad jis visas bus atnaujintas, o atnaujinti bus tik kai kurie mazgai. Kuo trumpesnė trukmė tarp perskaičiavimų, tuo daugiau grafo perskaičiavimas sueikvos procesoriaus išteklių, tačiau pats grafas geriau atspindės realią situaciją. Kita vertus, ilgesnė trukmė mažiau apkraus procesorių, tačiau gali tekti ilgėliau palaukti, kol nauji maršrutai bus įtraukti į grafą.
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :Pasiskirstymo grafo perskaičiavimas užtruks {STRING}{NBSP}dien{P 0:2 ą as ų}
-STR_CONFIG_SETTING_LINKGRAPH_TIME_HELPTEXT                      :Laiko trukmė skirta pilnam krovinių paskirstymo grafui perskaičiuoti. Nustačius per mažą reikšmę, žaidimas gali trumpam pakibti, kol bus baigti skaičiavimai. Kita vertus, kuo ilgesnė ši trukmė, tuo vėliau į grafą bus įtraukti maršrutų pakeitimai.
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :Keleivių paskirstymas: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :„Simetriškas“ reiškia, jog iš stoties A į stotį B keliaus apytiksliai toks pat keleivių srautas, kaip ir iš B į A. „Asimetriško“ režimo atveju, srautai pirmyn ir atgal gali skirtis. „Originalus“ reiškia, kad srautai nebus reguliuojami ir veiks kaip ir originaliame TTD žaidime.
@@ -2152,7 +2146,7 @@ STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :Dažnai tarp dv
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Greičio vienetai: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Vienetai, kuriais matuojamas greitis
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :imperiniai (mph)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :metriniai (km/h)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (m/s)
@@ -3514,7 +3508,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Įspėjimas: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Klaida: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Lemtingoji klaida: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Įvyko lemtingoji plėtinio klaida:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} neveiks su TTDPatch versija nurodyta pagal OpenTTD
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} skirtas {STRING} TTD versijai.
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} yra pritaikytas naudojimui su {STRING}
@@ -4825,12 +4818,11 @@ STR_SCREENSHOT_WORLD_SCREENSHOT                                 :{BLACK}Viso pas
 STR_SCREENSHOT_HEIGHTMAP_SCREENSHOT                             :{BLACK}Teminio žemėlapio kopija
 STR_SCREENSHOT_MINIMAP_SCREENSHOT                               :{BLACK}Mini žemėlapio kopija
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :DI
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Uždaryti
 STR_AI_SETTINGS_RESET                                           :{BLACK}Atstatyti
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Dienų skaičius po kurio šitas DI bus paleistas po paskutiniojo (maždaug): {ORANGE}{STRING}
 
 
 # Textfile window
@@ -5281,6 +5273,8 @@ STR_ERROR_CAN_T_STOP_SHARING_ORDER_LIST                         :{WHITE}Negalima
 STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Užduočių sąrašo kopijuoti negalima...
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... per toli buvusio kelionės tikslo
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... lėktuvui paskirties vieta yra per toli
+
+# Extra messages which go on the third line of errors, explaining why orders failed
 
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Neįmanoma sudaryti grafiko...
@@ -5956,10 +5950,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Powernaut malun
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Kompanija {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Grupė {COMMA}
@@ -6047,7 +6041,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

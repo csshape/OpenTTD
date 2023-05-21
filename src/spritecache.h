@@ -46,18 +46,19 @@ uint GetMaxSpriteID();
 
 static inline const Sprite *GetSprite(SpriteID sprite, SpriteType type)
 {
-	assert(type != ST_RECOLOUR);
+	assert(type != SpriteType::Recolour);
 	return (Sprite*)GetRawSprite(sprite, type);
 }
 
 static inline const byte *GetNonSprite(SpriteID sprite, SpriteType type)
 {
-	assert(type == ST_RECOLOUR);
+	assert(type == SpriteType::Recolour);
 	return (byte*)GetRawSprite(sprite, type);
 }
 
 void GfxInitSpriteMem();
 void GfxClearSpriteCache();
+void GfxClearFontSpriteCache();
 void IncreaseSpriteLRU();
 
 SpriteFile &OpenCachedSpriteFile(const std::string &filename, Subdirectory subdir, bool palette_remap);

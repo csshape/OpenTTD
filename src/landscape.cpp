@@ -20,7 +20,10 @@
 #include "tgp.h"
 #include "genworld.h"
 #include "fios.h"
+#include "error_func.h"
 #include "date_func.h"
+#include "timer/timer_game_calendar.h"
+#include "timer/timer_game_tick.h"
 #include "water.h"
 #include "effectvehicle_func.h"
 #include "landscape_type.h"
@@ -210,144 +213,97 @@ uint ApplyFoundationToSlope(Foundation f, Slope *s)
 
 
 /**
- * Determines height at given coordinate of a slope
- * @param x x coordinate
- * @param y y coordinate
+ * Determines height at given coordinate of a slope.
+ *
+ * At the northern corner (0, 0) the result is always a multiple of TILE_HEIGHT.
+ * When the height is a fractional Z, then the height is rounded down. For example,
+ * when at the height is 0 at x = 0 and the height is 8 at x = 16 (actually x = 0
+ * of the next tile), then height is 0 at x = 1, 1 at x = 2, and 7 at x = 15.
+ * @param x x coordinate (value from 0 to 15)
+ * @param y y coordinate (value from 0 to 15)
  * @param corners slope to examine
  * @return height of given point of given slope
  */
 uint GetPartialPixelZ(int x, int y, Slope corners)
 {
 	if (IsHalftileSlope(corners)) {
+		/* A foundation is placed on half the tile at a specific corner. This means that,
+		 * depending on the corner, that one half of the tile is at the maximum height. */
 		switch (GetHalftileSlopeCorner(corners)) {
 			case CORNER_W:
-				if (x - y >= 0) return GetSlopeMaxPixelZ(corners);
+				if (x > y) return GetSlopeMaxPixelZ(corners);
 				break;
 
 			case CORNER_S:
-				if (x - (y ^ 0xF) >= 0) return GetSlopeMaxPixelZ(corners);
+				if (x + y >= (int)TILE_SIZE) return GetSlopeMaxPixelZ(corners);
 				break;
 
 			case CORNER_E:
-				if (y - x >= 0) return GetSlopeMaxPixelZ(corners);
+				if (x <= y) return GetSlopeMaxPixelZ(corners);
 				break;
 
 			case CORNER_N:
-				if ((y ^ 0xF) - x >= 0) return GetSlopeMaxPixelZ(corners);
+				if (x + y < (int)TILE_SIZE) return GetSlopeMaxPixelZ(corners);
 				break;
 
 			default: NOT_REACHED();
 		}
 	}
 
-	int z = 0;
-
 	switch (RemoveHalftileSlope(corners)) {
-		case SLOPE_W:
-			if (x - y >= 0) {
-				z = (x - y) >> 1;
-			}
-			break;
+		case SLOPE_FLAT: return 0;
 
-		case SLOPE_S:
-			y ^= 0xF;
-			if ((x - y) >= 0) {
-				z = (x - y) >> 1;
-			}
-			break;
+		/* One corner is up.*/
+		case SLOPE_N: return x + y <= (int)TILE_SIZE ? (TILE_SIZE - x - y)     >> 1 : 0;
+		case SLOPE_E: return y >= x                  ? (1 + y - x)             >> 1 : 0;
+		case SLOPE_S: return x + y >= (int)TILE_SIZE ? (1 + x + y - TILE_SIZE) >> 1 : 0;
+		case SLOPE_W: return x >= y                  ? (x - y)                 >> 1 : 0;
 
-		case SLOPE_SW:
-			z = (x >> 1) + 1;
-			break;
+		/* Two corners next to eachother are up. */
+		case SLOPE_NE: return (TILE_SIZE - x) >> 1;
+		case SLOPE_SE: return (y + 1) >> 1;
+		case SLOPE_SW: return (x + 1) >> 1;
+		case SLOPE_NW: return (TILE_SIZE - y) >> 1;
 
-		case SLOPE_E:
-			if (y - x >= 0) {
-				z = (y - x) >> 1;
-			}
-			break;
+		/* Three corners are up on the same level. */
+		case SLOPE_ENW: return x + y >= (int)TILE_SIZE ? TILE_HEIGHT - ((1 + x + y - TILE_SIZE) >> 1) : TILE_HEIGHT;
+		case SLOPE_SEN: return y < x                   ? TILE_HEIGHT - ((x - y)                 >> 1) : TILE_HEIGHT;
+		case SLOPE_WSE: return x + y <= (int)TILE_SIZE ? TILE_HEIGHT - ((TILE_SIZE - x - y)     >> 1) : TILE_HEIGHT;
+		case SLOPE_NWS: return x < y                   ? TILE_HEIGHT - ((1 + y - x)             >> 1) : TILE_HEIGHT;
 
-		case SLOPE_EW:
-		case SLOPE_NS:
-		case SLOPE_ELEVATED:
-			z = 4;
-			break;
+		/* Two corners at opposite sides are up. */
+		case SLOPE_NS: return x + y < (int)TILE_SIZE ? (TILE_SIZE - x - y) >> 1 : (1 + x + y - TILE_SIZE) >> 1;
+		case SLOPE_EW: return x >= y ? (x - y) >> 1 : (1 + y - x) >> 1;
 
-		case SLOPE_SE:
-			z = (y >> 1) + 1;
-			break;
+		/* Very special cases. */
+		case SLOPE_ELEVATED: return TILE_HEIGHT;
 
-		case SLOPE_WSE:
-			z = 8;
-			y ^= 0xF;
-			if (x - y < 0) {
-				z += (x - y) >> 1;
-			}
-			break;
+		/* Steep slopes. The top is at 2 * TILE_HEIGHT. */
+		case SLOPE_STEEP_N: return (TILE_SIZE - x + TILE_SIZE - y) >> 1;
+		case SLOPE_STEEP_E: return (TILE_SIZE + 1 + y - x) >> 1;
+		case SLOPE_STEEP_S: return (1 + x + y) >> 1;
+		case SLOPE_STEEP_W: return (TILE_SIZE + x - y) >> 1;
 
-		case SLOPE_N:
-			y ^= 0xF;
-			if (y - x >= 0) {
-				z = (y - x) >> 1;
-			}
-			break;
-
-		case SLOPE_NW:
-			z = (y ^ 0xF) >> 1;
-			break;
-
-		case SLOPE_NWS:
-			z = 8;
-			if (x - y < 0) {
-				z += (x - y) >> 1;
-			}
-			break;
-
-		case SLOPE_NE:
-			z = (x ^ 0xF) >> 1;
-			break;
-
-		case SLOPE_ENW:
-			z = 8;
-			y ^= 0xF;
-			if (y - x < 0) {
-				z += (y - x) >> 1;
-			}
-			break;
-
-		case SLOPE_SEN:
-			z = 8;
-			if (y - x < 0) {
-				z += (y - x) >> 1;
-			}
-			break;
-
-		case SLOPE_STEEP_S:
-			z = 1 + ((x + y) >> 1);
-			break;
-
-		case SLOPE_STEEP_W:
-			z = 1 + ((x + (y ^ 0xF)) >> 1);
-			break;
-
-		case SLOPE_STEEP_N:
-			z = 1 + (((x ^ 0xF) + (y ^ 0xF)) >> 1);
-			break;
-
-		case SLOPE_STEEP_E:
-			z = 1 + (((x ^ 0xF) + y) >> 1);
-			break;
-
-		default: break;
+		default: NOT_REACHED();
 	}
-
-	return z;
 }
 
-int GetSlopePixelZ(int x, int y)
+/**
+ * Return world \c Z coordinate of a given point of a tile. Normally this is the
+ * Z of the ground/foundation at the given location, but in some cases the
+ * ground/foundation can differ from the Z coordinate that the (ground) vehicle
+ * passing over it would take. For example when entering a tunnel or bridge.
+ *
+ * @param x World X coordinate in tile "units".
+ * @param y World Y coordinate in tile "units".
+ * @param ground_vehicle Whether to get the Z coordinate of the ground vehicle, or the ground.
+ * @return World Z coordinate at tile ground (vehicle) level, including slopes and foundations.
+ */
+int GetSlopePixelZ(int x, int y, bool ground_vehicle)
 {
 	TileIndex tile = TileVirtXY(x, y);
 
-	return _tile_type_procs[GetTileType(tile)]->get_slope_z_proc(tile, x, y);
+	return _tile_type_procs[GetTileType(tile)]->get_slope_z_proc(tile, x, y, ground_vehicle);
 }
 
 /**
@@ -361,9 +317,9 @@ int GetSlopePixelZ(int x, int y)
 int GetSlopePixelZOutsideMap(int x, int y)
 {
 	if (IsInsideBS(x, 0, Map::SizeX() * TILE_SIZE) && IsInsideBS(y, 0, Map::SizeY() * TILE_SIZE)) {
-		return GetSlopePixelZ(x, y);
+		return GetSlopePixelZ(x, y, false);
 	} else {
-		return _tile_type_procs[MP_VOID]->get_slope_z_proc(INVALID_TILE, x, y);
+		return _tile_type_procs[MP_VOID]->get_slope_z_proc(INVALID_TILE, x, y, false);
 	}
 }
 
@@ -658,7 +614,7 @@ byte GetSnowLine()
 	if (_snow_line == nullptr) return _settings_game.game_creation.snow_line_height;
 
 	YearMonthDay ymd;
-	ConvertDateToYMD(_date, &ymd);
+	ConvertDateToYMD(TimerGameCalendar::date, &ymd);
 	return _snow_line->table[ymd.month][ymd.day];
 }
 
@@ -826,7 +782,7 @@ void RunTileLoop()
 	assert(tile != 0);
 
 	/* Manually update tile 0 every 256 ticks - the LFSR never iterates over it itself.  */
-	if (_tick_counter % 256 == 0) {
+	if (TimerGameTick::counter % 256 == 0) {
 		_tile_type_procs[GetTileType(0)]->tile_loop_proc(0);
 		count--;
 	}
@@ -863,12 +819,15 @@ static void GenerateTerrain(int type, uint flag)
 {
 	uint32 r = Random();
 
-	const Sprite *templ = GetSprite((((r >> 24) * _genterrain_tbl_1[type]) >> 8) + _genterrain_tbl_2[type] + 4845, ST_MAPGEN);
-	if (templ == nullptr) usererror("Map generator sprites could not be loaded");
+	/* Choose one of the templates from the graphics file. */
+	const Sprite *templ = GetSprite((((r >> 24) * _genterrain_tbl_1[type]) >> 8) + _genterrain_tbl_2[type] + SPR_MAPGEN_BEGIN, SpriteType::MapGen);
+	if (templ == nullptr) UserError("Map generator sprites could not be loaded");
 
+	/* Chose a random location to apply the template to. */
 	uint x = r & Map::MaxX();
 	uint y = (r >> Map::LogX()) & Map::MaxY();
 
+	/* Make sure the template is not too close to the upper edges; bottom edges are checked later. */
 	uint edge_distance = 1 + (_settings_game.construction.freeform_edges ? 1 : 0);
 	if (x <= edge_distance || y <= edge_distance) return;
 
@@ -881,6 +840,9 @@ static void GenerateTerrain(int type, uint flag)
 	const byte *p = templ->data;
 
 	if ((flag & 4) != 0) {
+		/* This is only executed in secondary/tertiary loops to generate the terrain for arctic and tropic.
+		 * It prevents the templates to be applied to certain parts of the map based on the flags, thus
+		 * creating regions with different elevations/topography. */
 		uint xw = x * Map::SizeY();
 		uint yw = y * Map::SizeX();
 		uint bias = (Map::SizeX() + Map::SizeY()) * 16;
@@ -905,11 +867,15 @@ static void GenerateTerrain(int type, uint flag)
 		}
 	}
 
+	/* Ensure the template does not overflow at the bottom edges of the map; upper edges were checked before. */
 	if (x + w >= Map::MaxX()) return;
 	if (y + h >= Map::MaxY()) return;
 
 	TileIndex tile = TileXY(x, y);
 
+	/* Get the template and overlay in a particular direction over the map's height from the given
+	 * origin point (tile), and update the map's height everywhere where the height from the template
+	 * is higher than the height of the map. In other words, this only raises the tile heights. */
 	switch (direction) {
 		default: NOT_REACHED();
 		case DIAGDIR_NE:

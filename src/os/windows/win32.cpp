@@ -22,10 +22,7 @@
 #include "win32.h"
 #include "../../fios.h"
 #include "../../core/alloc_func.hpp"
-#include "../../openttd.h"
-#include "../../core/random_func.hpp"
 #include "../../string_func.h"
-#include "../../crashlog.h"
 #include <errno.h>
 #include <sys/stat.h>
 #include "../../language.h"
@@ -229,37 +226,6 @@ bool FiosGetDiskFreeSpace(const char *path, uint64 *tot)
 	return retval;
 }
 
-static int ParseCommandLine(char *line, char **argv, int max_argc)
-{
-	int n = 0;
-
-	do {
-		/* skip whitespace */
-		while (*line == ' ' || *line == '\t') line++;
-
-		/* end? */
-		if (*line == '\0') break;
-
-		/* special handling when quoted */
-		if (*line == '"') {
-			argv[n++] = ++line;
-			while (*line != '"') {
-				if (*line == '\0') return n;
-				line++;
-			}
-		} else {
-			argv[n++] = line;
-			while (*line != ' ' && *line != '\t') {
-				if (*line == '\0') return n;
-				line++;
-			}
-		}
-		*line++ = '\0';
-	} while (n != max_argc);
-
-	return n;
-}
-
 void CreateConsole()
 {
 	HANDLE hand;
@@ -352,71 +318,30 @@ static INT_PTR CALLBACK HelpDialogFunc(HWND wnd, UINT msg, WPARAM wParam, LPARAM
 	return FALSE;
 }
 
-void ShowInfo(const char *str)
+void ShowInfoI(const std::string &str)
 {
 	if (_has_console) {
-		fprintf(stderr, "%s\n", str);
+		fprintf(stderr, "%s\n", str.c_str());
 	} else {
 		bool old;
 		ReleaseCapture();
 		_left_button_clicked = _left_button_down = false;
 
 		old = MyShowCursor(true);
-		if (strlen(str) > 2048) {
+		if (str.size() > 2048) {
 			/* The minimum length of the help message is 2048. Other messages sent via
 			 * ShowInfo are much shorter, or so long they need this way of displaying
 			 * them anyway. */
-			_help_msg = str;
+			_help_msg = str.c_str();
 			DialogBox(GetModuleHandle(nullptr), MAKEINTRESOURCE(101), nullptr, HelpDialogFunc);
 		} else {
 			/* We need to put the text in a separate buffer because the default
 			 * buffer in OTTD2FS might not be large enough (512 chars). */
 			wchar_t help_msg_buf[8192];
-			MessageBox(GetActiveWindow(), convert_to_fs(str, help_msg_buf, lengthof(help_msg_buf)), L"OpenTTD", MB_ICONINFORMATION | MB_OK);
+			MessageBox(GetActiveWindow(), convert_to_fs(str.c_str(), help_msg_buf, lengthof(help_msg_buf)), L"OpenTTD", MB_ICONINFORMATION | MB_OK);
 		}
 		MyShowCursor(old);
 	}
-}
-
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
-{
-	int argc;
-	char *argv[64]; // max 64 command line arguments
-
-	/* Set system timer resolution to 1ms. */
-	timeBeginPeriod(1);
-
-	CrashLog::InitialiseCrashLog();
-
-	/* Convert the command line to UTF-8. We need a dedicated buffer
-	 * for this because argv[] points into this buffer and this needs to
-	 * be available between subsequent calls to FS2OTTD(). */
-	char *cmdline = stredup(FS2OTTD(GetCommandLine()).c_str());
-
-	/* Set the console codepage to UTF-8. */
-	SetConsoleOutputCP(CP_UTF8);
-
-#if defined(_DEBUG)
-	CreateConsole();
-#endif
-
-	_set_error_mode(_OUT_TO_MSGBOX); // force assertion output to messagebox
-
-	/* setup random seed to something quite random */
-	SetRandomSeed(GetTickCount());
-
-	argc = ParseCommandLine(cmdline, argv, lengthof(argv));
-
-	/* Make sure our arguments contain only valid UTF-8 characters. */
-	for (int i = 0; i < argc; i++) StrMakeValidInPlace(argv[i]);
-
-	openttd_main(argc, argv);
-
-	/* Restore system timer resolution. */
-	timeEndPeriod(1);
-
-	free(cmdline);
-	return 0;
 }
 
 char *getcwd(char *buf, size_t size)
@@ -544,10 +469,9 @@ std::string FS2OTTD(const std::wstring &name)
 	int name_len = (name.length() >= INT_MAX) ? INT_MAX : (int)name.length();
 	int len = WideCharToMultiByte(CP_UTF8, 0, name.c_str(), name_len, nullptr, 0, nullptr, nullptr);
 	if (len <= 0) return std::string();
-	char *utf8_buf = AllocaM(char, len + 1);
-	utf8_buf[len] = '\0';
-	WideCharToMultiByte(CP_UTF8, 0, name.c_str(), name_len, utf8_buf, len, nullptr, nullptr);
-	return std::string(utf8_buf, static_cast<size_t>(len));
+	std::string utf8_buf(len, '\0'); // len includes terminating null
+	WideCharToMultiByte(CP_UTF8, 0, name.c_str(), name_len, utf8_buf.data(), len, nullptr, nullptr);
+	return utf8_buf;
 }
 
 /**
@@ -562,10 +486,9 @@ std::wstring OTTD2FS(const std::string &name)
 	int name_len = (name.length() >= INT_MAX) ? INT_MAX : (int)name.length();
 	int len = MultiByteToWideChar(CP_UTF8, 0, name.c_str(), name_len, nullptr, 0);
 	if (len <= 0) return std::wstring();
-	wchar_t *system_buf = AllocaM(wchar_t, len + 1);
-	system_buf[len] = L'\0';
-	MultiByteToWideChar(CP_UTF8, 0, name.c_str(), name_len, system_buf, len);
-	return std::wstring(system_buf, static_cast<size_t>(len));
+	std::wstring system_buf(len, L'\0'); // len includes terminating null
+	MultiByteToWideChar(CP_UTF8, 0, name.c_str(), name_len, system_buf.data(), len);
+	return system_buf;
 }
 
 
@@ -669,13 +592,13 @@ int OTTDStringCompare(const char *s1, const char *s2)
 		int len_s2 = MultiByteToWideChar(CP_UTF8, 0, s2, -1, nullptr, 0);
 
 		if (len_s1 != 0 && len_s2 != 0) {
-			LPWSTR str_s1 = AllocaM(WCHAR, len_s1);
-			LPWSTR str_s2 = AllocaM(WCHAR, len_s2);
+			std::wstring str_s1(len_s1, L'\0'); // len includes terminating null
+			std::wstring str_s2(len_s2, L'\0');
 
-			MultiByteToWideChar(CP_UTF8, 0, s1, -1, str_s1, len_s1);
-			MultiByteToWideChar(CP_UTF8, 0, s2, -1, str_s2, len_s2);
+			MultiByteToWideChar(CP_UTF8, 0, s1, -1, str_s1.data(), len_s1);
+			MultiByteToWideChar(CP_UTF8, 0, s2, -1, str_s2.data(), len_s2);
 
-			int result = _CompareStringEx(_cur_iso_locale, LINGUISTIC_IGNORECASE | SORT_DIGITSASNUMBERS, str_s1, -1, str_s2, -1, nullptr, nullptr, 0);
+			int result = _CompareStringEx(_cur_iso_locale, LINGUISTIC_IGNORECASE | SORT_DIGITSASNUMBERS, str_s1.c_str(), -1, str_s2.c_str(), -1, nullptr, nullptr, 0);
 			if (result != 0) return result;
 		}
 	}

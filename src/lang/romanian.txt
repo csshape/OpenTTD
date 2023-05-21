@@ -982,10 +982,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Alege in
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Dezactivată
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :În fiecare lună
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :La fiecare 3 luni
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :La fiecare 6 luni
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :La fiecare 12 luni
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Limba
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Alege limba în care doreşti afişată interfaţa
@@ -1204,8 +1200,11 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_LEFT                          :stânga
 STR_CONFIG_SETTING_HORIZONTAL_POS_CENTER                        :centru
 STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :dreapta
 
-STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Valoarea maximă a împrumutului initial: {STRING}
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Valoarea maximă a împrumutului inițial: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Valoarea maximă pe care o companie o poate împrumuta (fără a ține cont de inflație)
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_VALUE                   :{CURRENCY_LONG}
+###setting-zero-is-special
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_DISABLED                :Niciun împrumut {RED}Necesită un script de joc pentru oferirea fondurilor inițiale
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Rata dobânzii: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Rata dobânzii; de asemenea controlează inflația dacă este activată
@@ -1805,6 +1804,7 @@ STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :Dacă este acti
 
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :Vârsta minimă a companiilor pentru tranzacțiile cu acțiuni: {STRING}
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_HELPTEXT                :Stabilește vechimea minimă a unei companii, ca alții să-i poată tranzacționa acțiunile.
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Procentul din profitul pe secţiune care să fie plătit pentru alimentare: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Procentul din câştig care este oferit legăturilor intermediare pentru alimentare, oferind mai mult control asupra încasărilor
@@ -1919,10 +1919,6 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :deloc
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Multiplicator iniţial dimensiune oraş: {STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :Dimensiunea medie a orașelor mari față de orașele normale, la începutul jocului
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :Actualizează graficul de distribuţie la fiecare {STRING}{NBSP}{P 0:2 zi zile "de zile"}
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL_HELPTEXT                  :Interval de timp între recalculările graficului de conexiuni. Fiecare recalculare calculează planurile unei componente ale graficului. Asta înseamnă că o valoare X pentru această setare nu va duce la actualizarea întregului grafic la fiecare X zile, ci doar o componentă va fi actualizată. Cu cât e mai mică valoarea, cu atât mai mult timp va fi necesar pentru calcule. Cu cât e mai mare valoarea, cu atât va dura mai mult până va începe distribuția mărfii pe rute noi.
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :Acordă {STRING}{NBSP}{P 0:2 zi zile "de zile"} pentru recalcularea graficului de distribuţie
-STR_CONFIG_SETTING_LINKGRAPH_TIME_HELPTEXT                      :Timpul necesar pentru fiecare recalculare a unei componente a graficului de legătură. Când se începe o recalculare, este generat un fir de execuție căruia i se permite să ruleze pentru acest număr de zile. Cu cât setați acest lucru mai scurt, cu atât este mai probabil ca firul să nu fie terminat atunci când trebuie. Apoi jocul se oprește până când este ("lag"). Cu cât îl setați mai mult, cu atât este nevoie de mai mult pentru ca distribuția să fie actualizată când se schimbă rutele.
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :Modalitatea de distribuire a pasagerilor: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :"Simetric" înseamnă că aproximativ același număr de pasageri va fi transportat din stația A spre stația B, precum de la B la A. "Asimetric" presupune transportul unui număr arbitrar de pasageri în fiecare direcție. "Manual" înseamnă că repartizarea pasagerilor nu va fi automatizată.
@@ -1950,7 +1946,7 @@ STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :Adesea, există
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Unitate viteză: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Afişează viteza în interfaţă folosind unităţile selectate
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :Imperial (mph)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :Metric (km/h)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (m/s)
@@ -2355,7 +2351,7 @@ STR_NETWORK_CLIENT_LIST_NEW_COMPANY                             :(Companie nouă
 STR_NETWORK_CLIENT_LIST_NEW_COMPANY_TOOLTIP                     :{BLACK}Creează o nouă companie și intră în ea
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_SELF_TOOLTIP                :{BLACK}Aici ești tu
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_HOST_TOOLTIP                :{BLACK}Aceasta este gazda jocului
-STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} {P client clienți "de clienți"} / {NUM}{P companie companii "de companii"}
+STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT_TOOLTIP            :{BLACK}Numărul de clienți conectați în prezent, numărul de companii și numărul maxim de companii permis de administratorul serverului
 
 # Matches ConnectionType
 ###length 5
@@ -3349,8 +3345,8 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Atenţie: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Eroare: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Fatal: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}O eroare fatală NewGRF a avut loc:{}{STRING}
-STR_NEWGRF_ERROR_POPUP                                          :{WHITE}O eroare NewGRF a avut loc:{}{STRING}
+STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}NewGRF-ul "{STRING}" a avut o eroare fatală:{}{STRING}
+STR_NEWGRF_ERROR_POPUP                                          :{WHITE}NewGRF-ul "{STRING}" a avut o eroare:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} nu va funcţiona cu versiunea TTDPatch raportată de OpenTTD
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} este pentru versiunea {2:STRING} a TTD
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} este conceput pentru a fi folosit cu {2:STRING}
@@ -4526,7 +4522,7 @@ STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Şterge 
 STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Ștergeți viteza maximă de deplasare a comenzii evidențiate. Ctrl+Click șterge viteza pentru toate comenzile
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Reinitializeaza contorul de intarziere
-STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Reiniţializează contorul de întârziere, astfel ca vehiculul să ajungă la timp
+STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Reiniţializează contorul de întârziere, astfel ca vehiculul să ajungă la timp. Ctrl+clic va reseta tot grupul astfel încât cel mai întârziat vehicul va ajunge la timp și toate celelalte vor ajunge mai devreme
 
 STR_TIMETABLE_AUTOFILL                                          :{BLACK}Auto-completare
 STR_TIMETABLE_AUTOFILL_TOOLTIP                                  :{BLACK}Completați automat orarul cu valorile din următoarea călătorie. Ctrl+Click pentru a încerca să păstrați timpii de așteptare
@@ -4549,7 +4545,7 @@ STR_DATE_YEAR_TOOLTIP                                           :{BLACK}Alege an
 
 
 # AI debug window
-STR_AI_DEBUG                                                    :{WHITE}Depanare IA / Script Joc
+STR_AI_DEBUG                                                    :{WHITE}Depanare IA / Script de joc
 STR_AI_DEBUG_NAME_AND_VERSION                                   :{BLACK}{STRING} (v{NUM})
 STR_AI_DEBUG_NAME_TOOLTIP                                       :{BLACK}Numele scriptului
 STR_AI_DEBUG_SETTINGS                                           :{BLACK}Setări
@@ -4575,7 +4571,7 @@ STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}Fereast
 # AI configuration window
 STR_AI_CONFIG_CAPTION_AI                                        :{WHITE}Configurație AI
 STR_AI_CONFIG_CAPTION_GAMESCRIPT                                :{WHITE}Configurarea scriptului de joc
-STR_AI_CONFIG_GAMELIST_TOOLTIP                                  :{BLACK}Script Joc încărcat în jocul următor
+STR_AI_CONFIG_GAMELIST_TOOLTIP                                  :{BLACK}Scriptul care va fi încărcat în jocul următor
 STR_AI_CONFIG_AILIST_TOOLTIP                                    :{BLACK}Modulul de IA care va fi încărcat în jocul următor
 STR_AI_CONFIG_HUMAN_PLAYER                                      :Jucator uman
 STR_AI_CONFIG_RANDOM_AI                                         :IA aleator
@@ -4587,12 +4583,12 @@ STR_AI_CONFIG_MOVE_UP_TOOLTIP                                   :{BLACK}Mută IA
 STR_AI_CONFIG_MOVE_DOWN                                         :{BLACK}În jos
 STR_AI_CONFIG_MOVE_DOWN_TOOLTIP                                 :{BLACK}Mută IA selectată jos în listă
 
-STR_AI_CONFIG_GAMESCRIPT                                        :{SILVER}Script Joc
+STR_AI_CONFIG_GAMESCRIPT                                        :{SILVER}Script de joc
 STR_AI_CONFIG_GAMESCRIPT_PARAM                                  :{SILVER}Parametri
 STR_AI_CONFIG_AI                                                :{SILVER}IA
 
 STR_AI_CONFIG_CHANGE_AI                                         :{BLACK}Selectați IA
-STR_AI_CONFIG_CHANGE_GAMESCRIPT                                 :{BLACK}Selectați Scriptul jocului
+STR_AI_CONFIG_CHANGE_GAMESCRIPT                                 :{BLACK}Selectați scriptul jocului
 STR_AI_CONFIG_CHANGE_TOOLTIP                                    :{BLACK}Încarcă un alt script
 STR_AI_CONFIG_CONFIGURE                                         :{BLACK}Configurază
 STR_AI_CONFIG_CONFIGURE_TOOLTIP                                 :{BLACK}Configurează parametrii scriptului
@@ -4620,12 +4616,13 @@ STR_SCREENSHOT_WORLD_SCREENSHOT                                 :{BLACK}Captură
 STR_SCREENSHOT_HEIGHTMAP_SCREENSHOT                             :{BLACK}Captură de hartă topografică
 STR_SCREENSHOT_MINIMAP_SCREENSHOT                               :{BLACK}Captură de hartă a lumii
 
-# AI Parameters
-STR_AI_SETTINGS_CAPTION_AI                                      :{WHITE}Parametrii IA
+# Script Parameters
+STR_AI_SETTINGS_CAPTION                                         :{WHITE}{STRING} Parametri
+STR_AI_SETTINGS_CAPTION_AI                                      :{WHITE}IA
+STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :Script de joc
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Închide
 STR_AI_SETTINGS_RESET                                           :{BLACK}Resetează
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Perioada (în zile) după care această librărie IA va fi activată, după cea anterioară (valoare aproximativă): {ORANGE}{STRING}
 
 
 # Textfile window
@@ -5079,6 +5076,20 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Nu pot c
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... prea departe de destinaţia precedentă
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... avionul nu are o rază de acțiune suficientă
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+STR_ERROR_NO_RAIL_STATION                                       :{WHITE}Nu există nicio gară
+STR_ERROR_NO_BUS_STATION                                        :{WHITE}Nu există stație de autobuz
+STR_ERROR_NO_TRUCK_STATION                                      :{WHITE}Nu există stație de camion
+STR_ERROR_NO_DOCK                                               :{WHITE}Nu există doc
+STR_ERROR_NO_AIRPORT                                            :{WHITE}Nu există aeroport/heliport
+STR_ERROR_NO_STOP_COMPATIBLE_ROAD_TYPE                          :{WHITE}Nu există opriri cu un tip de drum compatibil
+STR_ERROR_NO_STOP_COMPATIBLE_TRAM_TYPE                          :{WHITE}Nu există stații cu un tip de tramvai compatibil
+STR_ERROR_NO_STOP_ARTICULATED_VEHICLE                           :{WHITE}Nu există opriri care să fie potrivite pentru vehiculele rutiere articulate.{}Vehiculele rutiere articulate necesită o oprire de drum, nu o oprire într-o rampă.
+STR_ERROR_AIRPORT_NO_PLANES                                     :{WHITE}Acest avion nu poate ateriza la acest heliport
+STR_ERROR_AIRPORT_NO_HELICOPTERS                                :{WHITE}Acest elicopter nu poate ateriza pe acest aeroport
+STR_ERROR_NO_RAIL_WAYPOINT                                      :{WHITE}Nu există niciun punct intermediar feroviar
+STR_ERROR_NO_BUOY                                               :{WHITE}Nu există geamanduri
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Nu pot programa vehiculul...
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Vehiculele pot aştepta numai în staţii
@@ -5494,10 +5505,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Elicopter Power
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Companie {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Grup {COMMA}
@@ -5579,7 +5590,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

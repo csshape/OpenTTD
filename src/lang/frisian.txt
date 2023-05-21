@@ -947,10 +947,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Selektea
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Ut
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Eltse moanne
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Eltse 3 moannen
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Eltse 6 moannen
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Eltse 12 moannen
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Taal
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Selektearje de interfacetaal
@@ -1145,6 +1141,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Rjochts
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Maksimale startersliening: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Maksimale bedrach hokker troch in bedriuw lient wurde kin (sûnder acht te slaan op de ynflaasje)
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Rinte: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Rinte op liening; behearsket ek ynflaasje at dizze oan stiet
@@ -1678,6 +1675,7 @@ STR_CONFIG_SETTING_ENDING_YEAR_VALUE                            :{NUM}
 STR_CONFIG_SETTING_ALLOW_SHARES                                 :Stea it keapjen fan oandielen ta: {STRING}
 
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :Minimale leeftiid fan it bedriuw om oandielen te hanneljen: {STRING}
+###setting-zero-is-special
 
 
 STR_CONFIG_SETTING_DRAG_SIGNALS_DENSITY                         :By slepe, pleats seinen eltse: {STRING}
@@ -1756,7 +1754,6 @@ STR_CONFIG_SETTING_LARGER_TOWNS_VALUE                           :1 in {COMMA}
 STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :Gjin
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Begjin stêdgrutte fermenigfuldiger: {STRING}
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :Wurkje by de grafyk fan distribúsje eltse{STRING}{NBSP}dagen{P 0:2 "" s}
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :Distribusjemodus foar pazzazjiers: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_MAIL                            :Distribusjemodus foar post: {STRING}
@@ -1777,7 +1774,7 @@ STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :Gauris binne de
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Faasje-ienheid: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Wannear't in faasje sichtber is yn de interface de selektearre ienheid brûke
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :Ymperiaal (mph)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :Metrysk (km/h)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (m/s)
@@ -2102,7 +2099,6 @@ STR_NETWORK_CLIENT_LIST_SERVER_NAME_TOOLTIP                     :{BLACK}Namme fa
 STR_NETWORK_CLIENT_LIST_SERVER_VISIBILITY                       :{BLACK}Sichtberheid
 STR_NETWORK_CLIENT_LIST_PLAYER_NAME_QUERY_CAPTION               :Dyn namme
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_SELF_TOOLTIP                :{BLACK}Dit bisto sels
-STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} klïïnt{P "" en} / {NUM} bedriuw{P "" en}
 
 # Matches ConnectionType
 ###length 5
@@ -2870,7 +2866,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Warskôging: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Flater: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Fatale flater: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Der hat in fatale NewGRF-flater plakfûn:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} sil net wurkje kinne mei de TTDPatch-ferzje dy't troch OpenTTD meldt wurdt
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} is makke foar de {STRING}-ferzje fan TTD
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} makke om te brûken tegeare my{STRING}
@@ -3881,7 +3876,7 @@ STR_AI_LIST_CANCEL                                              :{BLACK}Annulear
 STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}Skript net feroare
 
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :AI
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Slúte
 STR_AI_SETTINGS_RESET                                           :{BLACK}Weromsette
@@ -4300,6 +4295,8 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Kin best
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... te fier fan lêste bestimming
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... fleantúch hat in te lege aksjeradius
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Kin gjin tsjinst meitsje
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Auto's kinne allinech op stations wachtsje
@@ -4713,10 +4710,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Powernaut Helik
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Bedriuw {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Klobke {COMMA}
@@ -4797,7 +4794,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

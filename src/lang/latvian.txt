@@ -984,10 +984,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Izvēlē
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Izslēgta
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :katru mēnesi
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :katrus 3 mēnešus
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :katrus 6 mēnešus
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :katrus 12 mēnešus
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Valoda
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Saskarnes valodas izvēle
@@ -1208,6 +1204,9 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :pa labi
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Maksimālais sākotnējais aizdevums: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Maksimālais aizdevuma daudzums, ko uzņēmums var izsniegt (neskaitot inflāciju)
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_VALUE                   :{CURRENCY_LONG}
+###setting-zero-is-special
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_DISABLED                :Nav aizdevuma {RED}Lai nodrošinātu sākotnējos līdzekļus, ir nepieciešams spēles skripts
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Procentu likme: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Aizdevumu procentu likme; ja ieslēgts, ietekmē arī inflāciju
@@ -1807,6 +1806,7 @@ STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :Ja iespējots, 
 
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :Minimālais uzņēmuma vecums, lai tirgotos ar akcijām: {STRING}
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_HELPTEXT                :Iestatīt minimālo uzņēmuma vecums, lai citi varētu pirkt un pārdod to akcijas.
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Procenti no kopējās peļņas, ko maksā tranzītstacijās: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Procenti no ienākumiem, kas tiek doti starpposmiem padeves sistēmās, kas dod lielāku kontroli pār ienākumiem
@@ -1921,10 +1921,6 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :neviena
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Pilsētu sākuma lieluma reizinātājs: {STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :Pilsētu vidējais lielums attiecībā pret parastām apdzīvotām vietām spēles sākumā
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :Atjaunināt sadales grafu ik pa {STRING}{NBSP}dien{P 0:2 ai ām ām}
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL_HELPTEXT                  :Laiks starp secīgām saišu grafa pārrēķināšanām. Katra pārrēķināšana izskaitļo plānos vienai grafa komponentei. Tas nozīmē, ka šim iestatījumam vērtība X nenozīmē, ka viss grafs tiks atjaunināts ir pēc X dienām. Tikai dažas komponentes tiks pārrēķinātas. Jo mazāka iestatītā vērtība, jo vairāk laika CPU pavadīs rēķinot. Jo lielāka iestatītā vērtība, jo ilgāk nevarēs sākties kravu izplatīšana jaunos maršrutos.
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :Dot {STRING}{NBSP}dien{P 0:2 u as u} izplatīšanas grafa pārrēķināšanai
-STR_CONFIG_SETTING_LINKGRAPH_TIME_HELPTEXT                      :Laiks, ko aizņem katra saišu grafa komponenšu pārrēķināšana. Kad sākas pārrēķināšana, tiek izveidots pavediens, kuram ir atļauts darboties norādīto dienu skaitu. Jo īsāku skaitli šeit ievadīsiet, jo lielāka iespēja, ka pavediens nebūs laicīgi paveicis savu darbu. Tādā gadījumā spēle apstāsies (“iebremzēs”) līdz darbs būs pabeigts. Jo lielāku skaitli šeit iestatīsiet, jo ilgāk aizņems izplatīšanas atjaunināšana, kad tiks mainīti maršruti.
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :Pasažieru izplatīšanas režīms: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :"simetriska" nozīmē, ka apmēram vienāds daudzums pasažieri vēlēsies doties virzienā no stacijas A uz B, cik no B uz A. "asimetriska" nozīmē, ka patvaļīgs pasažieru daudzums var vēlēties nokļūt katrā no virzieniem. "manuāli" nozīmē, ka pasažieriem netiks veikta automātiska izplatīšana.
@@ -1933,7 +1929,7 @@ STR_CONFIG_SETTING_DISTRIBUTION_MAIL_HELPTEXT                   :"simetriska" no
 STR_CONFIG_SETTING_DISTRIBUTION_ARMOURED                        :Izplatīšanas režīms APSARGĀJAMAI preču klasei: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_ARMOURED_HELPTEXT               :APSARGĀJAMĀ kravas klase satur vērtslietas mērenajā joslā, dimantus subtropu joslā un zeltu subarktiskajā joslā. NewGRF paplašinājumi var to mainīt. "simetriska" nozīmē, ka apmēram vienāds daudzums kravas tiks nosūtīts virzienā no stacijas A uz B, cik no B uz A. "asimetriska" nozīmē, ka patvaļīgs kravas daudzums var tikt nosūtīts katrā no virzieniem. "manuāli" nozīmē, ka pastam netiks veikta automātiska izplatīšana. Šo vērtību vēlams iestatīt kā asimetrisku vai manuālu, kad spēlē subarktiskajā joslā, jo bankas nesūta zeltu atpakaļ uz zelta raktuvēm. Mērenajā un subtropu joslā var izvēlēties simetrisku, jo bankas sūtīs vērtslietas atpakaļ uz izcelsmes banku, kad saņems vērtslietu pievedumu.
 STR_CONFIG_SETTING_DISTRIBUTION_DEFAULT                         :Izplatīšanas modelis citām kravu klasēm: {STRING}
-STR_CONFIG_SETTING_DISTRIBUTION_DEFAULT_HELPTEXT                :"asimetriska" nozīmē, ka patvaļīgu kravas daudzumu var nosūtīt abos virzienos."manuāli" nozīmē, ka šīm kravām netiks veikta automātiska izplatīšana.
+STR_CONFIG_SETTING_DISTRIBUTION_DEFAULT_HELPTEXT                :"Asimetrisks" nozīmē, ka jebkurā virzienā var nosūtīt patvaļīgu daudzumu kravas. "Manuāli" nozīmē, ka šīm kravām automātiska sadale nenotiks
 ###length 3
 STR_CONFIG_SETTING_DISTRIBUTION_MANUAL                          :manuāli
 STR_CONFIG_SETTING_DISTRIBUTION_ASYMMETRIC                      :asimetriska
@@ -1952,7 +1948,7 @@ STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :Nereti starp di
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Ātruma mērvienības: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Vai lietotāja saskarnē rāda ātrumu, rādīt norādītajās mērvienībās
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :impērijas, britu (jūdzes stundā)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :metriskās (km/h)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI, starptautiskās (m/s)
@@ -2359,7 +2355,6 @@ STR_NETWORK_CLIENT_LIST_NEW_COMPANY                             :(Jauna kompāni
 STR_NETWORK_CLIENT_LIST_NEW_COMPANY_TOOLTIP                     :{BLACK}Izveidot jaunu kompāniju un pievienoties tai
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_SELF_TOOLTIP                :{BLACK}Tas esat jūs
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_HOST_TOOLTIP                :{BLACK}Šis ir spēles īpašnieks
-STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} klient{P s а u} / {NUM} kompānij{P a u as}
 
 # Matches ConnectionType
 ###length 5
@@ -2702,6 +2697,9 @@ STR_BUILD_SIGNAL_DRAG_SIGNALS_DENSITY_INCREASE_TOOLTIP          :{BLACK}Palielin
 STR_SELECT_RAIL_BRIDGE_CAPTION                                  :{WHITE}Izvēlēties dzelzceļa tiltu
 STR_SELECT_ROAD_BRIDGE_CAPTION                                  :{WHITE}Izvēlēties tiltu
 STR_SELECT_BRIDGE_SELECTION_TOOLTIP                             :{BLACK}Tiltu izvēle - klikšķināt uz vēlamo tiltu, lai to uzbūvētu
+STR_SELECT_BRIDGE_INFO_NAME                                     :{GOLD}{STRING}
+STR_SELECT_BRIDGE_INFO_NAME_MAX_SPEED                           :{GOLD}{STRING},{} {VELOCITY}
+STR_SELECT_BRIDGE_INFO_NAME_MAX_SPEED_COST                      :{GOLD}{STRING},{} {VELOCITY} {WHITE}{CURRENCY_LONG}
 STR_BRIDGE_NAME_SUSPENSION_STEEL                                :Vanšu, tērauda
 STR_BRIDGE_NAME_GIRDER_STEEL                                    :Siju, tērauda
 STR_BRIDGE_NAME_CANTILEVER_STEEL                                :Izgriežamais, tērauda
@@ -3350,8 +3348,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Brīdinājums: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Kļūda: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Fatāls: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Notikusi fatāla NewGRF kļūda:{}{STRING}
-STR_NEWGRF_ERROR_POPUP                                          :{WHITE}Radusies NewGRF kļūda:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} nedarbosies kopā ar TTDPatch versiju (par ko ziņoja OpenTTD).
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} ir paredzēts TTD versijai {2:STRING}
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} ir paredzēts lietošanai ar {2:STRING}
@@ -4627,12 +4623,12 @@ STR_SCREENSHOT_WORLD_SCREENSHOT                                 :{BLACK}Visas ka
 STR_SCREENSHOT_HEIGHTMAP_SCREENSHOT                             :{BLACK}Augstumkartes ekrānuzņēmums
 STR_SCREENSHOT_MINIMAP_SCREENSHOT                               :{BLACK}Minikartes ekrānuzņēmums
 
-# AI Parameters
+# Script Parameters
+STR_AI_SETTINGS_CAPTION                                         :{WHITE}{STRING} Iestatījumi
 STR_AI_SETTINGS_CAPTION_AI                                      :{WHITE}MI Parametri
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Aizvērt
 STR_AI_SETTINGS_RESET                                           :{BLACK}Atiestatīt
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Aptuvenais dienu skaits, līdz palaist šo MI pēc iepriekšējā: {ORANGE}{STRING}
 
 
 # Textfile window
@@ -5086,6 +5082,8 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Nevar ko
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... pārāk tālu no iepriekšējā galamērķa
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... lidaparātam ir nepietiekams apgabals
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Nevar panākt transportalīdzekļa iekļaušanos sarakstā
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Transportlīdzekļus var gaidīt tikai stacijās
@@ -5501,10 +5499,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Powernaut helik
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :({COMMA}. uzņēmums)
 STR_FORMAT_GROUP_NAME                                           :Grupa {COMMA}
@@ -5586,7 +5584,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

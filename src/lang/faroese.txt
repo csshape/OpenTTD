@@ -902,10 +902,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Vel tít
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Sløkt
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Hvønn mánað
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Hvønn 3 mánað
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Hvønn 6 mánað
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Einaferð um árið
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Mál
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Vel mál at nýta í takførisflatu
@@ -1087,6 +1083,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Høgra
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Hægst loyvda byrjunar lán: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Mest loyvda upphæddin ein fyritøka kann lána (uttan at taka virðisminkan til eftirtektar)
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Rentu stigi: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Rentustigi á láni, stýrir eisini virðisminkan um hon er sligin til
@@ -1602,6 +1599,7 @@ STR_CONFIG_SETTING_STARTING_YEAR                                :Byrjunar ár: {
 STR_CONFIG_SETTING_ALLOW_SHARES                                 :Loyv keypi av partabrøvum frá øðrum fyritøkum: {STRING}
 STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :Um gilda, er loyvt at keypa og selja fyritøku partabrøv. Partabrøv verða einans tøk hjá fyritøkum ið hava rokki ein ávísan aldur
 
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Prosentpartur av deilvinningi at gjalda í veitingar kervum: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Prosentpartur av inntøku ið verður útgoldi til millum liðini í veitara kervum (umskipan), gevur betri ræðið í inntøkuni
@@ -1679,7 +1677,7 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :Eingin
 
 
 
-###length 4
+###length 5
 
 ###length 3
 
@@ -3683,12 +3681,11 @@ STR_AI_LIST_CANCEL                                              :{BLACK}Angra
 STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}Ikki broyta scripti
 
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :AI
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Lat aftur
 STR_AI_SETTINGS_RESET                                           :{BLACK}Endurstilla
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Tali av døgum til hetta AI byrjar aftaná tað fyrra (umleið): {ORANGE}{STRING}
 
 
 # Textfile window
@@ -4113,6 +4110,8 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Kann ikk
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... ov langt frá fyrra staði
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... flogfarið røkkur ikki
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Kann ikki gera tíðarætlan fyri akfrar...
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Akfør kunnu bara bíða við støðir
@@ -4518,10 +4517,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Powernaut Tyrla
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Fyritøka {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Bólkur {COMMA}
@@ -4600,7 +4599,7 @@ STR_JUST_RAW_STRING                                             :{STRING}
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

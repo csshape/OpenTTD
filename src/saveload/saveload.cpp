@@ -315,7 +315,7 @@ static void SlNullPointers()
 	_sl_version = SAVEGAME_VERSION;
 
 	for (const ChunkHandler &ch : ChunkHandlers()) {
-		Debug(sl, 3, "Nulling pointers for {:c}{:c}{:c}{:c}", ch.id >> 24, ch.id >> 16, ch.id >> 8, ch.id);
+		Debug(sl, 3, "Nulling pointers for {}", ch.GetName());
 		ch.FixPointers();
 	}
 
@@ -365,27 +365,6 @@ void NORETURN SlError(StringID string, const char *extra_msg)
 void NORETURN SlErrorCorrupt(const char *msg)
 {
 	SlError(STR_GAME_SAVELOAD_ERROR_BROKEN_SAVEGAME, msg);
-}
-
-void NORETURN SlErrorCorruptFmt(const char *format, ...) WARN_FORMAT(1, 2);
-
-/**
- * Issue an SlErrorCorrupt with a format string.
- * @param format format string
- * @param ... arguments to format string
- * @note This function does never return as it throws an exception to
- *       break out of all the saveload code.
- */
-void NORETURN SlErrorCorruptFmt(const char *format, ...)
-{
-	va_list ap;
-	char msg[256];
-
-	va_start(ap, format);
-	vseprintf(msg, lastof(msg), format, ap);
-	va_end(ap);
-
-	SlErrorCorrupt(msg);
 }
 
 
@@ -672,11 +651,11 @@ static size_t _next_offs;
  */
 int SlIterateArray()
 {
-	int index;
-
 	/* After reading in the whole array inside the loop
 	 * we must have read in all the data, so we must be at end of current block. */
-	if (_next_offs != 0 && _sl.reader->GetSize() != _next_offs) SlErrorCorrupt("Invalid chunk size");
+	if (_next_offs != 0 && _sl.reader->GetSize() != _next_offs) {
+		SlErrorCorruptFmt("Invalid chunk size iterating array - expected to be at position {}, actually at {}", _next_offs, _sl.reader->GetSize());
+	}
 
 	for (;;) {
 		uint length = SlReadArrayLength();
@@ -694,6 +673,7 @@ int SlIterateArray()
 			return INT32_MAX;
 		}
 
+		int index;
 		switch (_sl.block_mode) {
 			case CH_SPARSE_TABLE:
 			case CH_SPARSE_ARRAY: index = (int)SlReadSparseIndex(); break;
@@ -1068,24 +1048,21 @@ static void SlStdString(void *ptr, VarType conv)
 				return;
 			}
 
-			char *buf = AllocaM(char, len + 1);
-			SlCopyBytes(buf, len);
-			buf[len] = '\0'; // properly terminate the string
+			str->resize(len + 1);
+			SlCopyBytes(str->data(), len);
+			(*str)[len] = '\0'; // properly terminate the string
 
 			StringValidationSettings settings = SVS_REPLACE_WITH_QUESTION_MARK;
 			if ((conv & SLF_ALLOW_CONTROL) != 0) {
 				settings = settings | SVS_ALLOW_CONTROL_CODE;
 				if (IsSavegameVersionBefore(SLV_169)) {
-					str_fix_scc_encoded(buf, buf + len);
+					str_fix_scc_encoded(str->data(), str->data() + len);
 				}
 			}
 			if ((conv & SLF_ALLOW_NEWLINE) != 0) {
 				settings = settings | SVS_ALLOW_NEWLINE;
 			}
-			StrMakeValidInPlace(buf, buf + len, settings);
-
-			// Store sanitized string.
-			str->assign(buf);
+			*str = StrMakeValid(*str, settings);
 		}
 
 		case SLA_PTRS: break;
@@ -2095,8 +2072,6 @@ void SlGlobList(const SaveLoadTable &slt)
  */
 void SlAutolength(AutolengthProc *proc, void *arg)
 {
-	size_t offs;
-
 	assert(_sl.action == SLA_SAVE);
 
 	/* Tell it to calculate the length */
@@ -2108,12 +2083,15 @@ void SlAutolength(AutolengthProc *proc, void *arg)
 	_sl.need_length = NL_WANTLENGTH;
 	SlSetLength(_sl.obj_len);
 
-	offs = _sl.dumper->GetSize() + _sl.obj_len;
+	size_t start_pos = _sl.dumper->GetSize();
+	size_t expected_offs = start_pos + _sl.obj_len;
 
 	/* And write the stuff */
 	proc(arg);
 
-	if (offs != _sl.dumper->GetSize()) SlErrorCorrupt("Invalid chunk size");
+	if (expected_offs != _sl.dumper->GetSize()) {
+		SlErrorCorruptFmt("Invalid chunk size when writing autolength block, expected {}, got {}", _sl.obj_len, _sl.dumper->GetSize() - start_pos);
+	}
 }
 
 void ChunkHandler::LoadCheck(size_t len) const
@@ -2142,8 +2120,6 @@ void ChunkHandler::LoadCheck(size_t len) const
 static void SlLoadChunk(const ChunkHandler &ch)
 {
 	byte m = SlReadByte();
-	size_t len;
-	size_t endoffs;
 
 	_sl.block_mode = m & CH_TYPE_MASK;
 	_sl.obj_len = 0;
@@ -2167,15 +2143,20 @@ static void SlLoadChunk(const ChunkHandler &ch)
 			ch.Load();
 			if (_next_offs != 0) SlErrorCorrupt("Invalid array length");
 			break;
-		case CH_RIFF:
+		case CH_RIFF: {
 			/* Read length */
-			len = (SlReadByte() << 16) | ((m >> 4) << 24);
+			size_t len = (SlReadByte() << 16) | ((m >> 4) << 24);
 			len += SlReadUint16();
 			_sl.obj_len = len;
-			endoffs = _sl.reader->GetSize() + len;
+			size_t start_pos = _sl.reader->GetSize();
+			size_t endoffs = start_pos + len;
 			ch.Load();
-			if (_sl.reader->GetSize() != endoffs) SlErrorCorrupt("Invalid chunk size");
+
+			if (_sl.reader->GetSize() != endoffs) {
+				SlErrorCorruptFmt("Invalid chunk size in RIFF in {} - expected {}, got {}", ch.GetName(), len, _sl.reader->GetSize() - start_pos);
+			}
 			break;
+		}
 		default:
 			SlErrorCorrupt("Invalid chunk type");
 			break;
@@ -2192,8 +2173,6 @@ static void SlLoadChunk(const ChunkHandler &ch)
 static void SlLoadCheckChunk(const ChunkHandler &ch)
 {
 	byte m = SlReadByte();
-	size_t len;
-	size_t endoffs;
 
 	_sl.block_mode = m & CH_TYPE_MASK;
 	_sl.obj_len = 0;
@@ -2215,15 +2194,20 @@ static void SlLoadCheckChunk(const ChunkHandler &ch)
 		case CH_SPARSE_ARRAY:
 			ch.LoadCheck();
 			break;
-		case CH_RIFF:
+		case CH_RIFF: {
 			/* Read length */
-			len = (SlReadByte() << 16) | ((m >> 4) << 24);
+			size_t len = (SlReadByte() << 16) | ((m >> 4) << 24);
 			len += SlReadUint16();
 			_sl.obj_len = len;
-			endoffs = _sl.reader->GetSize() + len;
+			size_t start_pos = _sl.reader->GetSize();
+			size_t endoffs = start_pos + len;
 			ch.LoadCheck(len);
-			if (_sl.reader->GetSize() != endoffs) SlErrorCorrupt("Invalid chunk size");
+
+			if (_sl.reader->GetSize() != endoffs) {
+				SlErrorCorruptFmt("Invalid chunk size in RIFF in {} - expected {}, got {}", ch.GetName(), len, _sl.reader->GetSize() - start_pos);
+			}
 			break;
+		}
 		default:
 			SlErrorCorrupt("Invalid chunk type");
 			break;
@@ -2242,7 +2226,7 @@ static void SlSaveChunk(const ChunkHandler &ch)
 	if (ch.type == CH_READONLY) return;
 
 	SlWriteUint32(ch.id);
-	Debug(sl, 2, "Saving chunk {:c}{:c}{:c}{:c}", ch.id >> 24, ch.id >> 16, ch.id >> 8, ch.id);
+	Debug(sl, 2, "Saving chunk {}", ch.GetName());
 
 	_sl.block_mode = ch.type;
 	_sl.expect_table_header = (_sl.block_mode == CH_TABLE || _sl.block_mode == CH_SPARSE_TABLE);
@@ -2331,7 +2315,7 @@ static void SlFixPointers()
 	_sl.action = SLA_PTRS;
 
 	for (const ChunkHandler &ch : ChunkHandlers()) {
-		Debug(sl, 3, "Fixing pointers for {:c}{:c}{:c}{:c}", ch.id >> 24, ch.id >> 16, ch.id >> 8, ch.id);
+		Debug(sl, 3, "Fixing pointers for {}", ch.GetName());
 		ch.FixPointers();
 	}
 
@@ -3297,7 +3281,7 @@ SaveOrLoadResult SaveOrLoad(const std::string &filename, SaveLoadOperation fop, 
 		}
 
 		if (fop == SLO_SAVE) { // SAVE game
-			Debug(desync, 1, "save: {:08x}; {:02x}; {}", _date, _date_fract, filename);
+			Debug(desync, 1, "save: {:08x}; {:02x}; {}", TimerGameCalendar::date, TimerGameCalendar::date_fract, filename);
 			if (_network_server || !_settings_client.gui.threaded_saves) threaded = false;
 
 			return DoSave(new FileWriter(fh), threaded);
@@ -3375,7 +3359,7 @@ void GenerateDefaultSaveName(char *buf, const char *last)
 		case 2: SetDParam(1, STR_JUST_DATE_ISO); break;
 		default: NOT_REACHED();
 	}
-	SetDParam(2, _date);
+	SetDParam(2, TimerGameCalendar::date);
 
 	/* Get the correct string (special string for when there's not company) */
 	GetString(buf, !Company::IsValidID(cid) ? STR_SAVEGAME_NAME_SPECTATOR : STR_SAVEGAME_NAME_DEFAULT, last);

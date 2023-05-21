@@ -11,6 +11,7 @@
 #include "error.h"
 #include "articulated_vehicles.h"
 #include "command_func.h"
+#include "error_func.h"
 #include "pathfinder/npf/npf_func.h"
 #include "pathfinder/yapf/yapf.hpp"
 #include "news_func.h"
@@ -36,6 +37,7 @@
 #include "framerate_type.h"
 #include "train_cmd.h"
 #include "misc_cmd.h"
+#include "timer/timer_game_calendar.h"
 
 #include "table/strings.h"
 #include "table/train_sprites.h"
@@ -635,7 +637,7 @@ static CommandCost CmdBuildRailWagon(DoCommandFlag flags, TileIndex tile, const 
 
 		v->x_pos = x;
 		v->y_pos = y;
-		v->z_pos = GetSlopePixelZ(x, y);
+		v->z_pos = GetSlopePixelZ(x, y, true);
 		v->owner = _current_company;
 		v->track = TRACK_BIT_DEPOT;
 		v->vehstatus = VS_HIDDEN | VS_DEFPAL;
@@ -651,8 +653,8 @@ static CommandCost CmdBuildRailWagon(DoCommandFlag flags, TileIndex tile, const 
 
 		v->railtype = rvi->railtype;
 
-		v->date_of_last_service = _date;
-		v->build_year = _cur_year;
+		v->date_of_last_service = TimerGameCalendar::date;
+		v->build_year = TimerGameCalendar::year;
 		v->sprite_cache.sprite_seq.Set(SPR_IMG_QUERY);
 		v->random_bits = VehicleRandomBits();
 
@@ -761,7 +763,7 @@ CommandCost CmdBuildRailVehicle(DoCommandFlag flags, TileIndex tile, const Engin
 		v->owner = _current_company;
 		v->x_pos = x;
 		v->y_pos = y;
-		v->z_pos = GetSlopePixelZ(x, y);
+		v->z_pos = GetSlopePixelZ(x, y, true);
 		v->track = TRACK_BIT_DEPOT;
 		v->vehstatus = VS_HIDDEN | VS_STOPPED | VS_DEFPAL;
 		v->spritenum = rvi->image_index;
@@ -781,8 +783,8 @@ CommandCost CmdBuildRailVehicle(DoCommandFlag flags, TileIndex tile, const Engin
 		v->railtype = rvi->railtype;
 
 		v->SetServiceInterval(Company::Get(_current_company)->settings.vehicle.servint_trains);
-		v->date_of_last_service = _date;
-		v->build_year = _cur_year;
+		v->date_of_last_service = TimerGameCalendar::date;
+		v->build_year = TimerGameCalendar::year;
 		v->sprite_cache.sprite_seq.Set(SPR_IMG_QUERY);
 		v->random_bits = VehicleRandomBits();
 
@@ -1658,6 +1660,19 @@ static Vehicle *TrainOnTileEnum(Vehicle *v, void *)
 	return (v->type == VEH_TRAIN) ? v : nullptr;
 }
 
+/**
+ * Check if a level crossing tile has a train on it
+ * @param tile tile to test
+ * @return true if a train is on the crossing
+ * @pre tile is a level crossing
+ */
+bool TrainOnCrossing(TileIndex tile)
+{
+	assert(IsLevelCrossingTile(tile));
+
+	return HasVehicleOnPos(tile, nullptr, &TrainOnTileEnum);
+}
+
 
 /**
  * Checks if a train is approaching a rail-road crossing
@@ -1709,7 +1724,7 @@ static bool TrainApproachingCrossing(TileIndex tile)
 static inline bool CheckLevelCrossing(TileIndex tile)
 {
 	/* reserved || train on crossing || train approaching crossing */
-	return HasCrossingReservation(tile) || HasVehicleOnPos(tile, NULL, &TrainOnTileEnum) || TrainApproachingCrossing(tile);
+	return HasCrossingReservation(tile) || TrainOnCrossing(tile) || TrainApproachingCrossing(tile);
 }
 
 /**
@@ -3499,7 +3514,7 @@ bool TrainController(Train *v, Vehicle *nomove, bool reverse)
 
 invalid_rail:
 	/* We've reached end of line?? */
-	if (prev != nullptr) error("Disconnecting train");
+	if (prev != nullptr) FatalError("Disconnecting train");
 
 reverse_train_direction:
 	if (reverse) {

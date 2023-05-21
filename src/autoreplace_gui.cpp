@@ -148,7 +148,7 @@ class ReplaceVehicleWindow : public Window {
 		GUIEngineList list;
 
 		for (const Engine *e : Engine::IterateType(type)) {
-			if (!draw_left && !this->show_hidden_engines && e->IsHidden(_local_company)) continue;
+			if (!draw_left && !this->show_hidden_engines && e->IsVariantHidden(_local_company)) continue;
 			EngineID eid = e->index;
 			switch (type) {
 				case VEH_TRAIN:
@@ -458,7 +458,7 @@ public:
 						bool when_old = false;
 						EngineID e = EngineReplacementForCompany(c, this->sel_engine[0], this->sel_group, &when_old);
 						str = when_old ? STR_REPLACE_REPLACING_WHEN_OLD : STR_ENGINE_NAME;
-						SetDParam(0, e);
+						SetDParam(0, PackEngineNameDParam(e, EngineNameContext::PurchaseList));
 					}
 				} else {
 					str = STR_REPLACE_NOT_REPLACING_VEHICLE_SELECTED;

@@ -18,6 +18,9 @@
 #include "../textfile_gui.h"
 #include "script_instance.hpp"
 
+/** Maximum of 10 digits for MIN / MAX_INT32, 1 for the sign and 1 for '\0'. */
+static const int INT32_DIGITS_WITH_SIGN_AND_TERMINATION = 10 + 1 + 1;
+
 /** Bitmask of flags for Script settings. */
 enum ScriptConfigFlags {
 	SCRIPTCONFIG_NONE      = 0x0, ///< No flags set.
@@ -47,8 +50,6 @@ struct ScriptConfigItem {
 };
 
 typedef std::list<ScriptConfigItem> ScriptConfigItemList; ///< List of ScriptConfig items.
-
-extern ScriptConfigItem _start_date_config;
 
 /**
  * Script settings.
@@ -124,12 +125,12 @@ public:
 	 * @return The (default) value of the setting, or -1 if the setting was not
 	 *  found.
 	 */
-	virtual int GetSetting(const char *name) const;
+	int GetSetting(const char *name) const;
 
 	/**
 	 * Set the value of a setting for this config.
 	 */
-	virtual void SetSetting(const char *name, int value);
+	void SetSetting(const char *name, int value);
 
 	/**
 	 * Reset all settings to their default value.
@@ -144,7 +145,7 @@ public:
 	/**
 	 * Randomize all settings the Script requested to be randomized.
 	 */
-	virtual void AddRandomDeviation();
+	void AddRandomDeviation();
 
 	/**
 	 * Is this config attached to an Script? In other words, is there a Script
@@ -200,15 +201,9 @@ protected:
 	std::unique_ptr<ScriptInstance::ScriptData> to_load_data; ///< Data to load after the Script start.
 
 	/**
-	 * In case you have mandatory non-Script-definable config entries in your
-	 *  list, add them to this function.
-	 */
-	virtual void PushExtraConfigList() {};
-
-	/**
 	 * Routine that clears the config list.
 	 */
-	virtual void ClearConfigList();
+	void ClearConfigList();
 
 	/**
 	 * This function should call back to the Scanner in charge of this Config,

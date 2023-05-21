@@ -932,10 +932,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Vel inte
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Av
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Kvar månad
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Kvar 3. månad
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Kvart halvår
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Kvart år
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Språk
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Vel språk som skal nyttast
@@ -1126,6 +1122,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Høgre
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Maksimalt startlån: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Maksimalt lån eit firma kan ta opp (utan å reikne med inflasjon)
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Rente: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Lånerente; kontrollerar óg mogleg inflasjon
@@ -1606,6 +1603,7 @@ STR_CONFIG_SETTING_STARTING_YEAR                                :Start spelet i 
 
 STR_CONFIG_SETTING_ALLOW_SHARES                                 :Tillet kjøp av aksjar i andre firma: {STRING}
 
+###setting-zero-is-special
 
 
 STR_CONFIG_SETTING_DRAG_SIGNALS_DENSITY                         :Ved trekking, plasser signal kvar: {STRING}
@@ -1715,7 +1713,7 @@ STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :Ofte er det fle
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Eining for fart: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Bruk vald eining for å vise fart
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :Britisk eining (mph)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :Metrisk (km/t)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (m/s)
@@ -2898,7 +2896,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Åtvaring: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Feil: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Fatal: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Ein fatal NewGRF-feil har oppstått:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} vil ikkje verke med den TTDPatch versjonen som OpenTTD oppgjer
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} er for {STRING} utgåva av TTD.
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} er laga for å brukast saman med {STRING}
@@ -4050,12 +4047,11 @@ STR_AI_LIST_CANCEL                                              :{BLACK}Avbryt
 STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}Ikkje endre AI
 
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :AI
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Lukk
 STR_AI_SETTINGS_RESET                                           :{BLACK}Tilbakestill
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Antall dagar denne AIen skal starte etter den førre (ca): {ORANGE}{STRING}
 
 
 # Textfile window
@@ -4491,6 +4487,8 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Kan ikkj
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... for langt borte frå førre destinasjon
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... luftfartyg har ikkje nok rekkevidde
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Kan ikkje lage rutetabell for køyretøyet...
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Køyretøy kan kun venta på stasjonar
@@ -4904,10 +4902,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Powernaut-helik
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Firma {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Gruppe {COMMA}
@@ -4988,7 +4986,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

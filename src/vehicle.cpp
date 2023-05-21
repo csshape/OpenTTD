@@ -55,6 +55,10 @@
 #include "misc_cmd.h"
 #include "train_cmd.h"
 #include "vehicle_cmd.h"
+#include "newgrf_roadstop.h"
+#include "timer/timer.h"
+#include "timer/timer_game_calendar.h"
+#include "timer/timer_game_tick.h"
 
 #include "table/strings.h"
 
@@ -99,7 +103,7 @@ void VehicleSpriteSeq::GetBounds(Rect *bounds) const
 {
 	bounds->left = bounds->top = bounds->right = bounds->bottom = 0;
 	for (uint i = 0; i < this->count; ++i) {
-		const Sprite *spr = GetSprite(this->seq[i].sprite, ST_NORMAL);
+		const Sprite *spr = GetSprite(this->seq[i].sprite, SpriteType::Normal);
 		if (i == 0) {
 			bounds->left = spr->x_offs;
 			bounds->top  = spr->y_offs;
@@ -165,7 +169,7 @@ void VehicleServiceInDepot(Vehicle *v)
 	SetWindowDirty(WC_VEHICLE_DETAILS, v->index); // ensure that last service date and reliability are updated
 
 	do {
-		v->date_of_last_service = _date;
+		v->date_of_last_service = TimerGameCalendar::date;
 		v->breakdowns_since_last_service = 0;
 		v->reliability = v->GetEngine()->reliability;
 		/* Prevent vehicles from breaking down directly after exiting the depot. */
@@ -191,7 +195,7 @@ bool Vehicle::NeedsServicing() const
 	const Company *c = Company::Get(this->owner);
 	if (this->ServiceIntervalIsPercent() ?
 			(this->reliability >= this->GetEngine()->reliability * (100 - this->GetServiceInterval()) / 100) :
-			(this->date_of_last_service + this->GetServiceInterval() >= _date)) {
+			(this->date_of_last_service + this->GetServiceInterval() >= TimerGameCalendar::date)) {
 		return false;
 	}
 
@@ -770,7 +774,7 @@ uint32 Vehicle::GetGRFID() const
  */
 void Vehicle::ShiftDates(int interval)
 {
-	this->date_of_last_service += interval;
+	this->date_of_last_service = std::max(this->date_of_last_service + interval, 0);
 }
 
 /**
@@ -917,15 +921,15 @@ void VehicleEnteredDepotThisTick(Vehicle *v)
 
 /**
  * Increases the day counter for all vehicles and calls 1-day and 32-day handlers.
- * Each tick, it processes vehicles with "index % DAY_TICKS == _date_fract",
+ * Each tick, it processes vehicles with "index % DAY_TICKS == TimerGameCalendar::date_fract",
  * so each day, all vehicles are processes in DAY_TICKS steps.
  */
 static void RunVehicleDayProc()
 {
 	if (_game_mode != GM_NORMAL) return;
 
-	/* Run the day_proc for every DAY_TICKS vehicle starting at _date_fract. */
-	for (size_t i = _date_fract; i < Vehicle::GetPoolSize(); i += DAY_TICKS) {
+	/* Run the day_proc for every DAY_TICKS vehicle starting at TimerGameCalendar::date_fract. */
+	for (size_t i = TimerGameCalendar::date_fract; i < Vehicle::GetPoolSize(); i += DAY_TICKS) {
 		Vehicle *v = Vehicle::Get(i);
 		if (v == nullptr) continue;
 
@@ -2113,7 +2117,7 @@ void Vehicle::BeginLoading()
 {
 	assert(IsTileType(this->tile, MP_STATION) || this->type == VEH_SHIP);
 
-	Ticks travel_time = _tick_counter - this->last_loading_tick;
+	Ticks travel_time = TimerGameTick::counter - this->last_loading_tick;
 	if (this->current_order.IsType(OT_GOTO_STATION) &&
 			this->current_order.GetDestination() == this->last_station_visited) {
 		this->DeleteUnreachedImplicitOrders();
@@ -2278,7 +2282,7 @@ void Vehicle::LeaveStation()
 
 			/* if the vehicle could load here or could stop with cargo loaded set the last loading station */
 			this->last_loading_station = this->last_station_visited;
-			this->last_loading_tick = _tick_counter;
+			this->last_loading_tick = TimerGameTick::counter;
 		} else {
 			/* if the vehicle couldn't load and had to unload or transfer everything
 			 * set the last loading station to invalid as it will leave empty. */
@@ -2303,6 +2307,14 @@ void Vehicle::LeaveStation()
 
 		SetBit(Train::From(this)->flags, VRF_LEAVING_STATION);
 	}
+	if (this->type == VEH_ROAD && !(this->vehstatus & VS_CRASHED)) {
+		/* Trigger road stop animation */
+		if (IsRoadStopTile(this->tile)) {
+			TriggerRoadStopRandomisation(st, this->tile, RSRT_VEH_DEPARTS);
+			TriggerRoadStopAnimation(st, this->tile, SAT_TRAIN_DEPARTS);
+		}
+	}
+
 
 	this->MarkDirty();
 }
@@ -2817,7 +2829,7 @@ void Vehicle::RemoveFromShared()
 	this->previous_shared = nullptr;
 }
 
-void VehiclesYearlyLoop()
+static IntervalTimer<TimerGameCalendar> _vehicles_yearly({TimerGameCalendar::YEAR, TimerGameCalendar::Priority::VEHICLE}, [](auto)
 {
 	for (Vehicle *v : Vehicle::Iterate()) {
 		if (v->IsPrimaryVehicle()) {
@@ -2842,8 +2854,7 @@ void VehiclesYearlyLoop()
 	SetWindowClassesDirty(WC_SHIPS_LIST);
 	SetWindowClassesDirty(WC_ROADVEH_LIST);
 	SetWindowClassesDirty(WC_AIRCRAFT_LIST);
-}
-
+});
 
 /**
  * Can this station be used by the given engine type?
@@ -2892,6 +2903,58 @@ bool CanVehicleUseStation(const Vehicle *v, const Station *st)
 	if (v->type == VEH_ROAD) return st->GetPrimaryRoadStop(RoadVehicle::From(v)) != nullptr;
 
 	return CanVehicleUseStation(v->engine_type, st);
+}
+
+/**
+ * Get reason string why this station can't be used by the given vehicle.
+ * @param v The vehicle to test.
+ * @param st The station to test for.
+ * @return The string explaining why the vehicle cannot use the station.
+ */
+StringID GetVehicleCannotUseStationReason(const Vehicle *v, const Station *st)
+{
+	switch (v->type) {
+		case VEH_TRAIN:
+			return STR_ERROR_NO_RAIL_STATION;
+
+		case VEH_ROAD: {
+			const RoadVehicle *rv = RoadVehicle::From(v);
+			RoadStop *rs = st->GetPrimaryRoadStop(rv->IsBus() ? ROADSTOP_BUS : ROADSTOP_TRUCK);
+
+			StringID err = rv->IsBus() ? STR_ERROR_NO_BUS_STATION : STR_ERROR_NO_TRUCK_STATION;
+
+			for (; rs != nullptr; rs = rs->next) {
+				/* Articulated vehicles cannot use bay road stops, only drive-through. Make sure the vehicle can actually use this bay stop */
+				if (HasTileAnyRoadType(rs->xy, rv->compatible_roadtypes) && IsStandardRoadStopTile(rs->xy) && rv->HasArticulatedPart()) {
+					err = STR_ERROR_NO_STOP_ARTICULATED_VEHICLE;
+					continue;
+				}
+
+				/* Bay stop errors take precedence, but otherwise the vehicle may not be compatible with the roadtype/tramtype of this station tile.
+				 * We give bay stop errors precedence because they are usually a bus sent to a tram station or vice versa. */
+				if (!HasTileAnyRoadType(rs->xy, rv->compatible_roadtypes) && err != STR_ERROR_NO_STOP_ARTICULATED_VEHICLE) {
+					err = RoadTypeIsRoad(rv->roadtype) ? STR_ERROR_NO_STOP_COMPATIBLE_ROAD_TYPE : STR_ERROR_NO_STOP_COMPATIBLE_TRAM_TYPE;
+					continue;
+				}
+			}
+
+			return err;
+		}
+
+		case VEH_SHIP:
+			return STR_ERROR_NO_DOCK;
+
+		case VEH_AIRCRAFT:
+			if ((st->facilities & FACIL_AIRPORT) == 0) return STR_ERROR_NO_AIRPORT;
+			if (v->GetEngine()->u.air.subtype & AIR_CTOL) {
+				return STR_ERROR_AIRPORT_NO_PLANES;
+			} else {
+				return STR_ERROR_AIRPORT_NO_HELICOPTERS;
+			}
+
+		default:
+			return INVALID_STRING_ID;
+	}
 }
 
 /**

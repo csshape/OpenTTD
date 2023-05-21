@@ -389,66 +389,63 @@ struct NewGRFInspectWindow : Window {
 	 * Helper function to draw a string (line) in the window.
 	 * @param r      The (screen) rectangle we must draw within
 	 * @param offset The offset (in lines) we want to draw for
-	 * @param format The format string
+	 * @param string The string to draw
 	 */
-	void WARN_FORMAT(4, 5) DrawString(const Rect &r, int offset, const char *format, ...) const
+	void DrawString(const Rect &r, int offset, const std::string &string) const
 	{
-		char buf[1024];
-
-		va_list va;
-		va_start(va, format);
-		vseprintf(buf, lastof(buf), format, va);
-		va_end(va);
-
 		offset -= this->vscroll->GetPosition();
 		if (offset < 0 || offset >= this->vscroll->GetCapacity()) return;
 
-		::DrawString(r.Shrink(WidgetDimensions::scaled.frametext).Shrink(0, offset * this->resize.step_height, 0, 0), buf, TC_BLACK);
+		::DrawString(r.Shrink(WidgetDimensions::scaled.frametext).Shrink(0, offset * this->resize.step_height, 0, 0), string, TC_BLACK);
 	}
 
-	void DrawWidget(const Rect &r, int widget) const override
+	/**
+	 * Helper function to draw the vehicle chain widget.
+	 * @param r The rectangle to draw within.
+	 */
+	void DrawVehicleChainWidget(const Rect& r) const
 	{
-		switch (widget) {
-			case WID_NGRFI_VEH_CHAIN: {
-				const Vehicle *v = Vehicle::Get(this->GetFeatureIndex());
-				int total_width = 0;
-				int sel_start = 0;
-				int sel_end = 0;
-				for (const Vehicle *u = v->First(); u != nullptr; u = u->Next()) {
-					if (u == v) sel_start = total_width;
-					switch (u->type) {
-						case VEH_TRAIN: total_width += Train      ::From(u)->GetDisplayImageWidth(); break;
-						case VEH_ROAD:  total_width += RoadVehicle::From(u)->GetDisplayImageWidth(); break;
-						default: NOT_REACHED();
-					}
-					if (u == v) sel_end = total_width;
-				}
-
-				Rect br = r.Shrink(WidgetDimensions::scaled.bevel);
-				int width = br.Width();
-				int skip = 0;
-				if (total_width > width) {
-					int sel_center = (sel_start + sel_end) / 2;
-					if (sel_center > width / 2) skip = std::min(total_width - width, sel_center - width / 2);
-				}
-
-				GrfSpecFeature f = GetFeatureNum(this->window_number);
-				int h = GetVehicleImageCellSize((VehicleType)(VEH_TRAIN + (f - GSF_TRAINS)), EIT_IN_DEPOT).height;
-				int y = CenterBounds(br.top, br.bottom, h);
-				DrawVehicleImage(v->First(), br, INVALID_VEHICLE, EIT_IN_DETAILS, skip);
-
-				/* Highlight the articulated part (this is different to the whole-vehicle highlighting of DrawVehicleImage */
-				if (_current_text_dir == TD_RTL) {
-					DrawFrameRect(r.right - sel_end   + skip, y, r.right - sel_start + skip, y + h, COLOUR_WHITE, FR_BORDERONLY);
-				} else {
-					DrawFrameRect(r.left  + sel_start - skip, y, r.left  + sel_end   - skip, y + h, COLOUR_WHITE, FR_BORDERONLY);
-				}
-				break;
+		const Vehicle *v = Vehicle::Get(this->GetFeatureIndex());
+		int total_width = 0;
+		int sel_start = 0;
+		int sel_end = 0;
+		for (const Vehicle *u = v->First(); u != nullptr; u = u->Next()) {
+			if (u == v) sel_start = total_width;
+			switch (u->type) {
+				case VEH_TRAIN: total_width += Train::From(u)->GetDisplayImageWidth(); break;
+				case VEH_ROAD:  total_width += RoadVehicle::From(u)->GetDisplayImageWidth(); break;
+				default: NOT_REACHED();
 			}
+			if (u == v) sel_end = total_width;
 		}
 
-		if (widget != WID_NGRFI_MAINPANEL) return;
+		Rect br = r.Shrink(WidgetDimensions::scaled.bevel);
+		int width = br.Width();
+		int skip = 0;
+		if (total_width > width) {
+			int sel_center = (sel_start + sel_end) / 2;
+			if (sel_center > width / 2) skip = std::min(total_width - width, sel_center - width / 2);
+		}
 
+		GrfSpecFeature f = GetFeatureNum(this->window_number);
+		int h = GetVehicleImageCellSize((VehicleType)(VEH_TRAIN + (f - GSF_TRAINS)), EIT_IN_DEPOT).height;
+		int y = CenterBounds(br.top, br.bottom, h);
+		DrawVehicleImage(v->First(), br, INVALID_VEHICLE, EIT_IN_DETAILS, skip);
+
+		/* Highlight the articulated part (this is different to the whole-vehicle highlighting of DrawVehicleImage */
+		if (_current_text_dir == TD_RTL) {
+			DrawFrameRect(r.right - sel_end + skip, y, r.right - sel_start + skip, y + h, COLOUR_WHITE, FR_BORDERONLY);
+		} else {
+			DrawFrameRect(r.left + sel_start - skip, y, r.left + sel_end - skip, y + h, COLOUR_WHITE, FR_BORDERONLY);
+		}
+	}
+
+	/**
+	 * Helper function to draw the main panel widget.
+	 * @param r The rectangle to draw within.
+	 */
+	void DrawMainPanelWidget(const Rect& r) const
+	{
 		uint index = this->GetFeatureIndex();
 		const NIFeature *nif  = GetFeature(this->window_number);
 		const NIHelper *nih   = nif->helper;
@@ -466,9 +463,9 @@ struct NewGRFInspectWindow : Window {
 				if (!avail) continue;
 
 				if (HasVariableParameter(niv->var)) {
-					this->DrawString(r, i++, "  %02x[%02x]: %08x (%s)", niv->var, param, value, niv->name);
+					this->DrawString(r, i++, fmt::format("  {:02x}[{:02x}]: {:08x} ({})", niv->var, param, value, niv->name));
 				} else {
-					this->DrawString(r, i++, "  %02x: %08x (%s)", niv->var, value, niv->name);
+					this->DrawString(r, i++, fmt::format("  {:02x}: {:08x} ({})", niv->var, value, niv->name));
 				}
 			}
 		}
@@ -477,13 +474,13 @@ struct NewGRFInspectWindow : Window {
 		const int32 *psa = nih->GetPSAFirstPosition(index, this->caller_grfid);
 		if (psa_size != 0 && psa != nullptr) {
 			if (nih->PSAWithParameter()) {
-				this->DrawString(r, i++, "Persistent storage [%08X]:", BSWAP32(this->caller_grfid));
+				this->DrawString(r, i++, fmt::format("Persistent storage [{:08X}]:", BSWAP32(this->caller_grfid)));
 			} else {
 				this->DrawString(r, i++, "Persistent storage:");
 			}
 			assert(psa_size % 4 == 0);
 			for (uint j = 0; j < psa_size; j += 4, psa += 4) {
-				this->DrawString(r, i++, "  %i: %i %i %i %i", j, psa[0], psa[1], psa[2], psa[3]);
+				this->DrawString(r, i++, fmt::format("  {}: {} {} {} {}", j, psa[0], psa[1], psa[2], psa[3]));
 			}
 		}
 
@@ -516,7 +513,7 @@ struct NewGRFInspectWindow : Window {
 
 				char buffer[64];
 				GetString(buffer, string, lastof(buffer));
-				this->DrawString(r, i++, "  %02x: %s (%s)", nip->prop, buffer, nip->name);
+				this->DrawString(r, i++, fmt::format("  {:02x}: {} ({})", nip->prop, buffer, nip->name));
 			}
 		}
 
@@ -534,9 +531,9 @@ struct NewGRFInspectWindow : Window {
 					}
 
 					if (!HasBit(value, nic->cb_bit)) continue;
-					this->DrawString(r, i++, "  %03x: %s", nic->cb_id, nic->name);
+					this->DrawString(r, i++, fmt::format("  {:03x}: {}", nic->cb_id, nic->name));
 				} else {
-					this->DrawString(r, i++, "  %03x: %s (unmasked)", nic->cb_id, nic->name);
+					this->DrawString(r, i++, fmt::format("  {:03x}: {} (unmasked)", nic->cb_id, nic->name));
 				}
 			}
 		}
@@ -545,6 +542,19 @@ struct NewGRFInspectWindow : Window {
 		 * this whole function just to count the actual number of
 		 * elements. Especially because they need to be redrawn. */
 		const_cast<NewGRFInspectWindow*>(this)->vscroll->SetCount(i);
+	}
+
+	void DrawWidget(const Rect &r, int widget) const override
+	{
+		switch (widget) {
+			case WID_NGRFI_VEH_CHAIN:
+				this->DrawVehicleChainWidget(r);
+				break;
+
+			case WID_NGRFI_MAINPANEL:
+				this->DrawMainPanelWidget(r);
+				break;
+		}
 	}
 
 	void OnClick(Point pt, int widget, int click_count) override
@@ -601,7 +611,7 @@ struct NewGRFInspectWindow : Window {
 	{
 		if (StrEmpty(str)) return;
 
-		NewGRFInspectWindow::var60params[GetFeatureNum(this->window_number)][this->current_edit_param - 0x60] = strtol(str, nullptr, 16);
+		NewGRFInspectWindow::var60params[GetFeatureNum(this->window_number)][this->current_edit_param - 0x60] = std::strtol(str, nullptr, 16);
 		this->SetDirty();
 	}
 
@@ -776,6 +786,8 @@ GrfSpecFeature GetGrfSpecFeature(TileIndex tile)
 			switch (GetStationType(tile)) {
 				case STATION_RAIL:    return GSF_STATIONS;
 				case STATION_AIRPORT: return GSF_AIRPORTTILES;
+				case STATION_BUS:     return GSF_ROADSTOPS;
+				case STATION_TRUCK:   return GSF_ROADSTOPS;
 				default:              return GSF_INVALID;
 			}
 	}
@@ -822,12 +834,12 @@ struct SpriteAlignerWindow : Window {
 		this->SetWidgetLoweredState(WID_SA_CROSSHAIR, SpriteAlignerWindow::crosshair);
 
 		/* Oh yes, we assume there is at least one normal sprite! */
-		while (GetSpriteType(this->current_sprite) != ST_NORMAL) this->current_sprite++;
+		while (GetSpriteType(this->current_sprite) != SpriteType::Normal) this->current_sprite++;
 	}
 
 	void SetStringParameters(int widget) const override
 	{
-		const Sprite *spr = GetSprite(this->current_sprite, ST_NORMAL);
+		const Sprite *spr = GetSprite(this->current_sprite, SpriteType::Normal);
 		switch (widget) {
 			case WID_SA_CAPTION:
 				SetDParam(0, this->current_sprite);
@@ -882,7 +894,7 @@ struct SpriteAlignerWindow : Window {
 		switch (widget) {
 			case WID_SA_SPRITE: {
 				/* Center the sprite ourselves */
-				const Sprite *spr = GetSprite(this->current_sprite, ST_NORMAL);
+				const Sprite *spr = GetSprite(this->current_sprite, SpriteType::Normal);
 				Rect ir = r.Shrink(WidgetDimensions::scaled.bevel);
 				int x;
 				int y;
@@ -930,7 +942,7 @@ struct SpriteAlignerWindow : Window {
 			case WID_SA_PREVIOUS:
 				do {
 					this->current_sprite = (this->current_sprite == 0 ? GetMaxSpriteID() :  this->current_sprite) - 1;
-				} while (GetSpriteType(this->current_sprite) != ST_NORMAL);
+				} while (GetSpriteType(this->current_sprite) != SpriteType::Normal);
 				this->SetDirty();
 				break;
 
@@ -941,7 +953,7 @@ struct SpriteAlignerWindow : Window {
 			case WID_SA_NEXT:
 				do {
 					this->current_sprite = (this->current_sprite + 1) % GetMaxSpriteID();
-				} while (GetSpriteType(this->current_sprite) != ST_NORMAL);
+				} while (GetSpriteType(this->current_sprite) != SpriteType::Normal);
 				this->SetDirty();
 				break;
 
@@ -958,7 +970,7 @@ struct SpriteAlignerWindow : Window {
 				uint i = this->vscroll->GetPosition() + (pt.y - nwid->pos_y) / step_size;
 				if (i < _newgrf_debug_sprite_picker.sprites.size()) {
 					SpriteID spr = _newgrf_debug_sprite_picker.sprites[i];
-					if (GetSpriteType(spr) == ST_NORMAL) this->current_sprite = spr;
+					if (GetSpriteType(spr) == SpriteType::Normal) this->current_sprite = spr;
 				}
 				this->SetDirty();
 				break;
@@ -981,7 +993,7 @@ struct SpriteAlignerWindow : Window {
 				 * used by someone and the sprite cache isn't big enough for that
 				 * particular NewGRF developer.
 				 */
-				Sprite *spr = const_cast<Sprite *>(GetSprite(this->current_sprite, ST_NORMAL));
+				Sprite *spr = const_cast<Sprite *>(GetSprite(this->current_sprite, SpriteType::Normal));
 
 				/* Remember the original offsets of the current sprite, if not already in mapping. */
 				if (!(this->offs_start_map.Contains(this->current_sprite))) {
@@ -1026,7 +1038,7 @@ struct SpriteAlignerWindow : Window {
 
 		this->current_sprite = atoi(str);
 		if (this->current_sprite >= GetMaxSpriteID()) this->current_sprite = 0;
-		while (GetSpriteType(this->current_sprite) != ST_NORMAL) {
+		while (GetSpriteType(this->current_sprite) != SpriteType::Normal) {
 			this->current_sprite = (this->current_sprite + 1) % GetMaxSpriteID();
 		}
 		this->SetDirty();

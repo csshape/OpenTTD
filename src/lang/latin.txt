@@ -1127,10 +1127,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Eligere 
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Numquam
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Singulis mensibus
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Ternis mensibus
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Senis mensibus
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Duodenis mensibus
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Lingua
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Eligere linguam interfaciei
@@ -1321,6 +1317,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Dextro
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Creditum maximum in initio: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Copia crediti maxima (sine inflatione)
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Proportio faenoris: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Proportio faenoris creditorum; etiam inflationem afficit, si inflatio adest
@@ -1868,6 +1865,7 @@ STR_CONFIG_SETTING_STARTING_YEAR                                :Annus initii: {
 STR_CONFIG_SETTING_ALLOW_SHARES                                 :Sinere mercari sortes societatum: {STRING}
 STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :Sinere mercari sortes a societatibus. Sortes societatum satis aetatis modo mercari licet
 
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Centesimae partes lucri pendenda in translatione: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Centesimae lucri pars medietati data in systematibus transferendi, ut melius distribuatur lucrum vehiculorum
@@ -1969,10 +1967,6 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :Nulla
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Multiplicator magnitudinis initialis urbis: {STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :Quam maiores sunt urbes quam oppida in initio ludi
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :Recensere formulam partitionis {STRING} quoque die
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL_HELPTEXT                  :Tempus inter recensiones formulae partitionis. Quaeque recensio calculat rationes unius partis formulae. Ergo valor X huius electionis non facit ut cuncta formula recenseatur X quoque die; modo aliquot pars/partes recensebuntur. Valoribus minoribus, plus tempus CPU requiritur. Valoribus maioribus, plus tempus erit ad onerum partitionem incipiendam novis itineribus.
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :{STRING}{NBSP}die{P 0:2 "" s} ad formulam partitionis recalculandam
-STR_CONFIG_SETTING_LINKGRAPH_TIME_HELPTEXT                      :Tempus cuiusque recalculationis partis partitionis. Cum recalculatio incipitur, linea generatur quae agitur hos dies electos. Paucis diebus, magis probabilis est lineam non finiri cum debet esse finitam; tunc ludus intermittitur usque ad finitur ("segnitia"). Pluribus diebus, plus tempus requiritur ad partitionem mutandam cum itinera mutantur.
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :Modus partitionis vectoribus: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :Partitio "symmetrica" facit ut fere eadem copia vectorum mittatur a statione A ad stationem B quam a B ad A. Partitio "asymmetrica" facit ut quaelibet copia vectorum mittatur inter A et B. In partitione "manu" vectores non automatice partiuntur.
@@ -2000,7 +1994,7 @@ STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :Frequenter sunt
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Unitates velocitatis: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Quandocumque velocitas monstratur, monstrabitur his unitatibus electis
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :Anglicae (mph)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :Metricae (km/h)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (m/s)
@@ -3222,7 +3216,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Cautio: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Error: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Error Fatalis: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Error NewGRF fatalis:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} non operat apud editionem TTDPatch ab OpenTTD dicta
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} spectat ad editionem {STRING} TTD
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} spectat ad {STRING}
@@ -4419,12 +4412,11 @@ STR_AI_LIST_CANCEL                                              :{BLACK}Cancella
 STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}Non scriptum mutare
 
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :IA
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Claudere
 STR_AI_SETTINGS_RESET                                           :{BLACK}Revertere
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Quot dies post IA priorem haec IA incipiet (plus minusve): {ORANGE}{STRING}
 
 
 # Textfile window
@@ -4859,6 +4851,8 @@ STR_ERROR_CAN_T_STOP_SHARING_ORDER_LIST                         :{WHITE}Non lice
 STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Non licet iussa transcribere...
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... nimis procul a destinato priore
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... aeroplano non est satis distantia volatus
+
+# Extra messages which go on the third line of errors, explaining why orders failed
 
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Non licet vehiculo dare horarium...
@@ -5386,10 +5380,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Helicopterum Po
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Societas {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Grex {COMMA}
@@ -5474,7 +5468,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

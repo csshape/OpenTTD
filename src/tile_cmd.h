@@ -15,6 +15,7 @@
 #include "cargo_type.h"
 #include "track_type.h"
 #include "tile_map.h"
+#include "timer/timer_game_calendar.h"
 
 /** The returned bits of VehicleEnterTile. */
 enum VehicleEnterTileStatus {
@@ -52,7 +53,7 @@ struct TileDesc {
 	StringID str;               ///< Description of the tile
 	Owner owner[4];             ///< Name of the owner(s)
 	StringID owner_type[4];     ///< Type of each owner
-	Date build_date;            ///< Date of construction of tile contents
+	TimerGameCalendar::Date build_date; ///< Date of construction of tile contents
 	StringID station_class;     ///< Class of station
 	StringID station_name;      ///< Type of station within the class
 	StringID airport_class;     ///< Name of the airport class
@@ -73,7 +74,19 @@ struct TileDesc {
  * @param ti Information about the tile to draw
  */
 typedef void DrawTileProc(TileInfo *ti);
-typedef int GetSlopeZProc(TileIndex tile, uint x, uint y);
+
+/**
+ * Tile callback function signature for obtaining the world \c Z coordinate of a given
+ * point of a tile.
+ *
+ * @param tile The queries tile for the Z coordinate.
+ * @param x World X coordinate in tile "units".
+ * @param y World Y coordinate in tile "units".
+ * @param ground_vehicle Whether to get the Z coordinate of the ground vehicle, or the ground.
+ * @return World Z coordinate at tile ground (vehicle) level, including slopes and foundations.
+ * @see GetSlopePixelZ
+ */
+typedef int GetSlopeZProc(TileIndex tile, uint x, uint y, bool ground_vehicle);
 typedef CommandCost ClearTileProc(TileIndex tile, DoCommandFlag flags);
 
 /**

@@ -34,6 +34,9 @@
 #include "widgets/dropdown_func.h"
 #include "town_kdtree.h"
 #include "town_cmd.h"
+#include "timer/timer.h"
+#include "timer/timer_game_calendar.h"
+#include "timer/timer_window.h"
 
 #include "widgets/town_widget.h"
 
@@ -229,7 +232,7 @@ public:
 			case WID_TA_ACTION_INFO:
 				if (this->sel_index != -1) {
 					Money action_cost = _price[PR_TOWN_ACTION] * _town_action_costs[this->sel_index] >> 8;
-					bool affordable = action_cost < Company::GetIfValid(_local_company)->money;
+					bool affordable = Company::IsValidID(_local_company) && action_cost < Company::Get(_local_company)->money;
 
 					SetDParam(0, action_cost);
 					DrawStringMultiLine(r.Shrink(WidgetDimensions::scaled.framerect),
@@ -297,7 +300,7 @@ public:
 				}
 
 				/* When double-clicking, continue */
-				if (click_count == 1 || y < 0) break;
+				if (click_count == 1 || y < 0 || !HasBit(this->available_actions, y)) break;
 				FALLTHROUGH;
 			}
 
@@ -307,10 +310,10 @@ public:
 		}
 	}
 
-	void OnHundredthTick() override
-	{
+	/** Redraw the whole window on a regular interval. */
+	IntervalTimer<TimerWindow> redraw_interval = {std::chrono::seconds(3), [this](auto) {
 		this->SetDirty();
-	}
+	}};
 
 	void OnInvalidateData(int data = 0, bool gui_scope = true) override
 	{
@@ -594,6 +597,11 @@ public:
 
 		Command<CMD_RENAME_TOWN>::Post(STR_ERROR_CAN_T_RENAME_TOWN, this->window_number, str);
 	}
+
+	IntervalTimer<TimerGameCalendar> daily_interval = {{TimerGameCalendar::DAY, TimerGameCalendar::Priority::NONE}, [this](auto) {
+		/* Refresh after possible snowline change */
+		this->SetDirty();
+	}};
 };
 
 static const NWidgetPart _nested_town_game_view_widgets[] = {
@@ -769,7 +777,7 @@ private:
 
 		/* Sort unrated towns always on ascending town name. */
 		if (before) return TownDirectoryWindow::TownNameSorter(a, b);
-		return !TownDirectoryWindow::TownNameSorter(a, b);
+		return TownDirectoryWindow::TownNameSorter(b, a);
 	}
 
 public:
@@ -966,11 +974,11 @@ public:
 		this->DrawWidgets();
 	}
 
-	void OnHundredthTick() override
-	{
+	/** Redraw the whole window on a regular interval. */
+	IntervalTimer<TimerWindow> rebuild_interval = {std::chrono::seconds(3), [this](auto) {
 		this->BuildSortTownList();
 		this->SetDirty();
-	}
+	}};
 
 	void OnResize() override
 	{

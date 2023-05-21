@@ -144,7 +144,7 @@ static uint NPFHash(uint key1, uint key2)
 	uint part2 = TileY(key1) & NPF_HASH_HALFMASK;
 
 	assert(IsValidTrackdir((Trackdir)key2));
-	assert(IsValidTile(key1));
+	assert(IsValidTile((TileIndex)key1));
 	return ((part1 << NPF_HASH_HALFBITS | part2) + (NPF_HASH_SIZE * key2 / TRACKDIR_END)) % NPF_HASH_SIZE;
 }
 
@@ -245,8 +245,8 @@ static uint NPFSlopeCost(AyStarNode *current)
 	/* Get the height on both sides of the tile edge.
 	 * Avoid testing the height on the tile-center. This will fail for halftile-foundations.
 	 */
-	int z1 = GetSlopePixelZ(x1 + dx4, y1 + dy4);
-	int z2 = GetSlopePixelZ(x2 - dx4, y2 - dy4);
+	int z1 = GetSlopePixelZ(x1 + dx4, y1 + dy4, true);
+	int z2 = GetSlopePixelZ(x2 - dx4, y2 - dy4, true);
 
 	if (z2 - z1 > 1) {
 		/* Slope up */

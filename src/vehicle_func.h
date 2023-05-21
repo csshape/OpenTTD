@@ -11,6 +11,7 @@
 #define VEHICLE_FUNC_H
 
 #include "gfx_type.h"
+#include "date_type.h"
 #include "direction_type.h"
 #include "command_type.h"
 #include "vehicle_type.h"
@@ -166,6 +167,7 @@ CommandCost EnsureNoTrainOnTrackBits(TileIndex tile, TrackBits track_bits);
 
 bool CanVehicleUseStation(EngineID engine_type, const struct Station *st);
 bool CanVehicleUseStation(const Vehicle *v, const struct Station *st);
+StringID GetVehicleCannotUseStationReason(const Vehicle *v, const Station *st);
 
 void ReleaseDisastersTargetingVehicle(VehicleID vehicle);
 

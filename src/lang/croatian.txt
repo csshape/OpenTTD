@@ -1051,10 +1051,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Odaberi 
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Isključeno
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Svaki mjesec
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Svaka 3 mjeseca
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Svakih 6 mjeseci
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Svakih 12 mjeseci
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Jezik
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Odaberi jezik sučelja
@@ -1248,6 +1244,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Desno
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Najveći početni zajam: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Najveći iznos koji tvrtka može pozajmiti (ne uzimajući inflaciju u obzir)
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Kamatna stopa: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Kamatna stopa zajmova; također kontrolira i inflaciju ako je uključena
@@ -1813,6 +1810,7 @@ STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :Kada je uključ
 
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :Najmanja starost tvrtke za trgovanje udjelima: {STRING}
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_HELPTEXT                :Odredite najmanju starost tvtke da bi drugi mogli kupovati i prodavati dionice.
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Postotak dobiti za dionicu koji se plaća kod sustava feedera: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Postotak prihoda koji će biti predan srednjim dionicama prijevoza feeder sustavima, daje više kontrole nad prihodima
@@ -1917,10 +1915,6 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :Nijedan
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Početni množitelj veličine grada: {STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :Prosječna veličina gradova u donosu na naselja kod početka igre
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :Ažuriraj povezni grafikon svakih {STRING}{NBSP}dan{P 0:2 a a a}
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL_HELPTEXT                  :Vrijeme između slijedećih rekalkulacija poveznog grafikona. Svaka rekalkulacija izračunava planove za jednu komponentu grafikona. To znači da vrijednost X za ovu postavku ne mora značiti i ažuriranje kompletnog grafikona unutar X dana. Samo neke komponente će biti ažurirane. Čim kraće vrijeme odredite, više će biti potrebno resursa CPU-a za izračun. Čim duže vrijeme odredite, trebati će više vremena za pokretanje distribucije po novim rutama.
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :Uzmi {STRING}{NBSP}dan{P 0:2 a a a} za rekalkulaciju poveznog grafikona
-STR_CONFIG_SETTING_LINKGRAPH_TIME_HELPTEXT                      :Vrijeme potrebno za rekalkulaciju komponente poveznog grafikona. Kada se rekalkulacija pokrene, stvara se slijed koji može raditi broj dana koliko ovdje odredite. Čim kraće vrijeme odredite, postoji mogućnost da slijed neće biti gotov kada bi trebao. Tada se igra usporava odnosno zaustavlja dok ne bude gotovo. Čim duže vrijeme odredite, potrebno je duže da se distribucija ažurira kad se izmijene rute.
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :Način distribucije za putnike: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :"Simetrično" znači da će se otprilike isti broj putnika slati od stanice A prema stanici B ako od B prema A. "Asimetrično" znači da će se proizvoljni brojevi putnika slati u oba smjera. "Ručno" znači da se distribucija za putnike neće vršiti automatski.
@@ -1948,7 +1942,7 @@ STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :Često postoji 
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Jedinice brzine: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Uvijek kada je brzina prikazana u korisničkom sučelju, prikaži je u odabranim jedinicama
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :Imperijalni (mph)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :Metrički (km/h)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (m/s)
@@ -3239,7 +3233,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Upozorenje: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Greška: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Kobno: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Dogodila se kobna pogreška u NewGRF-u:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} neće raditi sa TTDPatch verzijom prijavljenom u OpenTTD
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} je za {STRING} verziju TTD-a.
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} je napravljen da se koristi sa {STRING}
@@ -4471,12 +4464,11 @@ STR_SCREENSHOT_WORLD_SCREENSHOT                                 :{BLACK}Slika ci
 STR_SCREENSHOT_HEIGHTMAP_SCREENSHOT                             :{BLACK}Slika visinske mape
 STR_SCREENSHOT_MINIMAP_SCREENSHOT                               :{BLACK}Slika mini-mape
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :UI
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Zatvori
 STR_AI_SETTINGS_RESET                                           :{BLACK}Resetiraj
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Broj dana za start ovog UI-ja nakon prethodnog (otprilike): {ORANGE}{STRING}
 
 
 # Textfile window
@@ -4919,6 +4911,8 @@ STR_ERROR_CAN_T_STOP_SHARING_ORDER_LIST                         :{WHITE}Nemoguć
 STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Nije moguće kopirati popis naredbi...
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... predaleko od prethodnog odredišta
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... avion nema dovoljni domet
+
+# Extra messages which go on the third line of errors, explaining why orders failed
 
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Nije moguće zadati vozni red za vozilo...
@@ -5372,10 +5366,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Helikopter Powe
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Tvrtka {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Groupa {COMMA}
@@ -5457,7 +5451,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

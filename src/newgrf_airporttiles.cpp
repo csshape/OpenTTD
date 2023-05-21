@@ -57,8 +57,8 @@ AirportTileOverrideManager _airporttile_mngr(NEW_AIRPORTTILE_OFFSET, NUM_AIRPORT
  */
 void AirportTileSpec::ResetAirportTiles()
 {
-	memset(&AirportTileSpec::tiles, 0, sizeof(AirportTileSpec::tiles));
-	memcpy(&AirportTileSpec::tiles, &_origin_airporttile_specs, sizeof(_origin_airporttile_specs));
+	auto insert = std::copy(std::begin(_origin_airporttile_specs), std::end(_origin_airporttile_specs), std::begin(AirportTileSpec::tiles));
+	std::fill(insert, std::end(AirportTileSpec::tiles), AirportTileSpec{});
 
 	/* Reset any overrides that have been set. */
 	_airporttile_mngr.ResetOverride();
@@ -69,11 +69,11 @@ void AirportTileOverrideManager::SetEntitySpec(const AirportTileSpec *airpts)
 	StationGfx airpt_id = this->AddEntityID(airpts->grf_prop.local_id, airpts->grf_prop.grffile->grfid, airpts->grf_prop.subst_id);
 
 	if (airpt_id == this->invalid_id) {
-		grfmsg(1, "AirportTile.SetEntitySpec: Too many airport tiles allocated. Ignoring.");
+		GrfMsg(1, "AirportTile.SetEntitySpec: Too many airport tiles allocated. Ignoring.");
 		return;
 	}
 
-	memcpy(&AirportTileSpec::tiles[airpt_id], airpts, sizeof(*airpts));
+	AirportTileSpec::tiles[airpt_id] = *airpts;
 
 	/* Now add the overrides. */
 	for (int i = 0; i < this->max_offset; i++) {
@@ -278,7 +278,7 @@ bool DrawNewAirportTile(TileInfo *ti, Station *st, StationGfx gfx, const Airport
 }
 
 /** Helper class for animation control. */
-struct AirportTileAnimationBase : public AnimationBase<AirportTileAnimationBase, AirportTileSpec, Station, int, GetAirportTileCallback> {
+struct AirportTileAnimationBase : public AnimationBase<AirportTileAnimationBase, AirportTileSpec, Station, int, GetAirportTileCallback, TileAnimationFrameAnimationHelper<Station> > {
 	static const CallbackID cb_animation_speed      = CBID_AIRPTILE_ANIMATION_SPEED;
 	static const CallbackID cb_animation_next_frame = CBID_AIRPTILE_ANIM_NEXT_FRAME;
 

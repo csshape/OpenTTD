@@ -12,8 +12,9 @@
 #include "../string_func.h"
 #include "../strings_func.h"
 #include "../window_func.h"
-#include "../guitimer_func.h"
 #include "../zoom_func.h"
+#include "../timer/timer.h"
+#include "../timer/timer_window.h"
 #include "dropdown_type.h"
 
 #include "dropdown_widget.h"
@@ -33,9 +34,7 @@ void DropDownListItem::Draw(const Rect &r, bool sel, Colours bg_colour) const
 
 uint DropDownListStringItem::Width() const
 {
-	char buffer[512];
-	GetString(buffer, this->String(), lastof(buffer));
-	return GetStringBoundingBox(buffer).width + WidgetDimensions::scaled.dropdowntext.Horizontal();
+	return GetStringBoundingBox(this->String()).width + WidgetDimensions::scaled.dropdowntext.Horizontal();
 }
 
 void DropDownListStringItem::Draw(const Rect &r, bool sel, Colours bg_colour) const
@@ -128,7 +127,6 @@ struct DropdownWindow : Window {
 	bool drag_mode;
 	bool instant_close;           ///< Close the window when the mouse button is raised.
 	int scrolling;                ///< If non-zero, auto-scroll the item list (one time).
-	GUITimer scrolling_timer;     ///< Timer for auto-scroll of the item list.
 	Point position;               ///< Position of the topleft corner of the window.
 	Scrollbar *vscroll;
 
@@ -185,7 +183,6 @@ struct DropdownWindow : Window {
 		this->click_delay      = 0;
 		this->drag_mode        = true;
 		this->instant_close    = instant_close;
-		this->scrolling_timer  = GUITimer(MILLISECONDS_PER_TICK);
 	}
 
 	void Close() override
@@ -280,22 +277,19 @@ struct DropdownWindow : Window {
 		}
 	}
 
-	void OnRealtimeTick(uint delta_ms) override
-	{
-		if (!this->scrolling_timer.Elapsed(delta_ms)) return;
-		this->scrolling_timer.SetInterval(MILLISECONDS_PER_TICK);
+	/** Rate limit how fast scrolling happens. */
+	IntervalTimer<TimerWindow> scroll_interval = {std::chrono::milliseconds(30), [this](auto) {
+		if (this->scrolling == 0) return;
 
-		if (this->scrolling != 0) {
-			int pos = this->vscroll->GetPosition();
+		int pos = this->vscroll->GetPosition();
 
-			this->vscroll->UpdatePosition(this->scrolling);
-			this->scrolling = 0;
+		this->vscroll->UpdatePosition(this->scrolling);
+		this->scrolling = 0;
 
-			if (pos != this->vscroll->GetPosition()) {
-				this->SetDirty();
-			}
+		if (pos != this->vscroll->GetPosition()) {
+			this->SetDirty();
 		}
-	}
+	}};
 
 	void OnMouseLoop() override
 	{
@@ -353,12 +347,10 @@ struct DropdownWindow : Window {
  * @param button   The widget which is passed to Window::OnDropdownSelect and OnDropdownClose.
  *                 Unless you override those functions, this should be then widget index of the dropdown button.
  * @param wi_rect  Coord of the parent drop down button, used to position the dropdown menu.
- * @param auto_width The width is determined by the widest item in the list,
- *                   in this case only one of \a left or \a right is used (depending on text direction).
  * @param instant_close Set to true if releasing mouse button should close the
  *                      list regardless of where the cursor is.
  */
-void ShowDropDownListAt(Window *w, DropDownList &&list, int selected, int button, Rect wi_rect, Colours wi_colour, bool auto_width, bool instant_close)
+void ShowDropDownListAt(Window *w, DropDownList &&list, int selected, int button, Rect wi_rect, Colours wi_colour, bool instant_close)
 {
 	CloseWindowById(WC_DROPDOWN_MENU, 0);
 
@@ -368,7 +360,7 @@ void ShowDropDownListAt(Window *w, DropDownList &&list, int selected, int button
 	/* The preferred width equals the calling widget */
 	uint width = wi_rect.Width();
 
-	/* Longest item in the list, if auto_width is enabled */
+	/* Longest item in the list */
 	uint max_item_width = 0;
 
 	/* Total height of list */
@@ -376,10 +368,10 @@ void ShowDropDownListAt(Window *w, DropDownList &&list, int selected, int button
 
 	for (const auto &item : list) {
 		height += item->Height(width);
-		if (auto_width) max_item_width = std::max(max_item_width, item->Width());
+		max_item_width = std::max(max_item_width, item->Width());
 	}
 
-	if (auto_width) max_item_width += WidgetDimensions::scaled.fullbevel.Horizontal();
+	max_item_width += WidgetDimensions::scaled.fullbevel.Horizontal();
 
 	/* Scrollbar needed? */
 	bool scroll = false;
@@ -423,7 +415,7 @@ void ShowDropDownListAt(Window *w, DropDownList &&list, int selected, int button
 		}
 	}
 
-	if (auto_width) width = std::max(width, max_item_width);
+	width = std::max(width, max_item_width);
 
 	Point dw_pos = { w->left + (_current_text_dir == TD_RTL ? wi_rect.right + 1 - (int)width : wi_rect.left), top};
 	Dimension dw_size = {width, height};
@@ -442,12 +434,11 @@ void ShowDropDownListAt(Window *w, DropDownList &&list, int selected, int button
  * @param selected The initially selected list item.
  * @param button   The widget within the parent window that is used to determine
  *                 the list's location.
- * @param width    Override the width determined by the selected widget.
- * @param auto_width Maximum width is determined by the widest item in the list.
+ * @param width    Override the minimum width determined by the selected widget and list contents.
  * @param instant_close Set to true if releasing mouse button should close the
  *                      list regardless of where the cursor is.
  */
-void ShowDropDownList(Window *w, DropDownList &&list, int selected, int button, uint width, bool auto_width, bool instant_close)
+void ShowDropDownList(Window *w, DropDownList &&list, int selected, int button, uint width, bool instant_close)
 {
 	/* Our parent's button widget is used to determine where to place the drop
 	 * down list window. */
@@ -470,7 +461,7 @@ void ShowDropDownList(Window *w, DropDownList &&list, int selected, int button, 
 		}
 	}
 
-	ShowDropDownListAt(w, std::move(list), selected, button, wi_rect, wi_colour, auto_width, instant_close);
+	ShowDropDownListAt(w, std::move(list), selected, button, wi_rect, wi_colour, instant_close);
 }
 
 /**
@@ -482,7 +473,7 @@ void ShowDropDownList(Window *w, DropDownList &&list, int selected, int button, 
  * @param button        Button widget number of the parent window \a w that wants the dropdown menu.
  * @param disabled_mask Bitmask for disabled items (items with their bit set are displayed, but not selectable in the dropdown list).
  * @param hidden_mask   Bitmask for hidden items (items with their bit set are not copied to the dropdown list).
- * @param width         Width of the dropdown menu. If \c 0, use the width of parent widget \a button.
+ * @param width         Minimum width of the dropdown menu.
  */
 void ShowDropDownMenu(Window *w, const StringID *strings, int selected, int button, uint32 disabled_mask, uint32 hidden_mask, uint width)
 {

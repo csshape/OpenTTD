@@ -10,10 +10,11 @@
 #include "stdafx.h"
 #include "command_func.h"
 #include "company_func.h"
-#include "date_func.h"
+#include "timer/timer_game_calendar.h"
 #include "window_func.h"
 #include "vehicle_base.h"
 #include "timetable_cmd.h"
+#include "timetable.h"
 
 #include "table/strings.h"
 
@@ -211,9 +212,10 @@ CommandCost CmdBulkChangeTimetable(DoCommandFlag flags, VehicleID veh, ModifyTim
  * Clear the lateness counter to make the vehicle on time.
  * @param flags Operation to perform.
  * @param veh Vehicle with the orders to change.
+ * @param apply_to_group Set to reset the late counter for all vehicles sharing the orders.
  * @return the cost of this operation or an error
  */
-CommandCost CmdSetVehicleOnTime(DoCommandFlag flags, VehicleID veh)
+CommandCost CmdSetVehicleOnTime(DoCommandFlag flags, VehicleID veh, bool apply_to_group)
 {
 	Vehicle *v = Vehicle::GetIfValid(veh);
 	if (v == nullptr || !v->IsPrimaryVehicle() || v->orders == nullptr) return CMD_ERROR;
@@ -222,8 +224,23 @@ CommandCost CmdSetVehicleOnTime(DoCommandFlag flags, VehicleID veh)
 	if (ret.Failed()) return ret;
 
 	if (flags & DC_EXEC) {
-		v->lateness_counter = 0;
-		SetWindowDirty(WC_VEHICLE_TIMETABLE, v->index);
+		if (apply_to_group) {
+			int32 most_late = 0;
+			for (Vehicle *u = v->FirstShared(); u != nullptr; u = u->NextShared()) {
+				if (u->lateness_counter > most_late) {
+					most_late = u->lateness_counter;
+				}
+			}
+			if (most_late > 0) {
+				for (Vehicle *u = v->FirstShared(); u != nullptr; u = u->NextShared()) {
+					u->lateness_counter -= most_late;
+					SetWindowDirty(WC_VEHICLE_TIMETABLE, u->index);
+				}
+			}
+		} else {
+			v->lateness_counter = 0;
+			SetWindowDirty(WC_VEHICLE_TIMETABLE, v->index);
+		}
 	}
 
 	return CommandCost();
@@ -275,7 +292,7 @@ static bool VehicleTimetableSorter(Vehicle * const &a, Vehicle * const &b)
  * @param start_date The timetable start date.
  * @return The error or cost of the operation.
  */
-CommandCost CmdSetTimetableStart(DoCommandFlag flags, VehicleID veh_id, bool timetable_all, Date start_date)
+CommandCost CmdSetTimetableStart(DoCommandFlag flags, VehicleID veh_id, bool timetable_all, TimerGameCalendar::Date start_date)
 {
 	Vehicle *v = Vehicle::GetIfValid(veh_id);
 	if (v == nullptr || !v->IsPrimaryVehicle() || v->orders == nullptr) return CMD_ERROR;
@@ -287,9 +304,9 @@ CommandCost CmdSetTimetableStart(DoCommandFlag flags, VehicleID veh_id, bool tim
 
 	/* Don't let a timetable start more than 15 years into the future or 1 year in the past. */
 	if (start_date < 0 || start_date > MAX_DAY) return CMD_ERROR;
-	if (start_date - _date > 15 * DAYS_IN_LEAP_YEAR) return CMD_ERROR;
-	if (_date - start_date > DAYS_IN_LEAP_YEAR) return CMD_ERROR;
-	if (timetable_all && !v->orders->IsCompleteTimetable()) return CMD_ERROR;
+	if (start_date - TimerGameCalendar::date > MAX_TIMETABLE_START_YEARS * DAYS_IN_LEAP_YEAR) return CMD_ERROR;
+	if (TimerGameCalendar::date - start_date > DAYS_IN_LEAP_YEAR) return CMD_ERROR;
+	if (timetable_all && !v->orders->IsCompleteTimetable()) return CommandCost(STR_ERROR_TIMETABLE_INCOMPLETE);
 	if (timetable_all && start_date + total_duration / DAY_TICKS > MAX_DAY) return CMD_ERROR;
 
 	if (flags & DC_EXEC) {
@@ -409,7 +426,7 @@ void UpdateVehicleTimetable(Vehicle *v, bool travelling)
 		just_started = !HasBit(v->vehicle_flags, VF_TIMETABLE_STARTED);
 
 		if (v->timetable_start != 0) {
-			v->lateness_counter = (_date - v->timetable_start) * DAY_TICKS + _date_fract;
+			v->lateness_counter = (TimerGameCalendar::date - v->timetable_start) * DAY_TICKS + TimerGameCalendar::date_fract;
 			v->timetable_start = 0;
 		}
 

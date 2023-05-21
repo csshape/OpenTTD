@@ -15,7 +15,7 @@
 #include "company_func.h"
 #include "company_base.h"
 #include "engine_base.h"
-#include "date_func.h"
+#include "timer/timer_game_calendar.h"
 #include "landscape.h"
 #include "road.h"
 #include "road_func.h"
@@ -111,7 +111,8 @@ RoadBits CleanUpRoadBits(const TileIndex tile, RoadBits org_rb)
 bool HasRoadTypeAvail(const CompanyID company, RoadType roadtype)
 {
 	if (company == OWNER_DEITY || company == OWNER_TOWN || _game_mode == GM_EDITOR || _generating_world) {
-		return true; // TODO: should there be a proper check?
+		const RoadTypeInfo *rti = GetRoadTypeInfo(roadtype);
+		return rti->label != 0 && (rti->flags & ROTFB_HIDDEN) == 0;
 	} else {
 		const Company *c = Company::GetIfValid(company);
 		if (c == nullptr) return false;
@@ -152,7 +153,7 @@ bool ValParamRoadType(RoadType roadtype)
  * @return The road types that should be available when date
  *         introduced road types are taken into account as well.
  */
-RoadTypes AddDateIntroducedRoadTypes(RoadTypes current, Date date)
+RoadTypes AddDateIntroducedRoadTypes(RoadTypes current, TimerGameCalendar::Date date)
 {
 	RoadTypes rts = current;
 
@@ -193,7 +194,7 @@ RoadTypes GetCompanyRoadTypes(CompanyID company, bool introduces)
 		const EngineInfo *ei = &e->info;
 
 		if (HasBit(ei->climates, _settings_game.game_creation.landscape) &&
-				(HasBit(e->company_avail, company) || _date >= e->intro_date + DAYS_IN_YEAR)) {
+				(HasBit(e->company_avail, company) || TimerGameCalendar::date >= e->intro_date + DAYS_IN_YEAR)) {
 			const RoadVehicleInfo *rvi = &e->u.road;
 			assert(rvi->roadtype < ROADTYPE_END);
 			if (introduces) {
@@ -204,7 +205,7 @@ RoadTypes GetCompanyRoadTypes(CompanyID company, bool introduces)
 		}
 	}
 
-	if (introduces) return AddDateIntroducedRoadTypes(rts, _date);
+	if (introduces) return AddDateIntroducedRoadTypes(rts, TimerGameCalendar::date);
 	return rts;
 }
 
@@ -285,7 +286,7 @@ RoadTypes ExistingRoadTypes(CompanyID c)
 		if (!HasBit(e->info.climates, _settings_game.game_creation.landscape)) continue;
 
 		/* Check whether available for all potential companies */
-		if (e->company_avail != (CompanyMask)-1) continue;
+		if (e->company_avail != MAX_UVALUE(CompanyMask)) continue;
 
 		known_roadtypes |= GetRoadTypeInfo(e->u.road.roadtype)->introduces_roadtypes;
 	}

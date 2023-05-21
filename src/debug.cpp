@@ -161,7 +161,7 @@ void DebugPrint(const char *level, const std::string &message)
  * @param s Text describing the wanted debugging levels.
  * @param error_func The function to call if a parse error occurs.
  */
-void SetDebugString(const char *s, void (*error_func)(const char *))
+void SetDebugString(const char *s, void (*error_func)(const std::string &))
 {
 	int v;
 	char *end;
@@ -174,7 +174,7 @@ void SetDebugString(const char *s, void (*error_func)(const char *))
 	if (*s >= '0' && *s <= '9') {
 		const DebugLevel *i;
 
-		v = strtoul(s, &end, 0);
+		v = std::strtoul(s, &end, 0);
 		s = end;
 
 		for (i = debug_level; i != endof(debug_level); ++i) {
@@ -201,13 +201,13 @@ void SetDebugString(const char *s, void (*error_func)(const char *))
 		}
 
 		if (*s == '=') s++;
-		v = strtoul(s, &end, 0);
+		v = std::strtoul(s, &end, 0);
 		s = end;
 		if (found != nullptr) {
 			new_levels[found->name] = v;
 		} else {
 			std::string error_string = fmt::format("Unknown debug level '{}'", std::string(t, s - t));
-			error_func(error_string.c_str());
+			error_func(error_string);
 			return;
 		}
 	}

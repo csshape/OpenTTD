@@ -942,10 +942,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}தா�
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Off
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :ஒவ்வொரு மாதமும்
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :மூன்று மாதங்களுக்கு ஒரு முறை
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :ஆறு மாதங்களுக்கு ஒரு முறை
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :ஒவ்வொரு வருடமும்
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}மொழி
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}பயன்படுத்தப்போகும் மொழியினை தேர்ந்தெடு
@@ -1142,6 +1138,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :வலது
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :அதிகபட்ச ஆரம்ப கடன்: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :ஒரு நிறுவனத்தால் பெறமுடியும் கடன் (பணவீக்கத்தினைக் கணக்கில் எடுத்துக் கொள்ளாமல்)
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :வட்டி: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :கடன் வட்டி;செயற்படுத்தினால் பணவீக்கத்தினையும் கட்டுப்படுத்தும்
@@ -1631,6 +1628,7 @@ STR_CONFIG_SETTING_ECONOMY_TYPE_FROZEN                          :உறைந்
 STR_CONFIG_SETTING_ALLOW_SHARES                                 :மற்ற நிறுவனங்களின் பங்குகளை வாங்குவதை அனுமதிக்கவும்: {STRING}
 
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :பங்குகள் பரிமாற்றத்திற்கு தேவையான குறைந்தபட்ச நிறுவன வயது: {STRING}
+###setting-zero-is-special
 
 
 STR_CONFIG_SETTING_DRAG_SIGNALS_DENSITY                         :இழுத்தால், சிக்னல்களை இடவும், ஒவ்வொறு: {STRING}
@@ -1737,7 +1735,7 @@ STR_CONFIG_SETTING_DEMAND_DISTANCE_HELPTEXT                     :இதை 0 ஐ
 
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :வேக அலகுகள்: {STRING}
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :இம்பீரியல் (mph)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :மெட்ரிக் (கி.மீ/மணிநேரம்)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (மீ/நொடி)
@@ -2097,7 +2095,6 @@ STR_NETWORK_CLIENT_LIST_NEW_COMPANY                             :(புதி�
 STR_NETWORK_CLIENT_LIST_NEW_COMPANY_TOOLTIP                     :{BLACK}புதிய நிறுவனத்தினை நிறுவி விளையாடு
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_SELF_TOOLTIP                :இது நீன்கள்
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_HOST_TOOLTIP                :{BLACK}இது விலையாட்டின் வழங்குபவர்
-STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} வாடிக்கையாளர்{P "" கள்} / {NUM} நிறுவன{P ம் ங்கள்}
 
 # Matches ConnectionType
 ###length 5
@@ -2964,7 +2961,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}எச்சரிக்கை: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}பிழை: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}மரணம்: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}மரணமான NewGRF பிழை ஏற்பட்டுள்ளது:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :OpenTTDஆல் தெரிவித்த TTDPatch விருத்துடன் {1:STRING} செயல்படாது
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} ஆனது {STRING} TTD பதிப்பிற்காகவே
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} ஆனது {STRING} உடன் இணைந்து பயன்படுத்த வடிவமைக்கப்பட்டுள்ளது
@@ -4124,12 +4120,11 @@ STR_SCREENSHOT_WORLD_SCREENSHOT                                 :{BLACK}மு�
 STR_SCREENSHOT_HEIGHTMAP_SCREENSHOT                             :{BLACK}உயர்படத்தின் திரைப்பிடிப்பு
 STR_SCREENSHOT_MINIMAP_SCREENSHOT                               :{BLACK}சிறிய வரைபட திரைபிடிப்பு
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :AI
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}மூடு
 STR_AI_SETTINGS_RESET                                           :{BLACK}முன்னிருந்தமாதிரி மாற்று
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :இந்த AI-இனை தொடங்குவதற்கான நாட்கள், முந்தின AI-இற்கு பிறகு: {ORANGE}{STRING}
 
 
 # Textfile window
@@ -4567,6 +4562,8 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}கட�
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... முந்தைய இடத்திலிருந்து நெடுந்தூரம் உள்ளது
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... விமானத்தால் அதிக தூரம் பறக்க இயலாது
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}வாகனத்தை கால அட்டவணை செய்ய இயலாது...
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}வாகனங்கள் நிலையங்களில் மட்டுமே காத்திருக்க முடியும்
@@ -4982,10 +4979,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :பவர்ன
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(நிறுவனம் {COMMA})
 STR_FORMAT_GROUP_NAME                                           :குழு {COMMA}
@@ -5067,7 +5064,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

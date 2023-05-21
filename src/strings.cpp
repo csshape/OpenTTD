@@ -19,10 +19,12 @@
 #include "signs_base.h"
 #include "fontdetection.h"
 #include "error.h"
+#include "error_func.h"
 #include "strings_func.h"
 #include "rev.h"
 #include "core/endian_func.hpp"
 #include "date_func.h"
+#include "timer/timer_game_calendar.h"
 #include "vehicle_base.h"
 #include "engine_base.h"
 #include "language.h"
@@ -34,7 +36,10 @@
 #include "debug.h"
 #include "game/game_text.hpp"
 #include "network/network_content_gui.h"
+#include "newgrf_engine.h"
+#include "core/backup_type.hpp"
 #include <stack>
+#include <charconv>
 
 #include "table/strings.h"
 #include "table/control_codes.h"
@@ -241,7 +246,7 @@ char *GetStringWithArgs(char *buffr, StringID string, StringParameters *args, co
 		case TEXT_TAB_OLD_CUSTOM:
 			/* Old table for custom names. This is no longer used */
 			if (!game_script) {
-				error("Incorrect conversion of custom name string.");
+				FatalError("Incorrect conversion of custom name string.");
 			}
 			break;
 
@@ -262,7 +267,7 @@ char *GetStringWithArgs(char *buffr, StringID string, StringParameters *args, co
 		if (game_script) {
 			return GetStringWithArgs(buffr, STR_UNDEFINED, args, last);
 		}
-		error("String 0x%X is invalid. You are probably using an old version of the .lng file.\n", string);
+		FatalError("String 0x{:X} is invalid. You are probably using an old version of the .lng file.\n", string);
 	}
 
 	return FormatString(buffr, GetStringPtr(string), args, last, case_index);
@@ -328,7 +333,7 @@ static char *FormatNumber(char *buff, int64 number, const char *last, const char
 	int thousands_offset = (max_digits - fractional_digits - 1) % 3;
 
 	if (number < 0) {
-		buff += seprintf(buff, last, "-");
+		if (buff != last) *buff++ = '-';
 		number = -number;
 	}
 
@@ -338,7 +343,7 @@ static char *FormatNumber(char *buff, int64 number, const char *last, const char
 		if (i == max_digits - fractional_digits) {
 			const char *decimal_separator = _settings_game.locale.digit_decimal_separator.c_str();
 			if (StrEmpty(decimal_separator)) decimal_separator = _langpack.langpack->digit_decimal_separator;
-			buff += seprintf(buff, last, "%s", decimal_separator);
+			buff = strecpy(buff, decimal_separator, last);
 		}
 
 		uint64 quot = 0;
@@ -347,7 +352,7 @@ static char *FormatNumber(char *buff, int64 number, const char *last, const char
 			num = num % divisor;
 		}
 		if ((tot |= quot) || i >= max_digits - zerofill) {
-			buff += seprintf(buff, last, "%i", (int)quot);
+			if (buff != last) *buff++ = '0' + quot; // quot is a single digit
 			if ((i % 3) == thousands_offset && i < max_digits - 1 - fractional_digits) buff = strecpy(buff, separator, last);
 		}
 
@@ -378,7 +383,7 @@ static char *FormatZerofillNumber(char *buff, int64 number, int64 count, const c
 
 static char *FormatHexNumber(char *buff, uint64 number, const char *last)
 {
-	return buff + seprintf(buff, last, "0x" OTTD_PRINTFHEX64, number);
+	return strecpy(buff, fmt::format("0x{:X}", number).c_str(), last);
 }
 
 /**
@@ -421,7 +426,7 @@ static char *FormatBytes(char *buff, int64 number, const char *last)
 	return buff;
 }
 
-static char *FormatYmdString(char *buff, Date date, const char *last, uint case_index)
+static char *FormatYmdString(char *buff, TimerGameCalendar::Date date, const char *last, uint case_index)
 {
 	YearMonthDay ymd;
 	ConvertDateToYMD(date, &ymd);
@@ -431,7 +436,7 @@ static char *FormatYmdString(char *buff, Date date, const char *last, uint case_
 	return FormatString(buff, GetStringPtr(STR_FORMAT_DATE_LONG), &tmp_params, last, case_index);
 }
 
-static char *FormatMonthAndYear(char *buff, Date date, const char *last, uint case_index)
+static char *FormatMonthAndYear(char *buff, TimerGameCalendar::Date date, const char *last, uint case_index)
 {
 	YearMonthDay ymd;
 	ConvertDateToYMD(date, &ymd);
@@ -441,18 +446,13 @@ static char *FormatMonthAndYear(char *buff, Date date, const char *last, uint ca
 	return FormatString(buff, GetStringPtr(STR_FORMAT_DATE_SHORT), &tmp_params, last, case_index);
 }
 
-static char *FormatTinyOrISODate(char *buff, Date date, StringID str, const char *last)
+static char *FormatTinyOrISODate(char *buff, TimerGameCalendar::Date date, StringID str, const char *last)
 {
 	YearMonthDay ymd;
 	ConvertDateToYMD(date, &ymd);
 
-	char day[3];
-	char month[3];
-	/* We want to zero-pad the days and months */
-	seprintf(day,   lastof(day),   "%02i", ymd.day);
-	seprintf(month, lastof(month), "%02i", ymd.month + 1);
-
-	int64 args[] = {(int64)(size_t)day, (int64)(size_t)month, ymd.year};
+	/* Day and month are zero-padded with ZEROFILL_NUM, hence the two 2s. */
+	int64 args[] = {ymd.day, 2, ymd.month + 1, 2, ymd.year};
 	StringParameters tmp_params(args);
 	return FormatString(buff, GetStringPtr(str), &tmp_params, last);
 }
@@ -702,10 +702,11 @@ struct UnitsLong {
 
 /** Unit conversions for velocity. */
 static const Units _units_velocity[] = {
-	{ {    1,  0}, STR_UNITS_VELOCITY_IMPERIAL,     0 },
-	{ {  103,  6}, STR_UNITS_VELOCITY_METRIC,       0 },
-	{ { 1831, 12}, STR_UNITS_VELOCITY_SI,           0 },
-	{ {37888, 16}, STR_UNITS_VELOCITY_GAMEUNITS,    1 },
+	{ {       1,  0}, STR_UNITS_VELOCITY_IMPERIAL,     0 },
+	{ {     103,  6}, STR_UNITS_VELOCITY_METRIC,       0 },
+	{ {    1831, 12}, STR_UNITS_VELOCITY_SI,           0 },
+	{ {   37888, 16}, STR_UNITS_VELOCITY_GAMEUNITS,    1 },
+	{ { 7289499, 23}, STR_UNITS_VELOCITY_KNOTS,        0 },
 };
 
 /** Unit conversions for power. */
@@ -757,16 +758,28 @@ static const Units _units_height[] = {
 };
 
 /**
+ * Get index for velocity conversion units for a vehicle type.
+ * @param type VehicleType to convert velocity for.
+ * @return Index within velocity conversion units for vehicle type.
+ */
+static byte GetVelocityUnits(VehicleType type)
+{
+	if (type == VEH_SHIP || type == VEH_AIRCRAFT) return _settings_game.locale.units_velocity_nautical;
+
+	return _settings_game.locale.units_velocity;
+}
+
+/**
  * Convert the given (internal) speed to the display speed.
  * @param speed the speed to convert
  * @return the converted speed.
  */
-uint ConvertSpeedToDisplaySpeed(uint speed)
+uint ConvertSpeedToDisplaySpeed(uint speed, VehicleType type)
 {
 	/* For historical reasons we don't want to mess with the
 	 * conversion for speed. So, don't round it and keep the
 	 * original conversion factors instead of the real ones. */
-	return _units_velocity[_settings_game.locale.units_velocity].c.ToDisplay(speed, false);
+	return _units_velocity[GetVelocityUnits(type)].c.ToDisplay(speed, false);
 }
 
 /**
@@ -774,9 +787,9 @@ uint ConvertSpeedToDisplaySpeed(uint speed)
  * @param speed the speed to convert
  * @return the converted speed.
  */
-uint ConvertDisplaySpeedToSpeed(uint speed)
+uint ConvertDisplaySpeedToSpeed(uint speed, VehicleType type)
 {
-	return _units_velocity[_settings_game.locale.units_velocity].c.FromDisplay(speed);
+	return _units_velocity[GetVelocityUnits(type)].c.FromDisplay(speed);
 }
 
 /**
@@ -784,9 +797,9 @@ uint ConvertDisplaySpeedToSpeed(uint speed)
  * @param speed the speed to convert
  * @return the converted speed.
  */
-uint ConvertKmhishSpeedToDisplaySpeed(uint speed)
+uint ConvertKmhishSpeedToDisplaySpeed(uint speed, VehicleType type)
 {
-	return _units_velocity[_settings_game.locale.units_velocity].c.ToDisplay(speed * 10, false) / 16;
+	return _units_velocity[GetVelocityUnits(type)].c.ToDisplay(speed * 10, false) / 16;
 }
 
 /**
@@ -794,10 +807,13 @@ uint ConvertKmhishSpeedToDisplaySpeed(uint speed)
  * @param speed the speed to convert
  * @return the converted speed.
  */
-uint ConvertDisplaySpeedToKmhishSpeed(uint speed)
+uint ConvertDisplaySpeedToKmhishSpeed(uint speed, VehicleType type)
 {
-	return _units_velocity[_settings_game.locale.units_velocity].c.FromDisplay(speed * 16, true, 10);
+	return _units_velocity[GetVelocityUnits(type)].c.FromDisplay(speed * 16, true, 10);
 }
+
+static std::vector<const char *> _game_script_raw_strings;
+
 /**
  * Parse most format codes within a string and write the result to a buffer.
  * @param buff    The buffer to write the final string to.
@@ -859,7 +875,7 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 				memset(sub_args_need_free, 0, sizeof(sub_args_need_free));
 
 				char *p;
-				uint32 stringid = strtoul(str, &p, 16);
+				uint32 stringid = std::strtoul(str, &p, 16);
 				if (*p != ':' && *p != '\0') {
 					while (*p != '\0') p++;
 					str = p;
@@ -911,7 +927,7 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 						bool lookup = (l == SCC_ENCODED);
 						if (lookup) s += len;
 
-						param = strtoull(s, &p, 16);
+						param = std::strtoull(s, &p, 16);
 
 						if (lookup) {
 							if (param >= TAB_SIZE_GAMESCRIPT) {
@@ -925,11 +941,13 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 
 						sub_args.SetParam(i++, param);
 					} else {
+						s++; // skip the leading \"
 						char *g = stredup(s);
-						g[p - s] = '\0';
+						g[p - s - 1] = '\0'; // skip the trailing \"
 
 						sub_args_need_free[i] = true;
 						sub_args.SetParam(i++, (uint64)(size_t)g);
+						_game_script_raw_strings.push_back(g);
 					}
 				}
 				/* If we didn't error out, we can actually print the string. */
@@ -939,7 +957,10 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 				}
 
 				for (i = 0; i < 20; i++) {
-					if (sub_args_need_free[i]) free((void *)sub_args.GetParam(i));
+					if (sub_args_need_free[i]) {
+						free((void *)sub_args.GetParam(i));
+						_game_script_raw_strings.pop_back();
+					}
 				}
 				break;
 			}
@@ -1043,8 +1064,11 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 				break;
 
 			case SCC_RAW_STRING_POINTER: { // {RAW_STRING}
-				if (game_script) break;
 				const char *raw_string = (const char *)(size_t)args->GetInt64(SCC_RAW_STRING_POINTER);
+				if (game_script && std::find(_game_script_raw_strings.begin(), _game_script_raw_strings.end(), raw_string) == _game_script_raw_strings.end()) {
+					buff = strecat(buff, "(invalid RAW_STRING parameter)", last);
+					break;
+				}
 				buff = FormatString(buff, raw_string, args, last);
 				break;
 			}
@@ -1279,11 +1303,15 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 			}
 
 			case SCC_VELOCITY: { // {VELOCITY}
-				assert(_settings_game.locale.units_velocity < lengthof(_units_velocity));
-				unsigned int decimal_places = _units_velocity[_settings_game.locale.units_velocity].decimal_places;
-				uint64 args_array[] = {ConvertKmhishSpeedToDisplaySpeed(args->GetInt64(SCC_VELOCITY)), decimal_places};
+				int64 arg = args->GetInt64(SCC_VELOCITY);
+				// Unpack vehicle type from packed argument to get desired units.
+				VehicleType vt = static_cast<VehicleType>(GB(arg, 56, 8));
+				byte units = GetVelocityUnits(vt);
+				assert(units < lengthof(_units_velocity));
+				unsigned int decimal_places = _units_velocity[units].decimal_places;
+				uint64 args_array[] = {ConvertKmhishSpeedToDisplaySpeed(GB(arg, 0, 56), vt), decimal_places};
 				StringParameters tmp_params(args_array, decimal_places ? 2 : 1, nullptr);
-				buff = FormatString(buff, GetStringPtr(_units_velocity[_settings_game.locale.units_velocity].s), &tmp_params, last);
+				buff = FormatString(buff, GetStringPtr(_units_velocity[units].s), &tmp_params, last);
 				break;
 			}
 
@@ -1371,17 +1399,38 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 			}
 
 			case SCC_ENGINE_NAME: { // {ENGINE}
-				const Engine *e = Engine::GetIfValid(args->GetInt32(SCC_ENGINE_NAME));
+				int64 arg = args->GetInt64(SCC_ENGINE_NAME);
+				const Engine *e = Engine::GetIfValid(static_cast<EngineID>(arg));
 				if (e == nullptr) break;
 
 				if (!e->name.empty() && e->IsEnabled()) {
 					int64 args_array[] = {(int64)(size_t)e->name.c_str()};
 					StringParameters tmp_params(args_array);
 					buff = GetStringWithArgs(buff, STR_JUST_RAW_STRING, &tmp_params, last);
-				} else {
-					StringParameters tmp_params(nullptr, 0, nullptr);
-					buff = GetStringWithArgs(buff, e->info.string_id, &tmp_params, last);
+
+					break;
 				}
+
+				if (HasBit(e->info.callback_mask, CBM_VEHICLE_NAME)) {
+					uint16 callback = GetVehicleCallback(CBID_VEHICLE_NAME, static_cast<uint32>(arg >> 32), 0, e->index, nullptr);
+					/* Not calling ErrorUnknownCallbackResult due to being inside string processing. */
+					if (callback != CALLBACK_FAILED && callback < 0x400) {
+						const GRFFile *grffile = e->GetGRF();
+						assert(grffile != nullptr);
+
+						StartTextRefStackUsage(grffile, 6);
+						uint64 tmp_dparam[6] = { 0 };
+						WChar tmp_type[6] = { 0 };
+						StringParameters tmp_params(tmp_dparam, 6, tmp_type);
+						buff = GetStringWithArgs(buff, GetGRFStringID(grffile->grfid, 0xD000 + callback), &tmp_params, last);
+						StopTextRefStackUsage();
+
+						break;
+					}
+				}
+
+				StringParameters tmp_params(nullptr, 0, nullptr);
+				buff = GetStringWithArgs(buff, e->info.string_id, &tmp_params, last);
 				break;
 			}
 
@@ -1406,7 +1455,11 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 				const Industry *i = Industry::GetIfValid(args->GetInt32(SCC_INDUSTRY_NAME));
 				if (i == nullptr) break;
 
-				if (_scan_for_gender_data) {
+				static bool use_cache = true;
+				if (use_cache) { // Use cached version if first call
+					AutoRestoreBackup cache_backup(use_cache, false);
+					buff = strecpy(buff, i->GetCachedName(), last);
+				} else if (_scan_for_gender_data) {
 					/* Gender is defined by the industry type.
 					 * STR_FORMAT_INDUSTRY_NAME may have the town first, so it would result in the gender of the town name */
 					StringParameters tmp_params(nullptr, 0, nullptr);
@@ -1451,7 +1504,11 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 					break;
 				}
 
-				if (!st->name.empty()) {
+				static bool use_cache = true;
+				if (use_cache) { // Use cached version if first call
+					AutoRestoreBackup cache_backup(use_cache, false);
+					buff = strecpy(buff, st->GetCachedName(), last);
+				} else if (!st->name.empty()) {
 					int64 args_array[] = {(int64)(size_t)st->name.c_str()};
 					StringParameters tmp_params(args_array);
 					buff = GetStringWithArgs(buff, STR_JUST_RAW_STRING, &tmp_params, last);
@@ -1481,7 +1538,11 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 				const Town *t = Town::GetIfValid(args->GetInt32(SCC_TOWN_NAME));
 				if (t == nullptr) break;
 
-				if (!t->name.empty()) {
+				static bool use_cache = true;
+				if (use_cache) { // Use cached version if first call
+					AutoRestoreBackup cache_backup(use_cache, false);
+					buff = strecpy(buff, t->GetCachedName(), last);
+				} else if (!t->name.empty()) {
 					int64 args_array[] = {(int64)(size_t)t->name.c_str()};
 					StringParameters tmp_params(args_array);
 					buff = GetStringWithArgs(buff, STR_JUST_RAW_STRING, &tmp_params, last);
@@ -1983,7 +2044,7 @@ void InitializeLanguagePacks()
 		std::string path = FioGetDirectory(sp, LANG_DIR);
 		GetLanguageList(path.c_str());
 	}
-	if (_languages.size() == 0) usererror("No available language packs (invalid versions?)");
+	if (_languages.size() == 0) UserError("No available language packs (invalid versions?)");
 
 	/* Acquire the locale of the current system */
 	const char *lang = GetCurrentLocale("LC_MESSAGES");
@@ -2019,7 +2080,7 @@ void InitializeLanguagePacks()
 		chosen_language = (language_fallback != nullptr) ? language_fallback : en_GB_fallback;
 	}
 
-	if (!ReadLanguagePack(chosen_language)) usererror("Can't read language pack '%s'", chosen_language->file);
+	if (!ReadLanguagePack(chosen_language)) UserError("Can't read language pack '{}'", chosen_language->file);
 }
 
 /**

@@ -914,10 +914,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Elektu i
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Malaktiva
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Je ĉiu monato
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Je ĉiuj 3 monatoj
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Je ĉiuj 6 monatoj
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Je ĉiuj 12 monatoj
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Lingvo
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Elektu uzotan interfacan lingvon
@@ -1090,6 +1086,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_CENTER                        :Centre
 STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Dekstre
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Maksimuma komenca prunto: {STRING}
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Rentumtarifoj: {STRING}
 
@@ -1455,6 +1452,7 @@ STR_CONFIG_SETTING_STARTING_YEAR                                :Komenca jaro: {
 
 STR_CONFIG_SETTING_ALLOW_SHARES                                 :Permesu aĉetadon de dividaĵoj en aliaj kompanioj: {STRING}
 
+###setting-zero-is-special
 
 
 
@@ -1518,7 +1516,7 @@ STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Komenca urbgran
 
 
 
-###length 4
+###length 5
 
 ###length 3
 STR_CONFIG_SETTING_LOCALISATION_UNITS_POWER_METRIC              :Metriko (hp)
@@ -2550,7 +2548,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Averto: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Eraro: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Fatalo: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Neriparebla NewGRF-eraro okazis:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} ne funkcios kun la versio de TTDPatch menciata de OpenTTD.
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} estas por la {STRING} versio de TTD.
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} estas intencita por uzo kun {STRING}
@@ -3542,7 +3539,7 @@ STR_AI_LIST_CANCEL                                              :{BLACK}Nuligi
 STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}Ne ŝanĝu AI-on
 
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :AI
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Fermi
 STR_AI_SETTINGS_RESET                                           :{BLACK}Reŝargo
@@ -3970,6 +3967,8 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Ne povas
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... tro for de la antaŭa destino
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... aviadilon ne havas sufiĉe da atingopovo
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Ne povas fari katalogon por veturilo...
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Veturiloj povas atendi nur ĉe stacioj.
@@ -4375,10 +4374,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Helikoptero "Po
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Kompanio {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Group {COMMA}
@@ -4458,7 +4457,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

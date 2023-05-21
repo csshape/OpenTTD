@@ -9,3 +9,7 @@ add_files(
     string_osx.h
     CONDITION APPLE
 )
+
+if(APPLE)
+    target_sources(openttd PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/osx_main.cpp)
+endif()

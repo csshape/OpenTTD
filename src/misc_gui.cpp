@@ -24,10 +24,11 @@
 #include "core/geometry_func.hpp"
 #include "newgrf_debug.h"
 #include "zoom_func.h"
-#include "guitimer_func.h"
 #include "viewport_func.h"
 #include "landscape_cmd.h"
 #include "rev.h"
+#include "timer/timer.h"
+#include "timer/timer_window.h"
 
 #include "widgets/misc_widget.h"
 
@@ -107,7 +108,7 @@ public:
 		}
 	}
 
-	LandInfoWindow(TileIndex tile) : Window(&_land_info_desc), tile(tile)
+	LandInfoWindow(Tile tile) : Window(&_land_info_desc), tile(tile)
 	{
 		this->InitNested();
 
@@ -116,17 +117,17 @@ public:
 #else
 #	define LANDINFOD_LEVEL 1
 #endif
-		Debug(misc, LANDINFOD_LEVEL, "TILE: {:#x} ({},{})", tile, TileX(tile), TileY(tile));
-		Debug(misc, LANDINFOD_LEVEL, "type   = {:#x}", _m[tile].type);
-		Debug(misc, LANDINFOD_LEVEL, "height = {:#x}", _m[tile].height);
-		Debug(misc, LANDINFOD_LEVEL, "m1     = {:#x}", _m[tile].m1);
-		Debug(misc, LANDINFOD_LEVEL, "m2     = {:#x}", _m[tile].m2);
-		Debug(misc, LANDINFOD_LEVEL, "m3     = {:#x}", _m[tile].m3);
-		Debug(misc, LANDINFOD_LEVEL, "m4     = {:#x}", _m[tile].m4);
-		Debug(misc, LANDINFOD_LEVEL, "m5     = {:#x}", _m[tile].m5);
-		Debug(misc, LANDINFOD_LEVEL, "m6     = {:#x}", _me[tile].m6);
-		Debug(misc, LANDINFOD_LEVEL, "m7     = {:#x}", _me[tile].m7);
-		Debug(misc, LANDINFOD_LEVEL, "m8     = {:#x}", _me[tile].m8);
+		Debug(misc, LANDINFOD_LEVEL, "TILE: 0x{:x} ({},{})", tile, TileX(tile), TileY(tile));
+		Debug(misc, LANDINFOD_LEVEL, "type   = 0x{:x}", tile.type());
+		Debug(misc, LANDINFOD_LEVEL, "height = 0x{:x}", tile.height());
+		Debug(misc, LANDINFOD_LEVEL, "m1     = 0x{:x}", tile.m1());
+		Debug(misc, LANDINFOD_LEVEL, "m2     = 0x{:x}", tile.m2());
+		Debug(misc, LANDINFOD_LEVEL, "m3     = 0x{:x}", tile.m3());
+		Debug(misc, LANDINFOD_LEVEL, "m4     = 0x{:x}", tile.m4());
+		Debug(misc, LANDINFOD_LEVEL, "m5     = 0x{:x}", tile.m5());
+		Debug(misc, LANDINFOD_LEVEL, "m6     = 0x{:x}", tile.m6());
+		Debug(misc, LANDINFOD_LEVEL, "m7     = 0x{:x}", tile.m7());
+		Debug(misc, LANDINFOD_LEVEL, "m8     = 0x{:x}", tile.m8());
 #undef LANDINFOD_LEVEL
 	}
 
@@ -267,7 +268,7 @@ public:
 
 		/* Rail speed limit */
 		if (td.rail_speed != 0) {
-			SetDParam(0, td.rail_speed);
+			SetDParam(0, PackVelocity(td.rail_speed, VEH_TRAIN));
 			this->landinfo_data.push_back(GetString(STR_LANG_AREA_INFORMATION_RAIL_SPEED_LIMIT));
 		}
 
@@ -279,7 +280,7 @@ public:
 
 		/* Road speed limit */
 		if (td.road_speed != 0) {
-			SetDParam(0, td.road_speed);
+			SetDParam(0, PackVelocity(td.road_speed, VEH_ROAD));
 			this->landinfo_data.push_back(GetString(STR_LANG_AREA_INFORMATION_ROAD_SPEED_LIMIT));
 		}
 
@@ -291,7 +292,7 @@ public:
 
 		/* Tram speed limit */
 		if (td.tram_speed != 0) {
-			SetDParam(0, td.tram_speed);
+			SetDParam(0, PackVelocity(td.tram_speed, VEH_ROAD));
 			this->landinfo_data.push_back(GetString(STR_LANG_AREA_INFORMATION_TRAM_SPEED_LIMIT));
 		}
 
@@ -360,12 +361,9 @@ public:
 	void OnInvalidateData(int data = 0, bool gui_scope = true) override
 	{
 		if (!gui_scope) return;
-		switch (data) {
-			case 1:
-				/* ReInit, "debug" sprite might have changed */
-				this->ReInit();
-				break;
-		}
+
+		/* ReInit, "debug" sprite might have changed */
+		if (data == 1) this->ReInit();
 	}
 };
 
@@ -473,9 +471,6 @@ struct AboutWindow : public Window {
 	int line_height;                         ///< The height of a single line
 	static const int num_visible_lines = 19; ///< The number of lines visible simultaneously
 
-	static const uint TIMER_INTERVAL = 2100; ///< Scrolling interval, scaled by line text line height. This value chosen to maintain parity: 2100 / FONT_HEIGHT_NORMAL = 150ms
-	GUITimer timer;
-
 	AboutWindow() : Window(&_about_desc)
 	{
 		this->InitNested(WN_GAME_OPTIONS_ABOUT);
@@ -503,10 +498,6 @@ struct AboutWindow : public Window {
 			d.width = std::max(d.width, GetStringBoundingBox(_credits[i]).width);
 		}
 		*size = maxdim(*size, d);
-
-		/* Set scroll interval based on required speed. To keep scrolling smooth,
-		 * the interval is adjusted rather than the distance moved. */
-		this->timer.SetInterval(TIMER_INTERVAL / FONT_HEIGHT_NORMAL);
 	}
 
 	void DrawWidget(const Rect &r, int widget) const override
@@ -524,18 +515,19 @@ struct AboutWindow : public Window {
 		}
 	}
 
-	void OnRealtimeTick(uint delta_ms) override
-	{
-		uint count = this->timer.CountElapsed(delta_ms);
-		if (count > 0) {
-			this->text_position -= count;
-			/* If the last text has scrolled start a new from the start */
-			if (this->text_position < (int)(this->GetWidget<NWidgetBase>(WID_A_SCROLLING_TEXT)->pos_y - lengthof(_credits) * this->line_height)) {
-				this->text_position = this->GetWidget<NWidgetBase>(WID_A_SCROLLING_TEXT)->pos_y + this->GetWidget<NWidgetBase>(WID_A_SCROLLING_TEXT)->current_y;
-			}
-			this->SetWidgetDirty(WID_A_SCROLLING_TEXT);
+	/**
+	 * Scroll the text in the about window slow.
+	 *
+	 * The interval of 2100ms is chosen to maintain parity: 2100 / FONT_HEIGHT_NORMAL = 150ms.
+	 */
+	IntervalTimer<TimerWindow> scroll_interval = {std::chrono::milliseconds(2100) / FONT_HEIGHT_NORMAL, [this](uint count) {
+		this->text_position -= count;
+		/* If the last text has scrolled start a new from the start */
+		if (this->text_position < (int)(this->GetWidget<NWidgetBase>(WID_A_SCROLLING_TEXT)->pos_y - lengthof(_credits) * this->line_height)) {
+			this->text_position = this->GetWidget<NWidgetBase>(WID_A_SCROLLING_TEXT)->pos_y + this->GetWidget<NWidgetBase>(WID_A_SCROLLING_TEXT)->current_y;
 		}
-	}
+		this->SetWidgetDirty(WID_A_SCROLLING_TEXT);
+	}};
 };
 
 void ShowAboutWindow()
@@ -935,7 +927,8 @@ void QueryString::ClickEditBox(Window *w, Point pt, int wid, int click_count, bo
 	assert((wi->type & WWT_MASK) == WWT_EDITBOX);
 
 	bool rtl = _current_text_dir == TD_RTL;
-	int clearbtn_width = GetSpriteSize(rtl ? SPR_IMG_DELETE_RIGHT : SPR_IMG_DELETE_LEFT).width;
+	Dimension sprite_size = GetSpriteSize(rtl ? SPR_IMG_DELETE_RIGHT : SPR_IMG_DELETE_LEFT);
+	int clearbtn_width = sprite_size.width + WidgetDimensions::scaled.imgbtn.Horizontal();
 
 	Rect cr = wi->GetCurrentRect().WithWidth(clearbtn_width, !rtl);
 

@@ -32,7 +32,7 @@
 #include "game/game.hpp"
 #include "core/random_func.hpp"
 #include "core/backup_type.hpp"
-#include "date_func.h"
+#include "timer/timer_game_calendar.h"
 #include "company_base.h"
 #include "company_gui.h"
 #include "newgrf_generic.h"
@@ -134,7 +134,7 @@ CommandCost CmdBuildShipDepot(DoCommandFlag flags, TileIndex tile, Axis axis)
 
 	if (flags & DC_EXEC) {
 		Depot *depot = new Depot(tile);
-		depot->build_date = _date;
+		depot->build_date = TimerGameCalendar::date;
 
 		uint new_water_infra = 2 * LOCK_DEPOT_TILE_FACTOR;
 		/* Update infrastructure counts after the tile clears earlier.
@@ -158,7 +158,7 @@ CommandCost CmdBuildShipDepot(DoCommandFlag flags, TileIndex tile, Axis axis)
 	return cost;
 }
 
-bool IsPossibleDockingTile(TileIndex t)
+bool IsPossibleDockingTile(Tile t)
 {
 	assert(IsValidTile(t));
 	switch (GetTileType(t)) {
@@ -481,6 +481,14 @@ CommandCost CmdBuildCanal(DoCommandFlag flags, TileIndex tile, TileIndex start_t
 		if (!water) cost.AddCost(ret);
 
 		if (flags & DC_EXEC) {
+			if (IsTileType(current_tile, MP_WATER) && IsCanal(current_tile)) {
+				Owner owner = GetTileOwner(current_tile);
+				if (Company::IsValidID(owner)) {
+					Company::Get(owner)->infrastructure.water--;
+					DirtyCompanyInfrastructureWindows(owner);
+				}
+			}
+
 			switch (wc) {
 				case WATER_CLASS_RIVER:
 					MakeRiver(current_tile, Random());
@@ -498,14 +506,11 @@ CommandCost CmdBuildCanal(DoCommandFlag flags, TileIndex tile, TileIndex start_t
 					FALLTHROUGH;
 
 				default:
-					/* If we overbuild a water object with a canal, don't update the infrastructure total. */
-					bool is_existing_canal = IsTileType(current_tile, MP_WATER) && IsCanal(current_tile);
-					if (Company::IsValidID(_current_company) && !is_existing_canal) {
+					MakeCanal(current_tile, _current_company, Random());
+					if (Company::IsValidID(_current_company)) {
 						Company::Get(_current_company)->infrastructure.water++;
 						DirtyCompanyInfrastructureWindows(_current_company);
 					}
-
-					MakeCanal(current_tile, _current_company, Random());
 					break;
 			}
 			MarkTileDirtyByTile(current_tile);
@@ -936,7 +941,7 @@ void DrawShipDepotSprite(int x, int y, Axis axis, DepotPart part)
 }
 
 
-static int GetSlopePixelZ_Water(TileIndex tile, uint x, uint y)
+static int GetSlopePixelZ_Water(TileIndex tile, uint x, uint y, bool ground_vehicle)
 {
 	int z;
 	Slope tileh = GetTilePixelSlope(tile, &z);

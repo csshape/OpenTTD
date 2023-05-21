@@ -34,7 +34,6 @@
 #include "newgrf_cargo.h"
 #include "cheat_type.h"
 #include "animated_tile_func.h"
-#include "date_func.h"
 #include "subsidy_func.h"
 #include "core/pool_func.hpp"
 #include "town.h"
@@ -52,6 +51,9 @@
 #include "road_cmd.h"
 #include "terraform_cmd.h"
 #include "tunnelbridge_cmd.h"
+#include "timer/timer.h"
+#include "timer/timer_game_calendar.h"
+#include "timer/timer_game_tick.h"
 
 #include "table/strings.h"
 #include "table/town_land.h"
@@ -143,9 +145,9 @@ Town::~Town()
 	/* Clear the persistent storage list. */
 	this->psa_list.clear();
 
-	DeleteSubsidyWith(ST_TOWN, this->index);
+	DeleteSubsidyWith(SourceType::Town, this->index);
 	DeleteNewGRFInspectWindow(GSF_FAKE_TOWNS, this->index);
-	CargoPacket::InvalidateAllFrom(ST_TOWN, this->index);
+	CargoPacket::InvalidateAllFrom(SourceType::Town, this->index);
 	MarkWholeScreenDirty();
 }
 
@@ -306,7 +308,7 @@ static void DrawTile_Town(TileInfo *ti)
 	}
 }
 
-static int GetSlopePixelZ_Town(TileIndex tile, uint x, uint y)
+static int GetSlopePixelZ_Town(TileIndex tile, uint x, uint y, bool ground_vehicle)
 {
 	return GetTileMaxPixelZ(tile);
 }
@@ -343,7 +345,7 @@ static void AnimateTile_Town(TileIndex tile)
 		return;
 	}
 
-	if (_tick_counter & 3) return;
+	if (TimerGameTick::counter & 3) return;
 
 	/* If the house is not one with a lift anymore, then stop this animating.
 	 * Not exactly sure when this happens, but probably when a house changes.
@@ -564,7 +566,7 @@ static void TileLoop_Town(TileIndex tile)
 			uint amt = GB(callback, 0, 8);
 			if (amt == 0) continue;
 
-			uint moved = MoveGoodsToStation(cargo, amt, ST_TOWN, t->index, stations.GetStations());
+			uint moved = MoveGoodsToStation(cargo, amt, SourceType::Town, t->index, stations.GetStations());
 
 			const CargoSpec *cs = CargoSpec::Get(cargo);
 			t->supplied[cs->Index()].new_max += amt;
@@ -579,7 +581,7 @@ static void TileLoop_Town(TileIndex tile)
 
 					if (EconomyIsInRecession()) amt = (amt + 1) >> 1;
 					t->supplied[CT_PASSENGERS].new_max += amt;
-					t->supplied[CT_PASSENGERS].new_act += MoveGoodsToStation(CT_PASSENGERS, amt, ST_TOWN, t->index, stations.GetStations());
+					t->supplied[CT_PASSENGERS].new_act += MoveGoodsToStation(CT_PASSENGERS, amt, SourceType::Town, t->index, stations.GetStations());
 				}
 
 				if (GB(r, 8, 8) < hs->mail_generation) {
@@ -587,7 +589,7 @@ static void TileLoop_Town(TileIndex tile)
 
 					if (EconomyIsInRecession()) amt = (amt + 1) >> 1;
 					t->supplied[CT_MAIL].new_max += amt;
-					t->supplied[CT_MAIL].new_act += MoveGoodsToStation(CT_MAIL, amt, ST_TOWN, t->index, stations.GetStations());
+					t->supplied[CT_MAIL].new_act += MoveGoodsToStation(CT_MAIL, amt, SourceType::Town, t->index, stations.GetStations());
 				}
 				break;
 
@@ -595,7 +597,7 @@ static void TileLoop_Town(TileIndex tile)
 				/* Binomial distribution per tick, by a series of coin flips */
 				/* Reduce generation rate to a 1/4, using tile bits to spread out distribution.
 				 * As tick counter is incremented by 256 between each call, we ignore the lower 8 bits. */
-				if (GB(_tick_counter, 8, 2) == GB(tile, 0, 2)) {
+				if (GB(TimerGameTick::counter, 8, 2) == GB(tile, 0, 2)) {
 					/* Make a bitmask with up to 32 bits set, one for each potential pax */
 					int genmax = (hs->population + 7) / 8;
 					uint32 genmask = (genmax >= 32) ? 0xFFFFFFFF : ((1 << genmax) - 1);
@@ -604,7 +606,7 @@ static void TileLoop_Town(TileIndex tile)
 					/* Adjust and apply */
 					if (EconomyIsInRecession()) amt = (amt + 1) >> 1;
 					t->supplied[CT_PASSENGERS].new_max += amt;
-					t->supplied[CT_PASSENGERS].new_act += MoveGoodsToStation(CT_PASSENGERS, amt, ST_TOWN, t->index, stations.GetStations());
+					t->supplied[CT_PASSENGERS].new_act += MoveGoodsToStation(CT_PASSENGERS, amt, SourceType::Town, t->index, stations.GetStations());
 
 					/* Do the same for mail, with a fresh random */
 					r = Random();
@@ -613,7 +615,7 @@ static void TileLoop_Town(TileIndex tile)
 					amt = CountBits(r & genmask);
 					if (EconomyIsInRecession()) amt = (amt + 1) >> 1;
 					t->supplied[CT_MAIL].new_max += amt;
-					t->supplied[CT_MAIL].new_act += MoveGoodsToStation(CT_MAIL, amt, ST_TOWN, t->index, stations.GetStations());
+					t->supplied[CT_MAIL].new_act += MoveGoodsToStation(CT_MAIL, amt, SourceType::Town, t->index, stations.GetStations());
 				}
 				break;
 
@@ -871,7 +873,7 @@ RoadType GetTownRoadType(const Town *t)
 		if (!HasBit(rti->flags, ROTF_TOWN_BUILD)) continue;
 
 		/* Not yet introduced at this date. */
-		if (IsInsideMM(rti->introduction_date, 0, MAX_DAY) && rti->introduction_date > _date) continue;
+		if (IsInsideMM(rti->introduction_date, 0, MAX_DAY) && rti->introduction_date > TimerGameCalendar::date) continue;
 
 		if (best != nullptr) {
 			if ((rti->max_speed == 0 ? assume_max_speed : rti->max_speed) < (best->max_speed == 0 ? assume_max_speed : best->max_speed)) continue;
@@ -1362,6 +1364,20 @@ static inline bool RoadTypesAllowHouseHere(TileIndex t)
 	return !allow;
 }
 
+/** Test if town can grow road onto a specific tile.
+ * @param town Town that is building.
+ * @param tile Tile to build upon.
+ * @return true iff the tile's road type don't prevent extending the road.
+ */
+static bool TownCanGrowRoad(const Town *town, TileIndex tile)
+{
+	if (!IsTileType(tile, MP_ROAD)) return true;
+
+	/* Allow extending on roadtypes which can be built by town, or if the road type matches the type the town will build. */
+	RoadType rt = GetRoadTypeRoad(tile);
+	return HasBit(GetRoadTypeInfo(rt)->flags, ROTF_TOWN_BUILD) || GetTownRoadType(town) == rt;
+}
+
 /**
  * Grows the given town.
  * There are at the moment 3 possible way's for
@@ -1438,6 +1454,8 @@ static void GrowTownInTile(TileIndex *tile_ptr, RoadBits cur_rb, DiagDirection t
 		}
 
 	} else if (target_dir < DIAGDIR_END && !(cur_rb & DiagDirToRoadBits(ReverseDiagDir(target_dir)))) {
+		if (!TownCanGrowRoad(t1, tile)) return;
+
 		/* Continue building on a partial road.
 		 * Should be always OK, so we only generate
 		 * the fitting RoadBits */
@@ -1556,6 +1574,8 @@ static void GrowTownInTile(TileIndex *tile_ptr, RoadBits cur_rb, DiagDirection t
 			}
 			return;
 		}
+
+		if (!TownCanGrowRoad(t1, tile)) return;
 
 		_grow_town_result = GROWTH_SEARCH_STOPPED;
 	}
@@ -2612,7 +2632,7 @@ static bool BuildTownHouse(Town *t, TileIndex tile)
 			continue;
 		}
 
-		if (_cur_year < hs->min_year || _cur_year > hs->max_year) continue;
+		if (TimerGameCalendar::year < hs->min_year || TimerGameCalendar::year > hs->max_year) continue;
 
 		/* Special houses that there can be only one of. */
 		uint oneof = 0;
@@ -3738,7 +3758,7 @@ CommandCost CheckforTownRating(DoCommandFlag flags, Town *t, TownRatingCheckType
 	return CommandCost();
 }
 
-void TownsMonthlyLoop()
+static IntervalTimer<TimerGameCalendar> _towns_monthly({TimerGameCalendar::MONTH, TimerGameCalendar::Priority::TOWN}, [](auto)
 {
 	for (Town *t : Town::Iterate()) {
 		if (t->road_build_months != 0) t->road_build_months--;
@@ -3752,17 +3772,16 @@ void TownsMonthlyLoop()
 		UpdateTownRating(t);
 		UpdateTownUnwanted(t);
 	}
+});
 
-}
-
-void TownsYearlyLoop()
+static IntervalTimer<TimerGameCalendar> _towns_yearly({TimerGameCalendar::YEAR, TimerGameCalendar::Priority::TOWN}, [](auto)
 {
 	/* Increment house ages */
 	for (TileIndex t = 0; t < Map::Size(); t++) {
 		if (!IsTileType(t, MP_HOUSE)) continue;
 		IncrementHouseAge(t);
 	}
-}
+});
 
 static CommandCost TerraformTile_Town(TileIndex tile, DoCommandFlag flags, int z_new, Slope tileh_new)
 {
@@ -3815,8 +3834,8 @@ HouseSpec _house_specs[NUM_HOUSES];
 
 void ResetHouses()
 {
-	memset(&_house_specs, 0, sizeof(_house_specs));
-	memcpy(&_house_specs, &_original_house_specs, sizeof(_original_house_specs));
+	auto insert = std::copy(std::begin(_original_house_specs), std::end(_original_house_specs), std::begin(_house_specs));
+	std::fill(insert, std::end(_house_specs), HouseSpec{});
 
 	/* Reset any overrides that have been set. */
 	_house_mngr.ResetOverride();

@@ -32,11 +32,12 @@
 #include "../core/geometry_func.hpp"
 #include "../genworld.h"
 #include "../map_type.h"
-#include "../guitimer_func.h"
 #include "../zoom_func.h"
 #include "../sprite.h"
 #include "../settings_internal.h"
 #include "../company_cmd.h"
+#include "../timer/timer.h"
+#include "../timer/timer_window.h"
 
 #include "../widgets/network_widget.h"
 
@@ -54,8 +55,6 @@
 #include "../safeguards.h"
 
 static void ShowNetworkStartServerWindow();
-
-static const int NETWORK_LIST_REFRESH_DELAY = 30; ///< Time, in seconds, between updates of the network list.
 
 static ClientID _admin_client_id = INVALID_CLIENT_ID; ///< For what client a confirmation window is open.
 static CompanyID _admin_company_id = INVALID_COMPANY; ///< For what company a confirmation window is open.
@@ -229,7 +228,6 @@ protected:
 	Scrollbar *vscroll;             ///< Vertical scrollbar of the list of servers.
 	QueryString name_editbox;       ///< Client name editbox.
 	QueryString filter_editbox;     ///< Editbox for filter on servers.
-	GUITimer requery_timer;         ///< Timer for network requery.
 	bool searched_internet = false; ///< Did we ever press "Search Internet" button?
 
 	int lock_offset; ///< Left offset for lock icon.
@@ -398,9 +396,8 @@ protected:
 
 		/* show highlighted item with a different colour */
 		if (highlight) {
-			Rect r = {name.left, y, info.right, y + (int)this->resize.step_height - 1};
-			Rect ir = r.Shrink(WidgetDimensions::scaled.bevel);
-			GfxFillRect(ir.left, ir.top, ir.right, ir.bottom, PC_GREY);
+			Rect r = {std::min(name.left, info.left), y, std::max(name.right, info.right), y + (int)this->resize.step_height - 1};
+			GfxFillRect(r.Shrink(WidgetDimensions::scaled.bevel), PC_GREY);
 		}
 
 		/* offsets to vertically centre text and icons */
@@ -499,8 +496,6 @@ public:
 
 		this->last_joined = NetworkAddServer(_settings_client.network.last_joined, false);
 		this->server = this->last_joined;
-
-		this->requery_timer.SetInterval(NETWORK_LIST_REFRESH_DELAY * 1000);
 
 		this->servers.SetListing(this->last_sorting);
 		this->servers.SetSortFuncs(this->sorter_funcs);
@@ -892,14 +887,12 @@ public:
 		this->vscroll->SetCapacityFromWidget(this, WID_NG_MATRIX);
 	}
 
-	void OnRealtimeTick(uint delta_ms) override
-	{
+	/** Refresh the online servers on a regular interval. */
+	IntervalTimer<TimerWindow> refresh_interval = {std::chrono::seconds(30), [this](uint count) {
 		if (!this->searched_internet) return;
-		if (!this->requery_timer.Elapsed(delta_ms)) return;
-		this->requery_timer.SetInterval(NETWORK_LIST_REFRESH_DELAY * 1000);
 
 		_network_coordinator_client.GetListing();
-	}
+	}};
 };
 
 Listing NetworkGameWindow::last_sorting = {false, 5};
@@ -1352,7 +1345,7 @@ static const NWidgetPart _nested_client_list_widgets[] = {
 		NWidget(NWID_VERTICAL),
 			NWidget(WWT_MATRIX, COLOUR_GREY, WID_CL_MATRIX), SetMinimalSize(180, 0), SetResize(1, 1), SetFill(1, 1), SetMatrixDataTip(1, 0, STR_NULL), SetScrollbar(WID_CL_SCROLLBAR),
 			NWidget(WWT_PANEL, COLOUR_GREY),
-				NWidget(WWT_TEXT, COLOUR_GREY, WID_CL_CLIENT_COMPANY_COUNT), SetFill(1, 0), SetMinimalTextLines(1, 0), SetResize(1, 0), SetPadding(2, 1, 2, 1), SetAlignment(SA_CENTER), SetDataTip(STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT, STR_NULL),
+				NWidget(WWT_TEXT, COLOUR_GREY, WID_CL_CLIENT_COMPANY_COUNT), SetFill(1, 0), SetMinimalTextLines(1, 0), SetResize(1, 0), SetPadding(2, 1, 2, 1), SetAlignment(SA_CENTER), SetDataTip(STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT, STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT_TOOLTIP),
 			EndContainer(),
 		EndContainer(),
 		NWidget(NWID_VERTICAL),
@@ -1572,7 +1565,7 @@ private:
 		wi_rect.bottom = pt.y;
 
 		w->dd_client_id = client_id;
-		ShowDropDownListAt(w, std::move(list), -1, WID_CL_MATRIX, wi_rect, COLOUR_GREY, true, true);
+		ShowDropDownListAt(w, std::move(list), -1, WID_CL_MATRIX, wi_rect, COLOUR_GREY, true);
 	}
 
 	/**
@@ -1594,7 +1587,7 @@ private:
 		wi_rect.bottom = pt.y;
 
 		w->dd_company_id = company_id;
-		ShowDropDownListAt(w, std::move(list), -1, WID_CL_MATRIX, wi_rect, COLOUR_GREY, true, true);
+		ShowDropDownListAt(w, std::move(list), -1, WID_CL_MATRIX, wi_rect, COLOUR_GREY, true);
 	}
 	/**
 	 * Chat button on a Client is clicked.
@@ -1797,6 +1790,7 @@ public:
 			case WID_CL_CLIENT_COMPANY_COUNT:
 				SetDParam(0, NetworkClientInfo::GetNumItems());
 				SetDParam(1, Company::GetNumItems());
+				SetDParam(2, NetworkMaxCompaniesAllowed());
 				break;
 		}
 	}

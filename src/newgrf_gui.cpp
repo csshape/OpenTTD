@@ -28,7 +28,8 @@
 #include "textfile_gui.h"
 #include "tilehighlight_func.h"
 #include "fios.h"
-#include "guitimer_func.h"
+#include "timer/timer.h"
+#include "timer/timer_window.h"
 
 #include "widgets/newgrf_widget.h"
 #include "widgets/misc_widget.h"
@@ -50,12 +51,13 @@ void ShowNewGRFError()
 		/* Only show Fatal and Error level messages */
 		if (c->error == nullptr || (c->error->severity != STR_NEWGRF_ERROR_MSG_FATAL && c->error->severity != STR_NEWGRF_ERROR_MSG_ERROR)) continue;
 
-		SetDParam   (0, c->error->message != STR_NULL ? c->error->message : STR_JUST_RAW_STRING);
-		SetDParamStr(1, c->error->custom_message);
-		SetDParamStr(2, c->filename);
-		SetDParamStr(3, c->error->data);
+		SetDParamStr(0, c->GetName());
+		SetDParam   (1, c->error->message != STR_NULL ? c->error->message : STR_JUST_RAW_STRING);
+		SetDParamStr(2, c->error->custom_message);
+		SetDParamStr(3, c->filename);
+		SetDParamStr(4, c->error->data);
 		for (uint i = 0; i < lengthof(c->error->param_value); i++) {
-			SetDParam(4 + i, c->error->param_value[i]);
+			SetDParam(5 + i, c->error->param_value[i]);
 		}
 		if (c->error->severity == STR_NEWGRF_ERROR_MSG_FATAL) {
 			ShowErrorMessage(STR_NEWGRF_ERROR_FATAL_POPUP, INVALID_STRING_ID, WL_CRITICAL);
@@ -154,7 +156,6 @@ struct NewGRFParametersWindow : public Window {
 	bool clicked_increase; ///< True if the increase button was clicked, false for the decrease button.
 	bool clicked_dropdown; ///< Whether the dropdown is open.
 	bool closing_dropdown; ///< True, if the dropdown list is currently closing.
-	GUITimer timeout;      ///< How long before we unpress the last-pressed button?
 	uint clicked_row;      ///< The selected parameter
 	int line_height;       ///< Height of a row in the matrix widget.
 	Scrollbar *vscroll;
@@ -381,7 +382,7 @@ struct NewGRFParametersWindow : public Window {
 								list.emplace_back(new DropDownListCharStringItem(GetGRFStringFromGRFText(par_info->value_names.Find(i)->second), i, false));
 							}
 
-							ShowDropDownListAt(this, std::move(list), old_val, -1, wi_rect, COLOUR_ORANGE, true);
+							ShowDropDownListAt(this, std::move(list), old_val, -1, wi_rect, COLOUR_ORANGE);
 						}
 					}
 				} else if (IsInsideMM(x, 0, SETTING_BUTTON_WIDTH)) {
@@ -403,7 +404,7 @@ struct NewGRFParametersWindow : public Window {
 						par_info->SetValue(this->grf_config, val);
 
 						this->clicked_button = num;
-						this->timeout.SetInterval(150);
+						this->unclick_timeout.Reset();
 					}
 				} else if (par_info->type == PTYPE_UINT_ENUM && !par_info->complete_labels && click_count >= 2) {
 					/* Display a query box so users can enter a custom value. */
@@ -483,13 +484,11 @@ struct NewGRFParametersWindow : public Window {
 		}
 	}
 
-	void OnRealtimeTick(uint delta_ms) override
-	{
-		if (timeout.Elapsed(delta_ms)) {
-			this->clicked_button = UINT_MAX;
-			this->SetDirty();
-		}
-	}
+	/** When reset, unclick the button after a small timeout. */
+	TimeoutTimer<TimerWindow> unclick_timeout = {std::chrono::milliseconds(150), [this]() {
+		this->clicked_button = UINT_MAX;
+		this->SetDirty();
+	}};
 };
 GRFParameterInfo NewGRFParametersWindow::dummy_parameter_info(0);
 

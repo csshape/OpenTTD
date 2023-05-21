@@ -145,13 +145,14 @@ static bool EngineNameSorter(const GUIEngineListItem &a, const GUIEngineListItem
 
 	if (a.engine_id != _last_engine[0]) {
 		_last_engine[0] = a.engine_id;
-		SetDParam(0, a.engine_id);
+		SetDParam(0, PackEngineNameDParam(a.engine_id, EngineNameContext::PurchaseList));
+
 		GetString(last_name[0], STR_ENGINE_NAME, lastof(last_name[0]));
 	}
 
 	if (b.engine_id != _last_engine[1]) {
 		_last_engine[1] = b.engine_id;
-		SetDParam(0, b.engine_id);
+		SetDParam(0, PackEngineNameDParam(b.engine_id, EngineNameContext::PurchaseList));
 		GetString(last_name[1], STR_ENGINE_NAME, lastof(last_name[1]));
 	}
 
@@ -299,7 +300,7 @@ static bool EnginePowerVsRunningCostSorter(const GUIEngineListItem &a, const GUI
 	 * since we want consistent sorting.
 	 * Also if both have no power then sort with reverse of running cost to simulate
 	 * previous sorting behaviour for wagons. */
-	if (v_a == 0 && v_b == 0) return !EngineRunningCostSorter(a, b);
+	if (v_a == 0 && v_b == 0) return EngineRunningCostSorter(b, a);
 	if (v_a == v_b)  return EngineNumberSorter(a, b);
 	return _engine_sort_direction != (v_a < v_b);
 }
@@ -610,7 +611,7 @@ static int DrawRailWagonPurchaseInfo(int left, int right, int y, EngineID engine
 	if (_settings_game.vehicle.wagon_speed_limits) {
 		uint max_speed = e->GetDisplayMaxSpeed();
 		if (max_speed > 0) {
-			SetDParam(0, max_speed);
+			SetDParam(0, PackVelocity(max_speed, e->type));
 			DrawString(left, right, y, STR_PURCHASE_INFO_SPEED);
 			y += FONT_HEIGHT_NORMAL;
 		}
@@ -645,7 +646,7 @@ static int DrawRailEnginePurchaseInfo(int left, int right, int y, EngineID engin
 	y += FONT_HEIGHT_NORMAL;
 
 	/* Max speed - Engine power */
-	SetDParam(0, e->GetDisplayMaxSpeed());
+	SetDParam(0, PackVelocity(e->GetDisplayMaxSpeed(), e->type));
 	SetDParam(1, e->GetPower());
 	DrawString(left, right, y, STR_PURCHASE_INFO_SPEED_POWER);
 	y += FONT_HEIGHT_NORMAL;
@@ -700,7 +701,7 @@ static int DrawRoadVehPurchaseInfo(int left, int right, int y, EngineID engine_n
 		y += FONT_HEIGHT_NORMAL;
 
 		/* Max speed - Engine power */
-		SetDParam(0, e->GetDisplayMaxSpeed());
+		SetDParam(0, PackVelocity(e->GetDisplayMaxSpeed(), e->type));
 		SetDParam(1, e->GetPower());
 		DrawString(left, right, y, STR_PURCHASE_INFO_SPEED_POWER);
 		y += FONT_HEIGHT_NORMAL;
@@ -714,11 +715,11 @@ static int DrawRoadVehPurchaseInfo(int left, int right, int y, EngineID engine_n
 		if (te.cost != 0) {
 			SetDParam(0, e->GetCost() + te.cost);
 			SetDParam(1, te.cost);
-			SetDParam(2, e->GetDisplayMaxSpeed());
+			SetDParam(2, PackVelocity(e->GetDisplayMaxSpeed(), e->type));
 			DrawString(left, right, y, STR_PURCHASE_INFO_COST_REFIT_SPEED);
 		} else {
 			SetDParam(0, e->GetCost());
-			SetDParam(1, e->GetDisplayMaxSpeed());
+			SetDParam(1, PackVelocity(e->GetDisplayMaxSpeed(), e->type));
 			DrawString(left, right, y, STR_PURCHASE_INFO_COST_SPEED);
 		}
 		y += FONT_HEIGHT_NORMAL;
@@ -746,11 +747,11 @@ static int DrawShipPurchaseInfo(int left, int right, int y, EngineID engine_numb
 		if (te.cost != 0) {
 			SetDParam(0, e->GetCost() + te.cost);
 			SetDParam(1, te.cost);
-			SetDParam(2, ocean_speed);
+			SetDParam(2, PackVelocity(ocean_speed, e->type));
 			DrawString(left, right, y, STR_PURCHASE_INFO_COST_REFIT_SPEED);
 		} else {
 			SetDParam(0, e->GetCost());
-			SetDParam(1, ocean_speed);
+			SetDParam(1, PackVelocity(ocean_speed, e->type));
 			DrawString(left, right, y, STR_PURCHASE_INFO_COST_SPEED);
 		}
 		y += FONT_HEIGHT_NORMAL;
@@ -765,11 +766,11 @@ static int DrawShipPurchaseInfo(int left, int right, int y, EngineID engine_numb
 		}
 		y += FONT_HEIGHT_NORMAL;
 
-		SetDParam(0, ocean_speed);
+		SetDParam(0, PackVelocity(ocean_speed, e->type));
 		DrawString(left, right, y, STR_PURCHASE_INFO_SPEED_OCEAN);
 		y += FONT_HEIGHT_NORMAL;
 
-		SetDParam(0, canal_speed);
+		SetDParam(0, PackVelocity(canal_speed, e->type));
 		DrawString(left, right, y, STR_PURCHASE_INFO_SPEED_CANAL);
 		y += FONT_HEIGHT_NORMAL;
 	}
@@ -806,11 +807,11 @@ static int DrawAircraftPurchaseInfo(int left, int right, int y, EngineID engine_
 	if (te.cost != 0) {
 		SetDParam(0, e->GetCost() + te.cost);
 		SetDParam(1, te.cost);
-		SetDParam(2, e->GetDisplayMaxSpeed());
+		SetDParam(2, PackVelocity(e->GetDisplayMaxSpeed(), e->type));
 		DrawString(left, right, y, STR_PURCHASE_INFO_COST_REFIT_SPEED);
 	} else {
 		SetDParam(0, e->GetCost());
-		SetDParam(1, e->GetDisplayMaxSpeed());
+		SetDParam(1, PackVelocity(e->GetDisplayMaxSpeed(), e->type));
 		DrawString(left, right, y, STR_PURCHASE_INFO_COST_SPEED);
 	}
 	y += FONT_HEIGHT_NORMAL;
@@ -1010,7 +1011,7 @@ void DrawEngineList(VehicleType type, const Rect &r, const GUIEngineList &eng_li
 	if (show_count) {
 		replace_icon = GetSpriteSize(SPR_GROUP_REPLACE_ACTIVE);
 		SetDParamMaxDigits(0, 3, FS_SMALL);
-		count_width = GetStringBoundingBox(STR_TINY_BLACK_COMA).width;
+		count_width = GetStringBoundingBox(STR_TINY_BLACK_COMMA).width;
 	}
 
 	Rect tr = ir.Indent(circle_width + WidgetDimensions::scaled.hsep_normal + sprite_width + WidgetDimensions::scaled.hsep_wide, rtl); // Name position
@@ -1037,14 +1038,19 @@ void DrawEngineList(VehicleType type, const Rect &r, const GUIEngineList &eng_li
 		StringID str = hidden ? STR_HIDDEN_ENGINE_NAME : STR_ENGINE_NAME;
 		TextColour tc = (item.engine_id == selected_id) ? TC_WHITE : (TC_NO_SHADE | ((hidden | shaded) ? TC_GREY : TC_BLACK));
 
-		SetDParam(0, item.engine_id);
+		if (show_count) {
+			/* relies on show_count to find 'Vehicle in use' panel of autoreplace window */
+			SetDParam(0, PackEngineNameDParam(item.engine_id, EngineNameContext::AutoreplaceVehicleInUse, item.indent));
+		} else {
+			SetDParam(0, PackEngineNameDParam(item.engine_id, EngineNameContext::PurchaseList, item.indent));
+		}
 		Rect itr = tr.Indent(indent, rtl);
 		DrawString(itr.left, itr.right, y + normal_text_y_offset, str, tc);
 		int sprite_x = ir.Indent(indent + circle_width + WidgetDimensions::scaled.hsep_normal, rtl).WithWidth(sprite_width, rtl).left + sprite_left;
 		DrawVehicleEngine(r.left, r.right, sprite_x, y + sprite_y_offset, item.engine_id, (show_count && num_engines == 0) ? PALETTE_CRASH : GetEnginePalette(item.engine_id, _local_company), EIT_PURCHASE);
 		if (show_count) {
 			SetDParam(0, num_engines);
-			DrawString(cr.left, cr.right, y + small_text_y_offset, STR_TINY_BLACK_COMA, TC_FROMSTRING, SA_RIGHT | SA_FORCE);
+			DrawString(cr.left, cr.right, y + small_text_y_offset, STR_TINY_BLACK_COMMA, TC_FROMSTRING, SA_RIGHT | SA_FORCE);
 			if (EngineHasReplacementForCompany(Company::Get(_local_company), item.engine_id, selected_group)) DrawSprite(SPR_GROUP_REPLACE_ACTIVE, num_engines == 0 ? PALETTE_CRASH : PAL_NONE, rr.left, y + replace_icon_y_offset);
 		}
 		if (has_variants) {
@@ -1343,7 +1349,7 @@ struct BuildVehicleWindow : Window {
 		 * and if not, reset selection to INVALID_ENGINE. This could be the case
 		 * when engines become obsolete and are removed */
 		for (const Engine *e : Engine::IterateType(VEH_TRAIN)) {
-			if (!this->show_hidden_engines && e->IsHidden(_local_company)) continue;
+			if (!this->show_hidden_engines && e->IsVariantHidden(_local_company)) continue;
 			EngineID eid = e->index;
 			const RailVehicleInfo *rvi = &e->u.rail;
 
@@ -1394,7 +1400,7 @@ struct BuildVehicleWindow : Window {
 		this->eng_list.clear();
 
 		for (const Engine *e : Engine::IterateType(VEH_ROAD)) {
-			if (!this->show_hidden_engines && e->IsHidden(_local_company)) continue;
+			if (!this->show_hidden_engines && e->IsVariantHidden(_local_company)) continue;
 			EngineID eid = e->index;
 			if (!IsEngineBuildable(eid, VEH_ROAD, _local_company)) continue;
 			if (this->filter.roadtype != INVALID_ROADTYPE && !HasPowerOnRoad(e->u.road.roadtype, this->filter.roadtype)) continue;
@@ -1413,7 +1419,7 @@ struct BuildVehicleWindow : Window {
 		this->eng_list.clear();
 
 		for (const Engine *e : Engine::IterateType(VEH_SHIP)) {
-			if (!this->show_hidden_engines && e->IsHidden(_local_company)) continue;
+			if (!this->show_hidden_engines && e->IsVariantHidden(_local_company)) continue;
 			EngineID eid = e->index;
 			if (!IsEngineBuildable(eid, VEH_SHIP, _local_company)) continue;
 			this->eng_list.emplace_back(eid, e->info.variant_id, e->display_flags, 0);
@@ -1437,7 +1443,7 @@ struct BuildVehicleWindow : Window {
 		 * and if not, reset selection to INVALID_ENGINE. This could be the case
 		 * when planes become obsolete and are removed */
 		for (const Engine *e : Engine::IterateType(VEH_AIRCRAFT)) {
-			if (!this->show_hidden_engines && e->IsHidden(_local_company)) continue;
+			if (!this->show_hidden_engines && e->IsVariantHidden(_local_company)) continue;
 			EngineID eid = e->index;
 			if (!IsEngineBuildable(eid, VEH_AIRCRAFT, _local_company)) continue;
 			/* First VEH_END window_numbers are fake to allow a window open for all different types at once */
@@ -1599,7 +1605,7 @@ struct BuildVehicleWindow : Window {
 				EngineID sel_eng = this->sel_engine;
 				if (sel_eng != INVALID_ENGINE) {
 					this->rename_engine = sel_eng;
-					SetDParam(0, sel_eng);
+					SetDParam(0, PackEngineNameDParam(sel_eng, EngineNameContext::Generic));
 					ShowQueryString(STR_ENGINE_NAME, STR_QUERY_RENAME_TRAIN_TYPE_CAPTION + this->vehicle_type, MAX_LENGTH_ENGINE_NAME_CHARS, this, CS_ALPHANUMERAL, QSF_ENABLE_DEFAULT | QSF_LEN_IN_CHARS);
 				}
 				break;

@@ -982,10 +982,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}选择�
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :关闭
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :每月
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :每 3 个月
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :每 6 个月
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :每 12 个月
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}语言
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}选择界面语言
@@ -1206,6 +1202,9 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :右侧
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :最大初始贷款: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :公司最大贷款额（不考虑通货膨胀的影响）
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_VALUE                   :{CURRENCY_LONG}
+###setting-zero-is-special
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_DISABLED                :无贷款 {RED}需要有游戏脚本以提供初始资金
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :贷款利率: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :贷款利率；如果通货膨胀启用，将同时影响通货膨胀率。
@@ -1805,6 +1804,7 @@ STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :“打开”时
 
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :公司可发售股份的最小已存续年份数：{STRING}
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_HELPTEXT                :设置公司可发售股份的最小已存续年份数。
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :转运系统中支付的利润百分比 {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :设定在转运系统中支付给前一环节的收入百分比, 从而对收入有更多的控制权
@@ -1919,10 +1919,6 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :没有
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :初始城市规模因子：{STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :游戏开局时，城市的平均规模相对于普通城镇的比值
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :每 {STRING}{NBSP}天刷新一次分配图
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL_HELPTEXT                  :指定每次计算货物分配图之间的时间。由于每次重新计算只会处理一个货物分配图元件，因此本设定不代表“每若干日重新计算整个货物分配图”。{}如果此设定赋值越小，則系统需要使用更多处理器时间计算货物分配图。相反，如果此设定赋值越大，則货物被派往新路线所需的时间越长。
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :容许系统用 {STRING}{NBSP}天时间刷新货物分配图
-STR_CONFIG_SETTING_LINKGRAPH_TIME_HELPTEXT                      :当刷新货物分配图时，系统会创建一条线程。此处设定的数值即该线程的持续时间。{}赋值越小，线程越有可能在应当停止的时候还未完成，游戏会暂停运作至线程完成工作。相反，赋值越大，则货物分配功能需要较长时间反映线路网变动的影晌。
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :乗客分配方式：{STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :假设有交通路线连接甲、乙两站。“对称”指甲站往乙站的乗客数量与乙站往甲站的乘客数量大致相同。“不对称”指任何一站往另一站的乘客数量皆由系统随意决定。“手动”指系统不会自动分配乘客的目的地。
@@ -1950,7 +1946,7 @@ STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :货物分配功
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :速度单位：{STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :在界面上以所选择的单位表示速度
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :英制（英里/小时）
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :公制（千米/小时）
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :国际单位制（米/秒）
@@ -2355,7 +2351,7 @@ STR_NETWORK_CLIENT_LIST_NEW_COMPANY                             :（新公司）
 STR_NETWORK_CLIENT_LIST_NEW_COMPANY_TOOLTIP                     :{BLACK}新建并加入公司
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_SELF_TOOLTIP                :{BLACK}这是你
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_HOST_TOOLTIP                :{BLACK}这里是游戏的主机
-STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM}个客户端 / {NUM}个公司
+STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT_TOOLTIP            :{BLACK}服务器管理员允许的当前连接的玩家数量、公司数量和最多公司数量
 
 # Matches ConnectionType
 ###length 5
@@ -3349,8 +3345,7 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}警告：{SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}错误：{SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}严重错误：{SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}发生了一个致命的NewGRF错误：{}{STRING}
-STR_NEWGRF_ERROR_POPUP                                          :{WHITE}发生了一个NewGRF错误：{}{STRING}
+STR_NEWGRF_ERROR_POPUP                                          :{WHITE}NewGRF "{STRING}"发生了一个错误:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} 不能与 OpenTTD 报告的 TTDPatch 版本兼容。
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} 是为 {2:STRING} 版 TTD 开发的。
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} 应当与 {2:STRING} 配合
@@ -4620,12 +4615,13 @@ STR_SCREENSHOT_WORLD_SCREENSHOT                                 :{BLACK}全地�
 STR_SCREENSHOT_HEIGHTMAP_SCREENSHOT                             :{BLACK}高度图截图
 STR_SCREENSHOT_MINIMAP_SCREENSHOT                               :{BLACK}小地图截图
 
-# AI Parameters
+# Script Parameters
+STR_AI_SETTINGS_CAPTION                                         :{WHITE}{STRING} 参数
 STR_AI_SETTINGS_CAPTION_AI                                      :{WHITE}AI参数
+STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :游戏脚本
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}关闭
 STR_AI_SETTINGS_RESET                                           :{BLACK}重设
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :当前AI在前一个AI运行 {ORANGE}{STRING}天之后开始运行
 
 
 # Textfile window
@@ -5079,6 +5075,18 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}不能�
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}……距离前一目的地太远
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... 飞机航行距离不足
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+STR_ERROR_NO_RAIL_STATION                                       :{WHITE}没有火车站
+STR_ERROR_NO_BUS_STATION                                        :{WHITE}没有公交车站
+STR_ERROR_NO_DOCK                                               :{WHITE}这里没有码头
+STR_ERROR_NO_AIRPORT                                            :{WHITE}没有机场/直升机场
+STR_ERROR_NO_STOP_COMPATIBLE_ROAD_TYPE                          :{WHITE}没有兼容此道路类型的站点
+STR_ERROR_NO_STOP_COMPATIBLE_TRAM_TYPE                          :{WHITE}没有兼容此有轨电车道路类型的站点
+STR_ERROR_NO_STOP_ARTICULATED_VEHICLE                           :{WHITE}没有适合铰接式道路车辆的站点.{}铰接式道路车辆需要通过式车站，而不是港湾式车站
+STR_ERROR_AIRPORT_NO_PLANES                                     :{WHITE}这架飞机不能降落在这个直升机场
+STR_ERROR_AIRPORT_NO_HELICOPTERS                                :{WHITE}这架直升机不能降落在这个机场
+STR_ERROR_NO_RAIL_WAYPOINT                                      :{WHITE}没有铁路路点
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}不能给车辆编制时间表…
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}车辆只能在站内等候。
@@ -5494,10 +5502,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Powernaut 直�
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(公司 {COMMA})
 STR_FORMAT_GROUP_NAME                                           :组 {COMMA}
@@ -5579,7 +5587,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

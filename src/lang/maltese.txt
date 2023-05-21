@@ -466,6 +466,7 @@ STR_GAME_OPTIONS_RESOLUTION_OTHER                               :oħrajn
 
 ###length 3
 
+###setting-zero-is-special
 
 
 STR_CONFIG_SETTING_RUNNING_COSTS_HELPTEXT                       :Stabbilixxi l-kosti għal manutenzjoni u servizzi fuq vetturi u infrastruttura
@@ -673,6 +674,7 @@ STR_CONFIG_SETTING_ADVANCED_VEHICLE_LISTS_HELPTEXT              :Ippermetti l-uz
 ###length 3
 
 
+###setting-zero-is-special
 
 
 
@@ -708,7 +710,7 @@ STR_CONFIG_SETTING_ADVANCED_VEHICLE_LISTS_HELPTEXT              :Ippermetti l-uz
 
 
 
-###length 4
+###length 5
 
 ###length 3
 
@@ -1322,7 +1324,7 @@ STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Исчи
 
 
 
-# AI Parameters
+# Script Parameters
 
 
 # Textfile window
@@ -1456,6 +1458,8 @@ STR_ERROR_CAN_T_MODIFY_THIS_ORDER                               :{WHITE}Ma tista
 STR_ERROR_CAN_T_MOVE_THIS_ORDER                                 :{WHITE}Ma tistax iċċaqlaq din l-ordni...
 STR_ERROR_CAN_T_SKIP_ORDER                                      :{WHITE}Ma tistax taqbeż din l-ordni...
 
+
+# Extra messages which go on the third line of errors, explaining why orders failed
 
 # Timetable related errors
 
@@ -1667,10 +1671,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Ħelikopter Pow
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_INDUSTRY_NAME                                        :{TOWN} {STRING}
 
@@ -1735,7 +1739,7 @@ STR_JUST_RAW_STRING                                             :{STRING}
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

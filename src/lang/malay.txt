@@ -905,10 +905,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Pilih te
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Matikan
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Setiap bulan
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Setiap 3 bulan
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Setiap 6 bulan
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Setiap 12 bulan
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Bahasa
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Pilih bahasa antaramuka yang ingin digunakan
@@ -1088,6 +1084,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Kanan
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Maksimum pinjaman permulaan: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Rantaian industri
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Kadar faedah: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Kadar faedah pinjaman; juga mengawal inflasi, jika dibolehkan
@@ -1520,6 +1517,7 @@ STR_CONFIG_SETTING_STARTING_YEAR                                :Tahun permulaan
 
 STR_CONFIG_SETTING_ALLOW_SHARES                                 :Benarkan membeli saham syarikat lain: {STRING}
 
+###setting-zero-is-special
 
 
 
@@ -1594,7 +1592,7 @@ STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Pengganda awal 
 
 
 
-###length 4
+###length 5
 
 ###length 3
 STR_CONFIG_SETTING_LOCALISATION_UNITS_POWER_IMPERIAL            :Sistem Imperial (kuasa kuda/hp)
@@ -2723,7 +2721,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Amaran: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Kesilapan: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Bahaya: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Kesilapan NewGRF yang bahaya telah berlaku:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} tidak akan berfungsi dengan versi TTDPatch seperti yang dilaporkan oleh OpenTTD.
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} adalah untuk TTD versi {STRING}.
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} direkabentuk untuk digunakan bersama {STRING}
@@ -3827,12 +3824,11 @@ STR_AI_LIST_CANCEL                                              :{BLACK}Batal
 STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}Jangan ubah skrip
 
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :AI
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Tutup
 STR_AI_SETTINGS_RESET                                           :{BLACK}Semula
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Bilangan hari Kepintaran Tiruan dimulakan selepas yang terdahulu (lebih kurang): {ORANGE}{STRING}
 
 
 # Textfile window
@@ -4255,6 +4251,8 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Senarai 
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... terlalu jauh dari destinasi sebelumnya
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... pesawat tidak memiliki jarak mencukupi
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Kenderaan tidak boleh dijadualkan...
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Kenderaan hanya boleh menunggu di stesen
@@ -4668,10 +4666,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Helikopter Powe
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Company {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Group {COMMA}
@@ -4751,7 +4749,7 @@ STR_JUST_RAW_STRING                                             :{STRING}
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

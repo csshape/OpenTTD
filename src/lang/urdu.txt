@@ -897,10 +897,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}خودم
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :بند
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :ہر مہینے
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :ہر سہ ماہی
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :ہر شش ماہی
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :ہر سال
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}زبان
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}استعمال کرنے کےلئے زبان اختیار کئیجیے
@@ -1057,6 +1053,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_LEFT                          :بائیں
 STR_CONFIG_SETTING_HORIZONTAL_POS_CENTER                        :درمیان
 STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :دائیں
 
+###setting-zero-is-special
 
 
 
@@ -1400,6 +1397,7 @@ STR_CONFIG_SETTING_STARTING_YEAR                                :شروعاتی 
 
 STR_CONFIG_SETTING_ALLOW_SHARES                                 :دوسری کمپنیوں کے حصص خریدنے کی اجازت: {STRING}
 
+###setting-zero-is-special
 
 
 
@@ -1470,7 +1468,7 @@ STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :شہر کا ش�
 
 
 
-###length 4
+###length 5
 
 ###length 3
 
@@ -2726,7 +2724,7 @@ STR_AI_CONFIG_GAMESCRIPT                                        :{SILVER}کھی�
 
 
 
-# AI Parameters
+# Script Parameters
 
 
 # Textfile window
@@ -2909,6 +2907,8 @@ STR_ERROR_CAN_T_CHANGE_SERVICING                                :{WHITE}مرمت
 # Order related errors
 
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE} ۔ ۔ ۔ ہوائی جہاز کی اتنی پہنچ نہیں ہے
+
+# Extra messages which go on the third line of errors, explaining why orders failed
 
 # Timetable related errors
 
@@ -3095,10 +3095,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Powernaut ہی�
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(کمپنی {COMMA})
 STR_FORMAT_GROUP_NAME                                           :گروہ {COMMA}
@@ -3176,7 +3176,7 @@ STR_JUST_RAW_STRING                                             :{STRING}
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

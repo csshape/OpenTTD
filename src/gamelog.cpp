@@ -15,6 +15,7 @@
 #include "console_func.h"
 #include "debug.h"
 #include "date_func.h"
+#include "timer/timer_game_tick.h"
 #include "rev.h"
 
 #include <stdarg.h>
@@ -212,11 +213,13 @@ void GamelogPrint(std::function<void(const char*)> proc)
 			switch (lc->ct) {
 				default: NOT_REACHED();
 				case GLCT_MODE:
+					/* Changing landscape, or going from scenario editor to game or back. */
 					buf += seprintf(buf, lastof(buffer), "New game mode: %u landscape: %u",
 						(uint)lc->mode.mode, (uint)lc->mode.landscape);
 					break;
 
 				case GLCT_REVISION:
+					/* The game was loaded in a diffferent version than before. */
 					buf += seprintf(buf, lastof(buffer), "Revision text changed to %s, savegame version %u, ",
 						lc->revision.text, lc->revision.slver);
 
@@ -230,6 +233,7 @@ void GamelogPrint(std::function<void(const char*)> proc)
 					break;
 
 				case GLCT_OLDVER:
+					/* The game was loaded from before 0.7.0-beta1. */
 					buf += seprintf(buf, lastof(buffer), "Conversion from ");
 					switch (lc->oldver.type) {
 						default: NOT_REACHED();
@@ -260,10 +264,12 @@ void GamelogPrint(std::function<void(const char*)> proc)
 					break;
 
 				case GLCT_SETTING:
+					/* A setting with the SF_NO_NETWORK flag got changed; these settings usually affect NewGRFs, such as road side or wagon speed limits. */
 					buf += seprintf(buf, lastof(buffer), "Setting changed: %s : %d -> %d", lc->setting.name, lc->setting.oldval, lc->setting.newval);
 					break;
 
 				case GLCT_GRFADD: {
+					/* A NewGRF got added to the game, either at the start of the game (never an issue), or later on when it could be an issue. */
 					const GRFConfig *gc = FindGRFConfig(lc->grfadd.grfid, FGCM_EXACT, lc->grfadd.md5sum);
 					buf += seprintf(buf, lastof(buffer), "Added NewGRF: ");
 					buf = PrintGrfInfo(buf, lastof(buffer), lc->grfadd.grfid, lc->grfadd.md5sum, gc);
@@ -274,6 +280,7 @@ void GamelogPrint(std::function<void(const char*)> proc)
 				}
 
 				case GLCT_GRFREM: {
+					/* A NewGRF got removed from the game, either manually or by it missing when loading the game. */
 					GrfIDMapping::Pair *gm = grf_names.Find(lc->grfrem.grfid);
 					buf += seprintf(buf, lastof(buffer), la->at == GLAT_LOAD ? "Missing NewGRF: " : "Removed NewGRF: ");
 					buf = PrintGrfInfo(buf, lastof(buffer), lc->grfrem.grfid, nullptr, gm != grf_names.End() ? gm->second.gc : nullptr);
@@ -291,6 +298,7 @@ void GamelogPrint(std::function<void(const char*)> proc)
 				}
 
 				case GLCT_GRFCOMPAT: {
+					/* Another version of the same NewGRF got loaded. */
 					const GRFConfig *gc = FindGRFConfig(lc->grfadd.grfid, FGCM_EXACT, lc->grfadd.md5sum);
 					buf += seprintf(buf, lastof(buffer), "Compatible NewGRF loaded: ");
 					buf = PrintGrfInfo(buf, lastof(buffer), lc->grfcompat.grfid, lc->grfcompat.md5sum, gc);
@@ -300,6 +308,7 @@ void GamelogPrint(std::function<void(const char*)> proc)
 				}
 
 				case GLCT_GRFPARAM: {
+					/* A parameter of a NewGRF got changed after the game was started. */
 					GrfIDMapping::Pair *gm = grf_names.Find(lc->grfrem.grfid);
 					buf += seprintf(buf, lastof(buffer), "GRF parameter changed: ");
 					buf = PrintGrfInfo(buf, lastof(buffer), lc->grfparam.grfid, nullptr, gm != grf_names.End() ? gm->second.gc : nullptr);
@@ -308,6 +317,7 @@ void GamelogPrint(std::function<void(const char*)> proc)
 				}
 
 				case GLCT_GRFMOVE: {
+					/* The order of NewGRFs got changed, which might cause some other NewGRFs to behave differently. */
 					GrfIDMapping::Pair *gm = grf_names.Find(lc->grfrem.grfid);
 					buf += seprintf(buf, lastof(buffer), "GRF order changed: %08X moved %d places %s",
 						BSWAP32(lc->grfmove.grfid), abs(lc->grfmove.offset), lc->grfmove.offset >= 0 ? "down" : "up" );
@@ -317,19 +327,19 @@ void GamelogPrint(std::function<void(const char*)> proc)
 				}
 
 				case GLCT_GRFBUG: {
+					/* A specific bug in a NewGRF, that could cause wide spread problems, has been noted during the execution of the game. */
 					GrfIDMapping::Pair *gm = grf_names.Find(lc->grfrem.grfid);
-					switch (lc->grfbug.bug) {
-						default: NOT_REACHED();
-						case GBUG_VEH_LENGTH:
-							buf += seprintf(buf, lastof(buffer), "Rail vehicle changes length outside a depot: GRF ID %08X, internal ID 0x%X", BSWAP32(lc->grfbug.grfid), (uint)lc->grfbug.data);
-							break;
-					}
+					assert (lc->grfbug.bug == GBUG_VEH_LENGTH);
+
+					buf += seprintf(buf, lastof(buffer), "Rail vehicle changes length outside a depot: GRF ID %08X, internal ID 0x%X", BSWAP32(lc->grfbug.grfid), (uint)lc->grfbug.data);
 					buf = PrintGrfInfo(buf, lastof(buffer), lc->grfbug.grfid, nullptr, gm != grf_names.End() ? gm->second.gc : nullptr);
 					if (gm == grf_names.End()) buf += seprintf(buf, lastof(buffer), ". Gamelog inconsistency: GrfID was never added!");
 					break;
 				}
 
 				case GLCT_EMERGENCY:
+					/* At one point the savegame was made during the handling of a game crash.
+					 * The generic code already mentioned the emergency savegame, and there is no extra information to log. */
 					break;
 			}
 
@@ -378,7 +388,7 @@ static LoggedChange *GamelogChange(GamelogChangeType ct)
 		_current_action  = &_gamelog_action[_gamelog_actions++];
 
 		_current_action->at      = _gamelog_action_type;
-		_current_action->tick    = _tick_counter;
+		_current_action->tick    = TimerGameTick::counter;
 		_current_action->change  = nullptr;
 		_current_action->changes = 0;
 	}

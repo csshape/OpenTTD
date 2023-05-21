@@ -1110,10 +1110,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Вибе
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :вимкнено
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :щомісяця
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :кожні три місяці
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :кожні півроку
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :щороку
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Мова
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Виберіть мову інтерфейса користувача
@@ -1334,6 +1330,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :правору�
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Максимальна сума позики: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Максимальна сума позики для компанії (без урахування інфляції)
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Процентна ставка: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Процентна ставка за позиками; також контролює інфляцію, якщо вона увімкнена
@@ -1933,6 +1930,7 @@ STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :При вклю
 
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :Мінімальний вік компанії для торгівлі акціями: {STRING}
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_HELPTEXT                :Встановіть мінімальний вік компанії, щоб інші могли купувати та продавати акції у них.
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Відсоток прибутку за часткове перевезення: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Налаштування проценту прибутку, що нараховується за часткове перевезення вантажу. За допомогою даної опції можна контролювати розподіл прибутків між учасниками багатоланкових перевезень.
@@ -2047,10 +2045,6 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :Жодного
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Множник розміру мегаполісів: {STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :Середньостатистичне відношення початкового розміру мегаполісів порівняно зі звичайними містами.
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :Оновлювати графік доставки раз на {STRING}{NBSP}д{P 0:2 "ень" "ні" "нів"}
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL_HELPTEXT                  :Час між послідовними обрахунками зв'язків на графіку. Кожен обрахунок здійснюється для одного параметра графіку. Тобто значення Х у налаштуваннях не означає, що графік оновлюється кожні Х днів. Лише деякі складові. При виборі параметру "часто" ЦП потрібно більше часу для обрахунку. При виборі параметру "рідко" наступний обрахунок почнеться після запуску доставки за новим маршрутом.
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :Обраховувати графік доставки раз на {STRING}{NBSP}д{P 0:2 "ень" "ні" "нів"}
-STR_CONFIG_SETTING_LINKGRAPH_TIME_HELPTEXT                      :Час, який займає переобчислення кожного зв'язку з компонентом графу. При запуску переобчислення створюється потік, якому дозволяється працювати декілька днів. Чим менше ви поставите це, тим більш можливо, що потік не буде завершено вчасно. Тоді гра зупиниться на час "лагу". Чим довше ви поставите, тим довше займе розподіл доставки при зміні маршрутів.
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :Режим розподілу для пасажирів: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :В "симетричному" режимі від станції A до станції B відправлятиметься приблизно стільки ж пасажирів, як від B до A. В "асиметричному" режимі дозволяється відправляти довільну кількість пасажирів в обох напрямках. Ручний режим означає, що розподіл пасажирів не здійснюватиметься автоматично.
@@ -2078,7 +2072,7 @@ STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :Часто мі
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Одиниці швидкості: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Показувати швидкості в таких одиницях
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :Імперські (милі/год)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :Метричні (км/год)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :СІ (м/с)
@@ -2483,7 +2477,6 @@ STR_NETWORK_CLIENT_LIST_NEW_COMPANY                             :(Нова ко�
 STR_NETWORK_CLIENT_LIST_NEW_COMPANY_TOOLTIP                     :{BLACK}Створити нову компанію і приєднатись до неї
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_SELF_TOOLTIP                :{BLACK}Це ти
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_HOST_TOOLTIP                :{BLACK}Організатор гри
-STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} клієнт{P "" и ів} / {NUM} компан{P ія ії ій}
 
 # Matches ConnectionType
 ###length 5
@@ -3476,8 +3469,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Попередження: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Помилка: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Збій: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Фатальна помилка NewGRF:{}{STRING}
-STR_NEWGRF_ERROR_POPUP                                          :{WHITE}Помилка NewGRF:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} не буде працювати з версією TTDPatch, вказаною OpenTTD
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} для {2:STRING}-версії TTD
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} розроблено для використання з {2:STRING}
@@ -4653,7 +4644,7 @@ STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Скас
 STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Скасувати обмеження швидкості для виділеного пункту. Ctrl+клац видалить швидкість в усіх завданнях
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Скасувати відхилення
-STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Скасувати лічильник відхилення від графіка, щоб транспорт встигнув
+STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Скасувати лічильник відхилення від графіка, щоб транспорт встигнув. Ctrl+клац щоб скасувати лічильник для всіх транспортів. При цьому останній транспорт стане йти за графіком, а інщі опереджати графік.
 
 STR_TIMETABLE_AUTOFILL                                          :{BLACK}Авторозрахунок
 STR_TIMETABLE_AUTOFILL_TOOLTIP                                  :{BLACK}Автоматично розрахувати розклад впродовж наступної поїздки. Ctrl+клац, щоб спробувати зберегти час очікування
@@ -4747,12 +4738,13 @@ STR_SCREENSHOT_WORLD_SCREENSHOT                                 :{BLACK}Знят
 STR_SCREENSHOT_HEIGHTMAP_SCREENSHOT                             :{BLACK}Зняток мапи висот
 STR_SCREENSHOT_MINIMAP_SCREENSHOT                               :{BLACK}Зняток мінімапи
 
-# AI Parameters
+# Script Parameters
+STR_AI_SETTINGS_CAPTION                                         :{WHITE}{STRING} Налаштування
 STR_AI_SETTINGS_CAPTION_AI                                      :{WHITE}Параметри ШІ
+STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :Ігровий Скрипт
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Закрити
 STR_AI_SETTINGS_RESET                                           :{BLACK}Скидання
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Кількість днів до запуску цього АІ після запуску попереднього АІ: {ORANGE}{STRING}
 
 
 # Textfile window
@@ -5206,6 +5198,8 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Немо
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... занадто далеко від попереднього пункту призначення
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... літак не може летіти так далеко
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Не можна встановити розклад для транспорту...
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Транспорт може чекати тільки на станціях
@@ -5658,10 +5652,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Гелікоп�
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Компанія {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Група {COMMA}
@@ -5743,7 +5737,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

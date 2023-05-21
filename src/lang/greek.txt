@@ -1088,10 +1088,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Επιλ
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Ανενεργό
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Κάθε μήνα
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Κάθε 3 μήνες
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Κάθε 6 μήνες
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Κάθε 12 μήνες
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Γλώσσα
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Επιλογή της γλώσσας του παιχνιδιού
@@ -1312,6 +1308,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Δεξιά
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Μέγιστο αρχικό δάνειο: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Μέγιστο ποσό που μπορεί να δανειστεί μία εταιρία (χωρίς να λαμβάνεται υπόψη ο πληθωρισμός)
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Επιτόκιο: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Επιτόκιο δανείων· επίσης ελέγχεται ο πληθωρισμός αν είναι ενεργοποιημένος
@@ -1911,6 +1908,7 @@ STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :Όταν είν
 
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :Ελάχιστη ηλικία εταιρίας για συναλλαγή μετοχών: {STRING}
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_HELPTEXT                :Ορίστε την ελάχιστη ηλικία μίας εταιρίας για να μπορούν άλλοι να αγοράσουν ή να πουλήσουν μετοχές από αυτές.
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Το ποσοστό κέρδους από το σκέλος μεταφοράς στα συστήματα τροφοδότησης: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Το ποσοστό του εισοδήματος που δίνεται στα ενδιάμεσα σκέλη των συστημάτων τροφοδότησης, δίνοντας μεγαλύτερο έλεγχο στο εισόδημα
@@ -2025,10 +2023,6 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :Καμία
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Αρχικός πολλαπλασιαστής μεγέθους πόλης: {STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :Μέσο μέγεθος μεγάλων πόλεων σε σχέση με τις κανονικές στην αρχή του παιχνιδιού
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :Ενημέρωση γραφήματος κάθε {STRING}{NBSP}μέρ{P 0:2 α ες}
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL_HELPTEXT                  :Χρόνος που μεσολαβεί μεταξύ επαναυπολογισμών του γραφήματος συνδέσμου. Κάθε επαναυπολογισμός υπολογίζει το σχέδιο για ένα τμήματος του γραφήματος. Αυτό σημαίνει ότι μια τιμή Χ για αυτή τη ρύθμιση δεν σημαίνει ότι ολόκληρο το γράφημα θα ενημερώνεται κάθε Χ ημέρες, μονάχα κάποια τμήματα. Όσο μικρότερη ρύθμιση τεθεί τόσο μεγαλύτερος χρόνος επεξεργαστή απαιτείται για τον υπολογσιμό του. Όσο μεγαλύτερη ρύθμιση τεθεί  τόσο περισσότερο θα πάρει για να ξεκινήσει η διανομή φορτίου σε νέες διαδρομές.
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :Πάρε {STRING}{NBSP}μέρ{P 0:2 α ες} για επανυπολογσιμό του γραφήματος διανομής
-STR_CONFIG_SETTING_LINKGRAPH_TIME_HELPTEXT                      :Χρόνος που απαιτείται για επαναυπολογισμούς τμήματος γραφήματος συνδέσμου. Όταν ένας επαναυπολογισμός αρχίζει, προκύπτει ένα νήμα το οποίο επιτρέπεται να τρέξει για έναν συγκεκριμένο αριθμό ημερών. Όσο μικρότερος αριθμός τόσο μεγαλύτερες πιθανότητες ότι το νήμα δεν τελείωνει όταν πρέπει. Τότε το παιχνίδι σταματά μέχρι να ολοκληρωθεί («λαγκάρει»). Όσο μεγαλύτερος αριθμός τόσο μεγαλύτερο χρόνο παίρνει για να για να ενημερωθεί διανομή όταν αλλάζουν οι διαδρομές.
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :Τρόπος διανομής επιβατών: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :Το «συμμετρικό» σημαίνει ότι περίπου ο ίδιος αριθμός επιβατών θα σταλέι από έναν σταθμό Α σε ένα σταθμό Β όσο από τον Β στον Α. Το «ασυμμετρικό» σημαίνει ότι αυθαίρετος αριθμός επιβατών μπορεί να σταλούν σε οποιαδήποτε εκ των δύο κατευθύνσεων. Το «χειροκίνητο» σημαίνει ότι καμία αυτόματη διανομή δε θα γίνεται για τους επιβάτες.
@@ -2056,7 +2050,7 @@ STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :Συχνά υπ
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Μονάδες μέτρησης ταχύτητας: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Όποτε εμφανίζεται μια ταχύτητα στη διεπαφή χρήστη, να εμφανίζεται στην επιλεγμένη μονάδα
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :Αυτοκρατορικό (μίλια/ώρα)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :Μετρικό (χλμ/ώρα)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (m/s)
@@ -2461,7 +2455,6 @@ STR_NETWORK_CLIENT_LIST_NEW_COMPANY                             :(Νέα ετα�
 STR_NETWORK_CLIENT_LIST_NEW_COMPANY_TOOLTIP                     :{BLACK}Δημιουργήστε μία νέα εταιρία και συμμετέχετε σε αυτήν
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_SELF_TOOLTIP                :{BLACK}Αυτός/η είστε εσείς
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_HOST_TOOLTIP                :{BLACK}Αυτός/η είναι ο/η οικοδεσπότης του παιχνιδιού
-STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} πελάτης/ες / {NUM} εταιρία/ες
 
 # Matches ConnectionType
 ###length 5
@@ -3450,8 +3443,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Προειδοποίηση: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Λάθος: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Καταστροφικό: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Ένα καταστροφικό λάθος για τα NewGRF έχει συμβεί:{}{STRING}
-STR_NEWGRF_ERROR_POPUP                                          :{WHITE}Ένα NewGRF λάθος έχει συμβεί:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :Το {1:STRING} δεν θα δουλέψει με την έκδοση του TTDPatch όπως αναφέρεται από το OpenTTD
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :Το {1:STRING} είναι για την έκδοση {STRING} του TTD
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} είναι σχεδιασμένο να δουλέψει με το {STRING}
@@ -4729,12 +4720,11 @@ STR_SCREENSHOT_WORLD_SCREENSHOT                                 :{BLACK}Στιγ
 STR_SCREENSHOT_HEIGHTMAP_SCREENSHOT                             :{BLACK}Στιγμιότυπο χάρτη υψομετρίας
 STR_SCREENSHOT_MINIMAP_SCREENSHOT                               :{BLACK}Στιγμιότυπο μίνι χάρτη
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :AI
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Κλείσιμο
 STR_AI_SETTINGS_RESET                                           :{BLACK}Επαναφορά
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Αριθμός ημερών για την εκκίνηση της επόμενης AI μετά από τη προηγούμενη (περίπου): {ORANGE}{STRING}
 
 
 # Textfile window
@@ -5187,6 +5177,8 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Αδύν
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... πολύ μακριά από τον προηγούμενο προορισμό
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... δεν επαρκεί η εμβέλεια του αεροσκάφους
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Δεν μπορεί να δρομολογηθεί το όχημα...
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Τα οχήματα μπορούν να περιμένουν μόνο στους σταθμούς
@@ -5606,10 +5598,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Ελικόπτ�
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING.date} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Εταιρία {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Ομάδα {COMMA}
@@ -5691,7 +5683,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

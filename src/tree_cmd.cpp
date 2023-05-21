@@ -22,7 +22,7 @@
 #include "company_base.h"
 #include "core/random_func.hpp"
 #include "newgrf_generic.h"
-#include "date_func.h"
+#include "timer/timer_game_tick.h"
 #include "tree_cmd.h"
 #include "landscape_cmd.h"
 
@@ -174,9 +174,6 @@ static void PlaceTree(TileIndex tile, uint32 r)
 		if (ground != TREE_GROUND_SNOW_DESERT && ground != TREE_GROUND_ROUGH_SNOW && ground != TREE_GROUND_SHORE) {
 			SetTreeGroundDensity(tile, (TreeGround)GB(r, 28, 1), 3);
 		}
-
-		/* Set the counter to a random start value */
-		SetTreeCounter(tile, (TreeGround)GB(r, 24, 4));
 	}
 }
 
@@ -589,7 +586,7 @@ static void DrawTile_Trees(TileInfo *ti)
 }
 
 
-static int GetSlopePixelZ_Trees(TileIndex tile, uint x, uint y)
+static int GetSlopePixelZ_Trees(TileIndex tile, uint x, uint y, bool ground_vehicle)
 {
 	int z;
 	Slope tileh = GetTilePixelSlope(tile, &z);
@@ -710,10 +707,14 @@ static void TileLoop_Trees(TileIndex tile)
 
 	AmbientSoundEffect(tile);
 
-	uint treeCounter = GetTreeCounter(tile);
+	/* TimerGameTick::counter is incremented by 256 between each call, so ignore lower 8 bits.
+	 * Also, we use a simple hash to spread the updates evenly over the map.
+	 * 11 and 9 are just some co-prime numbers for better spread.
+	 */
+	uint32 cycle = 11 * TileX(tile) + 9 * TileY(tile) + (TimerGameTick::counter >> 8);
 
 	/* Handle growth of grass (under trees/on MP_TREES tiles) at every 8th processings, like it's done for grass on MP_CLEAR tiles. */
-	if ((treeCounter & 7) == 7 && GetTreeGround(tile) == TREE_GROUND_GRASS) {
+	if ((cycle & 7) == 7 && GetTreeGround(tile) == TREE_GROUND_GRASS) {
 		uint density = GetTreeDensity(tile);
 		if (density < 3) {
 			SetTreeGroundDensity(tile, TREE_GROUND_GRASS, density + 1);
@@ -723,11 +724,7 @@ static void TileLoop_Trees(TileIndex tile)
 
 	if (_settings_game.construction.extra_tree_placement == ETP_NO_GROWTH_NO_SPREAD) return;
 
-	if (GetTreeCounter(tile) < 15) {
-		AddTreeCounter(tile, 1);
-		return;
-	}
-	SetTreeCounter(tile, 0);
+	if ((cycle & 15) != 15) return;
 
 	switch (GetTreeGrowth(tile)) {
 		case 3: // regular sized tree
@@ -844,7 +841,7 @@ void OnTick_Trees()
 	 * this is the maximum number of ticks that are skipped. Number of ticks to skip is
 	 * inversely proportional to map size, so that is handled to create a mask. */
 	int skip = Map::ScaleBySize(16);
-	if (skip < 16 && (_tick_counter & (16 / skip - 1)) != 0) return;
+	if (skip < 16 && (TimerGameTick::counter & (16 / skip - 1)) != 0) return;
 
 	/* place a tree at a random rainforest spot */
 	if (_settings_game.game_creation.landscape == LT_TROPIC) {

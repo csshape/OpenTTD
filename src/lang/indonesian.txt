@@ -982,10 +982,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Pilih se
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Mati
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Setiap bulan
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Setiap 3 bulan
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Setiap 6 bulan
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Setiap 12 bulan
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Bahasa
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Pilih antar muka bahasa yang akan dipergunakan
@@ -1206,6 +1202,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Kanan
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Maksimum pinjaman awal: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Jumlah maksimum yang dapat dipinjam (tanpa menghitung inflasi)
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Bunga pinjaman: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Bunga pinjaman; juga mengendalikan inflasi jika dinyalakan
@@ -1805,6 +1802,7 @@ STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :Jika diaktifkan
 
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :Usia minimum perusahaan untuk memperdagangkan saham: {STRING}
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_HELPTEXT                :Set umur minimal perusahaan saat sahamnya dapat dibeli atau dijual.
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Persentase keuntungan akhir dari sistem pengisi: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Persentase pendapatan yang diberikan dari sistem pengisi, memberikan lebih banyak kendali pendapatan
@@ -1919,10 +1917,6 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :Tidak ada
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Faktor kali ukuran kota awal: {STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :Ukuran rata-rata kota besar terhadap kota kecil saat permainan dimulai
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :Perbarui grafik distribusi setiap {STRING}{NBSP}hari
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL_HELPTEXT                  :Waktu diantara dua penghitungan linkgraph berurutan. Setiap penghitungan hanya menghitung satu komponen perencanaan dari grafik. Namun, angka yang diberikan untuk seting ini bukan berarti seluruh grafik akan diperbaharui dalam angka hari yang sama, hanya beberapa bagian. Semakin sedikit semakin banyak proses CPU yang diperlukan untuk menghitung. Semakin banyak semakin lama waktu sebelum cargo distribution dimulai pada rute baru.
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :Ambil {STRING}{NBSP}hari untuk menghitung grafik distribusi
-STR_CONFIG_SETTING_LINKGRAPH_TIME_HELPTEXT                      :Waktu dibutuhkan untuk setiap perhitungan dari komponen 'linkgraph'. Ketika perhitungan dimulai, ada utas 'dibuat' yang boleh dijalankan untuk jumlah hari ini. Semakin pendek anda mengatur ini lebih mungkin utas ini belum selesai ketika itu seharusnya. Kemudian permainan berhenti sampai itu ("lag"). Semakin lama anda mengatur semakin lama itu untuk distribusinya untuk memperbarui ketika rute mengganti.
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :Modus distribusi untuk penumpang: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :"Simetris" berarti kira-kira jumlah penumpang sama akan pergi dari stasiun A ke stasiun B sebagaimana dari B ke A. "Asimetris" berarti jumlah penumpang pergi pada kedua arah bisa berbeda-beda. "Manual" berarti bahwa tidak ada distribusi otomatis akan dilakukan untuk penumpang.
@@ -1950,7 +1944,7 @@ STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :Biasanya terdap
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Satuan kecepatan: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Apabila kecepatan ditampilkan di antarmuka, nyatakan di satuan yang dipilih
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :Imperial (mpj)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :Metrik (km/j)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (m/d)
@@ -2355,7 +2349,6 @@ STR_NETWORK_CLIENT_LIST_NEW_COMPANY                             :(Perusahaan bar
 STR_NETWORK_CLIENT_LIST_NEW_COMPANY_TOOLTIP                     :{BLACK}Ciptakan perusahaan baru dan bergabung
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_SELF_TOOLTIP                :{BLACK}Ini adalah Anda
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_HOST_TOOLTIP                :{BLACK}Ini adalah hos permainan
-STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} klien / {NUM} Perusahaan
 
 # Matches ConnectionType
 ###length 5
@@ -3345,8 +3338,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Peringatan: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Kesalahan: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Fatal: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Kesalahan fatal NewGRF telah terjadi:{}{STRING}
-STR_NEWGRF_ERROR_POPUP                                          :{WHITE}Terjadi galat pada NewGRF:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} tidak akan bekerja dengan versi TTDPatch yang telah dilaporkan oleh OpenTTD
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} untuk TTD versi {2:STRING}
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} didesain untuk digunakan dengan {2:STRING}
@@ -4616,12 +4607,11 @@ STR_SCREENSHOT_WORLD_SCREENSHOT                                 :{BLACK} Tangkap
 STR_SCREENSHOT_HEIGHTMAP_SCREENSHOT                             :{BLACK}Tangkapan layar Peta Ketinggian
 STR_SCREENSHOT_MINIMAP_SCREENSHOT                               :{BLACK}Tangkapan layar minimap
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :{WHITE}Parameter AI
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Tutup
 STR_AI_SETTINGS_RESET                                           :{BLACK}Reset
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Jalankan AI setelah berapa hari : {ORANGE}{STRING}
 
 
 # Textfile window
@@ -5075,6 +5065,8 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Tidak da
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... terlalu jauh dari tujuan sebelumnya
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... pesawat tidak dapat menjangkau
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Tidak dapat membuat jadwal keberangkatan kendaraan...
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Kendaran hanya dapat menunggu di stasiun
@@ -5490,10 +5482,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Helikopter Powe
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Perusahaan {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Kelompok {COMMA}
@@ -5575,7 +5567,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

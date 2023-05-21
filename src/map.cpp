@@ -11,6 +11,7 @@
 #include "debug.h"
 #include "core/alloc_func.hpp"
 #include "water_map.h"
+#include "error_func.h"
 #include "string_func.h"
 
 #include "safeguards.h"
@@ -27,8 +28,8 @@ extern "C" _CRTIMP void __cdecl _assert(void *, void *, unsigned);
 /* static */ uint Map::size;      ///< The number of tiles on the map
 /* static */ uint Map::tile_mask; ///< _map_size - 1 (to mask the mapsize)
 
-Tile *_m = nullptr;          ///< Tiles of the map
-TileExtended *_me = nullptr; ///< Extended Tiles of the map
+/* static */ Tile::TileBase *Tile::base_tiles = nullptr;         ///< Base tiles of the map
+/* static */ Tile::TileExtended *Tile::extended_tiles = nullptr; ///< Extended tiles of the map
 
 
 /**
@@ -44,7 +45,7 @@ TileExtended *_me = nullptr; ///< Extended Tiles of the map
 			!IsInsideMM(size_y, MIN_MAP_SIZE, MAX_MAP_SIZE + 1) ||
 			(size_x & (size_x - 1)) != 0 ||
 			(size_y & (size_y - 1)) != 0) {
-		error("Invalid map size");
+		FatalError("Invalid map size");
 	}
 
 	Debug(map, 1, "Allocating map of size {}x{}", size_x, size_y);
@@ -56,11 +57,11 @@ TileExtended *_me = nullptr; ///< Extended Tiles of the map
 	Map::size = size_x * size_y;
 	Map::tile_mask = Map::size - 1;
 
-	free(_m);
-	free(_me);
+	free(Tile::base_tiles);
+	free(Tile::extended_tiles);
 
-	_m = CallocT<Tile>(Map::size);
-	_me = CallocT<TileExtended>(Map::size);
+	Tile::base_tiles = CallocT<Tile::TileBase>(Map::size);
+	Tile::extended_tiles = CallocT<Tile::TileExtended>(Map::size);
 }
 
 

@@ -61,9 +61,10 @@ static void GfxMainBlitter(const Sprite *sprite, int x, int y, BlitterMode mode,
 
 static ReusableBuffer<uint8> _cursor_backup;
 
-ZoomLevel _gui_zoom = ZOOM_LVL_OUT_4X;     ///< GUI Zoom level
-int _gui_scale      = MIN_INTERFACE_SCALE; ///< GUI scale, 100 is 100%.
-int _gui_scale_cfg;                        ///< GUI scale in config.
+ZoomLevel _gui_zoom  = ZOOM_LVL_OUT_4X;     ///< GUI Zoom level
+ZoomLevel _font_zoom = _gui_zoom;           ///< Sprite font Zoom level (not clamped)
+int _gui_scale       = MIN_INTERFACE_SCALE; ///< GUI scale, 100 is 100%.
+int _gui_scale_cfg;                         ///< GUI scale in config.
 
 /**
  * The rect for repaint.
@@ -74,7 +75,7 @@ int _gui_scale_cfg;                        ///< GUI scale in config.
  */
 static Rect _invalid_rect;
 static const byte *_colour_remap_ptr;
-static byte _string_colourremap[3]; ///< Recoloursprite for stringdrawing. The grf loader ensures that #ST_FONT sprites only use colours 0 to 2.
+static byte _string_colourremap[3]; ///< Recoloursprite for stringdrawing. The grf loader ensures that #SpriteType::Font sprites only use colours 0 to 2.
 
 static const uint DIRTY_BLOCK_HEIGHT   = 8;
 static const uint DIRTY_BLOCK_WIDTH    = 64;
@@ -992,7 +993,7 @@ void DrawCharCentered(WChar c, const Rect &r, TextColour colour)
  */
 Dimension GetSpriteSize(SpriteID sprid, Point *offset, ZoomLevel zoom)
 {
-	const Sprite *sprite = GetSprite(sprid, ST_NORMAL);
+	const Sprite *sprite = GetSprite(sprid, SpriteType::Normal);
 
 	if (offset != nullptr) {
 		offset->x = UnScaleByZoom(sprite->x_offs, zoom);
@@ -1032,17 +1033,17 @@ void DrawSpriteViewport(SpriteID img, PaletteID pal, int x, int y, const SubSpri
 {
 	SpriteID real_sprite = GB(img, 0, SPRITE_WIDTH);
 	if (HasBit(img, PALETTE_MODIFIER_TRANSPARENT)) {
-		_colour_remap_ptr = GetNonSprite(GB(pal, 0, PALETTE_WIDTH), ST_RECOLOUR) + 1;
-		GfxMainBlitterViewport(GetSprite(real_sprite, ST_NORMAL), x, y, BM_TRANSPARENT, sub, real_sprite);
+		_colour_remap_ptr = GetNonSprite(GB(pal, 0, PALETTE_WIDTH), SpriteType::Recolour) + 1;
+		GfxMainBlitterViewport(GetSprite(real_sprite, SpriteType::Normal), x, y, BM_TRANSPARENT, sub, real_sprite);
 	} else if (pal != PAL_NONE) {
 		if (HasBit(pal, PALETTE_TEXT_RECOLOUR)) {
 			SetColourRemap((TextColour)GB(pal, 0, PALETTE_WIDTH));
 		} else {
-			_colour_remap_ptr = GetNonSprite(GB(pal, 0, PALETTE_WIDTH), ST_RECOLOUR) + 1;
+			_colour_remap_ptr = GetNonSprite(GB(pal, 0, PALETTE_WIDTH), SpriteType::Recolour) + 1;
 		}
-		GfxMainBlitterViewport(GetSprite(real_sprite, ST_NORMAL), x, y, GetBlitterMode(pal), sub, real_sprite);
+		GfxMainBlitterViewport(GetSprite(real_sprite, SpriteType::Normal), x, y, GetBlitterMode(pal), sub, real_sprite);
 	} else {
-		GfxMainBlitterViewport(GetSprite(real_sprite, ST_NORMAL), x, y, BM_NORMAL, sub, real_sprite);
+		GfxMainBlitterViewport(GetSprite(real_sprite, SpriteType::Normal), x, y, BM_NORMAL, sub, real_sprite);
 	}
 }
 
@@ -1059,17 +1060,17 @@ void DrawSprite(SpriteID img, PaletteID pal, int x, int y, const SubSprite *sub,
 {
 	SpriteID real_sprite = GB(img, 0, SPRITE_WIDTH);
 	if (HasBit(img, PALETTE_MODIFIER_TRANSPARENT)) {
-		_colour_remap_ptr = GetNonSprite(GB(pal, 0, PALETTE_WIDTH), ST_RECOLOUR) + 1;
-		GfxMainBlitter(GetSprite(real_sprite, ST_NORMAL), x, y, BM_TRANSPARENT, sub, real_sprite, zoom);
+		_colour_remap_ptr = GetNonSprite(GB(pal, 0, PALETTE_WIDTH), SpriteType::Recolour) + 1;
+		GfxMainBlitter(GetSprite(real_sprite, SpriteType::Normal), x, y, BM_TRANSPARENT, sub, real_sprite, zoom);
 	} else if (pal != PAL_NONE) {
 		if (HasBit(pal, PALETTE_TEXT_RECOLOUR)) {
 			SetColourRemap((TextColour)GB(pal, 0, PALETTE_WIDTH));
 		} else {
-			_colour_remap_ptr = GetNonSprite(GB(pal, 0, PALETTE_WIDTH), ST_RECOLOUR) + 1;
+			_colour_remap_ptr = GetNonSprite(GB(pal, 0, PALETTE_WIDTH), SpriteType::Recolour) + 1;
 		}
-		GfxMainBlitter(GetSprite(real_sprite, ST_NORMAL), x, y, GetBlitterMode(pal), sub, real_sprite, zoom);
+		GfxMainBlitter(GetSprite(real_sprite, SpriteType::Normal), x, y, GetBlitterMode(pal), sub, real_sprite, zoom);
 	} else {
-		GfxMainBlitter(GetSprite(real_sprite, ST_NORMAL), x, y, BM_NORMAL, sub, real_sprite, zoom);
+		GfxMainBlitter(GetSprite(real_sprite, SpriteType::Normal), x, y, BM_NORMAL, sub, real_sprite, zoom);
 	}
 }
 
@@ -1220,7 +1221,7 @@ std::unique_ptr<uint32[]> DrawSpriteToRgbaBuffer(SpriteID spriteId, ZoomLevel zo
 
 	/* Gather information about the sprite to write, reserve memory */
 	const SpriteID real_sprite = GB(spriteId, 0, SPRITE_WIDTH);
-	const Sprite *sprite = GetSprite(real_sprite, ST_NORMAL);
+	const Sprite *sprite = GetSprite(real_sprite, SpriteType::Normal);
 	Dimension dim = GetSpriteSize(real_sprite, nullptr, zoom);
 	size_t dim_size = static_cast<size_t>(dim.width) * dim.height;
 	std::unique_ptr<uint32[]> result(new uint32[dim_size]);
@@ -1843,7 +1844,7 @@ void UpdateCursorSize()
 	static_assert(lengthof(_cursor.sprite_seq) == lengthof(_cursor.sprite_pos));
 	assert(_cursor.sprite_count <= lengthof(_cursor.sprite_seq));
 	for (uint i = 0; i < _cursor.sprite_count; ++i) {
-		const Sprite *p = GetSprite(GB(_cursor.sprite_seq[i].sprite, 0, SPRITE_WIDTH), ST_NORMAL);
+		const Sprite *p = GetSprite(GB(_cursor.sprite_seq[i].sprite, 0, SPRITE_WIDTH), SpriteType::Normal);
 		Point offs, size;
 		offs.x = UnScaleGUI(p->x_offs) + _cursor.sprite_pos[i].x;
 		offs.y = UnScaleGUI(p->y_offs) + _cursor.sprite_pos[i].y;
@@ -2049,6 +2050,8 @@ void UpdateGUIZoom()
 	}
 
 	int8 new_zoom = ScaleGUITrad(1) <= 1 ? ZOOM_LVL_OUT_4X : ScaleGUITrad(1) >= 4 ? ZOOM_LVL_MIN : ZOOM_LVL_OUT_2X;
+	/* Font glyphs should not be clamped to min/max zoom. */
+	_font_zoom = static_cast<ZoomLevel>(new_zoom);
 	/* Ensure the gui_zoom is clamped between min/max. */
 	new_zoom = Clamp(new_zoom, _settings_client.gui.zoom_min, _settings_client.gui.zoom_max);
 	_gui_zoom = static_cast<ZoomLevel>(new_zoom);
@@ -2062,16 +2065,19 @@ void UpdateGUIZoom()
  */
 bool AdjustGUIZoom(bool automatic)
 {
-	ZoomLevel old_zoom = _gui_zoom;
+	ZoomLevel old_gui_zoom = _gui_zoom;
+	ZoomLevel old_font_zoom = _font_zoom;
 	int old_scale = _gui_scale;
 	UpdateGUIZoom();
 	if (old_scale == _gui_scale) return false;
 
 	/* Reload sprites if sprite zoom level has changed. */
-	if (old_zoom != _gui_zoom) {
+	if (old_gui_zoom != _gui_zoom) {
 		GfxClearSpriteCache();
 		VideoDriver::GetInstance()->ClearSystemSprites();
 		UpdateCursorSize();
+	} else if (old_font_zoom != _font_zoom) {
+		GfxClearFontSpriteCache();
 	}
 
 	ClearFontCache();
@@ -2080,7 +2086,7 @@ bool AdjustGUIZoom(bool automatic)
 
 	/* Adjust all window sizes to match the new zoom level, so that they don't appear
 	   to move around when the application is moved to a screen with different DPI. */
-	auto zoom_shift = old_zoom - _gui_zoom;
+	auto zoom_shift = old_gui_zoom - _gui_zoom;
 	for (Window *w : Window::Iterate()) {
 		if (automatic) {
 			w->left   = (w->left   * _gui_scale) / old_scale;

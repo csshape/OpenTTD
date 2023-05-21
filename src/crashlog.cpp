@@ -11,6 +11,7 @@
 #include "crashlog.h"
 #include "gamelog.h"
 #include "date_func.h"
+#include "timer/timer_game_calendar.h"
 #include "map_func.h"
 #include "rev.h"
 #include "strings_func.h"
@@ -63,6 +64,9 @@
 #endif /* WITH_SDL || WITH_SDL2 */
 #ifdef WITH_ZLIB
 # include <zlib.h>
+#endif
+#ifdef WITH_CURL
+# include <curl/curl.h>
 #endif
 
 #include "safeguards.h"
@@ -273,6 +277,16 @@ char *CrashLog::LogLibraries(char *buffer, const char *last) const
 	buffer += seprintf(buffer, last, " Zlib:       %s\n", zlibVersion());
 #endif
 
+#ifdef WITH_CURL
+	auto *curl_v = curl_version_info(CURLVERSION_NOW);
+	buffer += seprintf(buffer, last, " Curl:       %s\n", curl_v->version);
+	if (curl_v->ssl_version != nullptr) {
+		buffer += seprintf(buffer, last, " Curl SSL:   %s\n", curl_v->ssl_version);
+	} else {
+		buffer += seprintf(buffer, last, " Curl SSL:   none\n");
+	}
+#endif
+
 	buffer += seprintf(buffer, last, "\n");
 	return buffer;
 }
@@ -344,8 +358,8 @@ char *CrashLog::FillCrashLog(char *buffer, const char *last) const
 	buffer += UTCTime::Format(buffer, last, "Crash at: %Y-%m-%d %H:%M:%S (UTC)\n");
 
 	YearMonthDay ymd;
-	ConvertDateToYMD(_date, &ymd);
-	buffer += seprintf(buffer, last, "In game date: %i-%02i-%02i (%i)\n\n", ymd.year, ymd.month + 1, ymd.day, _date_fract);
+	ConvertDateToYMD(TimerGameCalendar::date, &ymd);
+	buffer += seprintf(buffer, last, "In game date: %i-%02i-%02i (%i)\n\n", ymd.year, ymd.month + 1, ymd.day, TimerGameCalendar::date_fract);
 
 	buffer = this->LogError(buffer, last, CrashLog::message.c_str());
 	buffer = this->LogOpenTTDVersion(buffer, last);
@@ -503,7 +517,7 @@ bool CrashLog::MakeCrashLog() const
  * Sets a message for the error message handler.
  * @param message The error message of the error.
  */
-/* static */ void CrashLog::SetErrorMessage(const char *message)
+/* static */ void CrashLog::SetErrorMessage(const std::string &message)
 {
 	CrashLog::message = message;
 }

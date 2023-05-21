@@ -14,6 +14,7 @@
 #include "vehicle_type.h"
 #include "core/pool_type.hpp"
 #include "newgrf_commons.h"
+#include "timer/timer_game_calendar.h"
 
 struct WagonOverride {
 	std::vector<EngineID> engines;
@@ -35,8 +36,8 @@ extern EnginePool _engine_pool;
 
 struct Engine : EnginePool::PoolItem<&_engine_pool> {
 	std::string name;           ///< Custom name of engine.
-	Date intro_date;            ///< Date of introduction of the engine.
-	Date age;
+	TimerGameCalendar::Date intro_date; ///< Date of introduction of the engine.
+	TimerGameCalendar::Date age;        ///< Age of the engine, in days.
 	uint16 reliability;         ///< Current reliability of the engine.
 	uint16 reliability_spd_dec; ///< Speed of reliability decay between services (per day).
 	uint16 reliability_start;   ///< Initial reliability of the engine.
@@ -123,7 +124,7 @@ struct Engine : EnginePool::PoolItem<&_engine_pool> {
 	uint GetPower() const;
 	uint GetDisplayWeight() const;
 	uint GetDisplayMaxTractiveEffort() const;
-	Date GetLifeLengthInDays() const;
+	TimerGameCalendar::Date GetLifeLengthInDays() const;
 	uint16 GetRange() const;
 	StringID GetAircraftTypeText() const;
 
@@ -136,6 +137,18 @@ struct Engine : EnginePool::PoolItem<&_engine_pool> {
 	{
 		return c < MAX_COMPANIES && HasBit(this->company_hidden, c);
 	}
+
+	/**
+	 * Get the last display variant for an engine.
+	 * @return Engine's last display variant or engine itself if no last display variant is set.
+	 */
+	const Engine *GetDisplayVariant() const
+	{
+		if (this->display_last_variant == this->index || this->display_last_variant == INVALID_ENGINE) return this;
+		return Engine::Get(this->display_last_variant);
+	}
+
+	bool IsVariantHidden(CompanyID c) const;
 
 	/**
 	 * Check if the engine is a ground vehicle.

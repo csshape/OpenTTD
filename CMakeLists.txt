@@ -124,6 +124,14 @@ find_package(LibLZMA)
 find_package(LZO)
 find_package(PNG)
 
+if(WIN32 OR EMSCRIPTEN)
+    # Windows uses WinHttp for HTTP requests.
+    # Emscripten uses Javascript for HTTP requests.
+else()
+    # All other targets use libcurl.
+    find_package(CURL)
+endif()
+
 if(NOT OPTION_DEDICATED)
     if(NOT WIN32)
         find_package(Allegro)
@@ -207,6 +215,7 @@ if(OPTION_PACKAGE_DEPENDENCIES)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 endif()
 
+include(CTest)
 include(SourceList)
 
 # Needed by rev.cpp
@@ -216,7 +225,9 @@ include_directories(${CMAKE_SOURCE_DIR}/src/3rdparty/squirrel/include)
 
 include(MSVCFilters)
 
-add_executable(openttd WIN32 ${GENERATED_SOURCE_FILES})
+add_library(openttd_lib OBJECT ${GENERATED_SOURCE_FILES})
+add_executable(openttd WIN32)
+add_executable(openttd_test)
 set_target_properties(openttd PROPERTIES OUTPUT_NAME "${BINARY_NAME}")
 # All other files are added via target_sources()
 
@@ -232,17 +243,25 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/media)
 add_dependencies(openttd
     find_version)
 
-target_link_libraries(openttd
+target_link_libraries(openttd_lib
     openttd::languages
     openttd::settings
-    openttd::media
-    openttd::basesets
     openttd::script_api
     Threads::Threads
 )
 
+target_link_libraries(openttd
+    openttd_lib
+    openttd::media
+    openttd::basesets
+)
+
+target_link_libraries(openttd_test PRIVATE openttd_lib)
+include(Catch)
+catch_discover_tests(openttd_test)
+
 if(HAIKU)
-    target_link_libraries(openttd "be" "network" "midi")
+    target_link_libraries(openttd_lib "be" "network" "midi")
 endif()
 
 if(IPO_FOUND)
@@ -258,6 +277,10 @@ link_package(PNG TARGET PNG::PNG ENCOURAGED)
 link_package(ZLIB TARGET ZLIB::ZLIB ENCOURAGED)
 link_package(LIBLZMA TARGET LibLZMA::LibLZMA ENCOURAGED)
 link_package(LZO)
+
+if(NOT WIN32 AND NOT EMSCRIPTEN)
+    link_package(CURL ENCOURAGED)
+endif()
 
 if(NOT OPTION_DEDICATED)
     link_package(Fluidsynth)
@@ -280,10 +303,12 @@ if(NOT OPTION_DEDICATED)
     endif()
 endif()
 
+include(CheckAtomic)
+
 if(APPLE)
     link_package(Iconv TARGET Iconv::Iconv)
 
-    target_link_libraries(openttd
+    target_link_libraries(openttd_lib
         ${AUDIOTOOLBOX_LIBRARY}
         ${AUDIOUNIT_LIBRARY}
         ${COCOA_LIBRARY}
@@ -362,12 +387,13 @@ if(WIN32)
         -DPSAPI_VERSION=1
     )
 
-    target_link_libraries(openttd
+    target_link_libraries(openttd_lib
         ws2_32
         winmm
         imm32
         usp10
         psapi
+        winhttp
     )
 endif()
 

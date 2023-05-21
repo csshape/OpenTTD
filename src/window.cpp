@@ -37,8 +37,9 @@
 #include "video/video_driver.hpp"
 #include "framerate_type.h"
 #include "network/network_func.h"
-#include "guitimer_func.h"
 #include "news_func.h"
+#include "timer/timer.h"
+#include "timer/timer_window.h"
 
 #include "safeguards.h"
 
@@ -1009,9 +1010,10 @@ void Window::SetDirty() const
  * Re-initialize a window, and optionally change its size.
  * @param rx Horizontal resize of the window.
  * @param ry Vertical resize of the window.
+ * @param reposition If set, reposition the window to default location.
  * @note For just resizing the window, use #ResizeWindow instead.
  */
-void Window::ReInit(int rx, int ry)
+void Window::ReInit(int rx, int ry, bool reposition)
 {
 	this->SetDirty(); // Mark whole current window as dirty.
 
@@ -1037,6 +1039,12 @@ void Window::ReInit(int rx, int ry)
 	 * The cast to int is necessary else dx/dy are implicitly casted to unsigned int, which won't work. */
 	if (this->resize.step_width  > 1) dx -= dx % (int)this->resize.step_width;
 	if (this->resize.step_height > 1) dy -= dy % (int)this->resize.step_height;
+
+	if (reposition) {
+		Point pt = this->OnInitialPosition(this->nested_root->smallest_x, this->nested_root->smallest_y, window_number);
+		this->InitializePositionSize(pt.x, pt.y, this->nested_root->smallest_x, this->nested_root->smallest_y);
+		this->FindWindowPlacementAndResize(this->window_desc->GetDefaultWidth(), this->window_desc->GetDefaultHeight());
+	}
 
 	ResizeWindow(this, dx, dy);
 	/* ResizeWindow() does this->SetDirty() already, no need to do it again here. */
@@ -1367,8 +1375,8 @@ static uint GetWindowZPriority(WindowClass wc)
 		case WC_CUSTOM_CURRENCY:
 		case WC_NETWORK_WINDOW:
 		case WC_GRF_PARAMETERS:
-		case WC_AI_LIST:
-		case WC_AI_SETTINGS:
+		case WC_SCRIPT_LIST:
+		case WC_SCRIPT_SETTINGS:
 		case WC_TEXTFILE:
 			++z_priority;
 			FALLTHROUGH;
@@ -1886,14 +1894,9 @@ void ResetWindowSystem()
 
 static void DecreaseWindowCounters()
 {
-	static byte hundredth_tick_timeout = 100;
-
 	if (_scroller_click_timeout != 0) _scroller_click_timeout--;
-	if (hundredth_tick_timeout != 0) hundredth_tick_timeout--;
 
 	for (Window *w : Window::Iterate()) {
-		if (!_network_dedicated && hundredth_tick_timeout == 0) w->OnHundredthTick();
-
 		if (_scroller_click_timeout == 0) {
 			/* Unclick scrollbar buttons if they are pressed. */
 			for (uint i = 0; i < w->nested_array_size; i++) {
@@ -1925,8 +1928,6 @@ static void DecreaseWindowCounters()
 			w->RaiseButtons(true);
 		}
 	}
-
-	if (hundredth_tick_timeout == 0) hundredth_tick_timeout = 100;
 }
 
 static void HandlePlacePresize()
@@ -3076,30 +3077,54 @@ void CallWindowRealtimeTickEvent(uint delta_ms)
 	}
 }
 
+/** Update various of window-related information on a regular interval. */
+static IntervalTimer<TimerWindow> window_interval(std::chrono::milliseconds(30), [](auto) {
+	extern int _caret_timer;
+	_caret_timer += 3;
+	CursorTick();
+
+	HandleKeyScrolling();
+	HandleAutoscroll();
+	DecreaseWindowCounters();
+});
+
+/** Blink the window highlight colour constantly. */
+static IntervalTimer<TimerWindow> highlight_interval(std::chrono::milliseconds(450), [](auto) {
+	_window_highlight_colour = !_window_highlight_colour;
+});
+
+/** Blink all windows marked with a white border. */
+static IntervalTimer<TimerWindow> white_border_interval(std::chrono::milliseconds(30), [](auto) {
+	if (_network_dedicated) return;
+
+	for (Window *w : Window::Iterate()) {
+		if ((w->flags & WF_WHITE_BORDER) && --w->white_border_timer == 0) {
+			CLRBITS(w->flags, WF_WHITE_BORDER);
+			w->SetDirty();
+		}
+	}
+});
+
 /**
  * Update the continuously changing contents of the windows, such as the viewports
  */
 void UpdateWindows()
 {
-	static std::chrono::steady_clock::time_point last_time = std::chrono::steady_clock::now();
-	uint delta_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - last_time).count();
+	static auto last_time = std::chrono::steady_clock::now();
+	auto now = std::chrono::steady_clock::now();
+	auto delta_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_time);
 
-	if (delta_ms == 0) return;
+	if (delta_ms.count() == 0) return;
 
-	last_time = std::chrono::steady_clock::now();
+	last_time = now;
 
 	PerformanceMeasurer framerate(PFE_DRAWING);
 	PerformanceAccumulator::Reset(PFE_DRAWWORLD);
 
 	ProcessPendingPerformanceMeasurements();
 
-	CallWindowRealtimeTickEvent(delta_ms);
-
-	static GUITimer network_message_timer = GUITimer(1);
-	if (network_message_timer.Elapsed(delta_ms)) {
-		network_message_timer.SetInterval(1000);
-		NetworkChatMessageLoop();
-	}
+	TimerManager<TimerWindow>::Elapsed(delta_ms);
+	CallWindowRealtimeTickEvent(delta_ms.count());
 
 	/* Process invalidations before anything else. */
 	for (Window *w : Window::Iterate()) {
@@ -3107,41 +3132,9 @@ void UpdateWindows()
 		w->ProcessHighlightedInvalidations();
 	}
 
-	static GUITimer window_timer = GUITimer(1);
-	if (window_timer.Elapsed(delta_ms)) {
-		if (_network_dedicated) window_timer.SetInterval(MILLISECONDS_PER_TICK);
-
-		extern int _caret_timer;
-		_caret_timer += 3;
-		CursorTick();
-
-		HandleKeyScrolling();
-		HandleAutoscroll();
-		DecreaseWindowCounters();
-	}
-
-	static GUITimer highlight_timer = GUITimer(1);
-	if (highlight_timer.Elapsed(delta_ms)) {
-		highlight_timer.SetInterval(450);
-		_window_highlight_colour = !_window_highlight_colour;
-	}
-
-	if (!_pause_mode || _game_mode == GM_EDITOR || _settings_game.construction.command_pause_level > CMDPL_NO_CONSTRUCTION) MoveAllTextEffects(delta_ms);
-
 	/* Skip the actual drawing on dedicated servers without screen.
 	 * But still empty the invalidation queues above. */
 	if (_network_dedicated) return;
-
-	if (window_timer.HasElapsed()) {
-		window_timer.SetInterval(MILLISECONDS_PER_TICK);
-
-		for (Window *w : Window::Iterate()) {
-			if ((w->flags & WF_WHITE_BORDER) && --w->white_border_timer == 0) {
-				CLRBITS(w->flags, WF_WHITE_BORDER);
-				w->SetDirty();
-			}
-		}
-	}
 
 	DrawDirtyBlocks();
 

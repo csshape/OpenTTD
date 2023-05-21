@@ -26,7 +26,10 @@ jobs:
         HOMEBREW_NO_AUTO_UPDATE: 1
         HOMEBREW_NO_INSTALL_CLEANUP: 1
       run: |
-        brew install pandoc
+        brew install \
+          pandoc \
+          pkg-config \
+          # EOF
 
     - name: Prepare cache key
       id: key
@@ -45,6 +48,8 @@ jobs:
     - name: Prepare vcpkg
       run: |
         vcpkg install \
+          curl:x64-osx \
+          curl:arm64-osx \
           liblzma:x64-osx \
           liblzma:arm64-osx \
           libpng:x64-osx \
@@ -76,7 +81,7 @@ jobs:
         echo "::endgroup::"
 
     - name: Import code signing certificates
-      uses: Apple-Actions/import-codesign-certs@v1
+      uses: Apple-Actions/import-codesign-certs@v2
       with:
         # The certificates in a PKCS12 file encoded as a base64 string
         p12-file-base64: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_P12_BASE64 }}

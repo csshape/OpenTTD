@@ -84,6 +84,7 @@ enum GrfSpecFeature {
 	GSF_AIRPORTTILES,
 	GSF_ROADTYPES,
 	GSF_TRAMTYPES,
+	GSF_ROADSTOPS,
 	GSF_END,
 
 	GSF_FAKE_TOWNS = GSF_END, ///< Fake town GrfSpecFeature for NewGRF debugging (parent scope)
@@ -111,13 +112,14 @@ struct GRFFile : ZeroedMemoryAllocator {
 	uint sound_offset;
 	uint16 num_sounds;
 
-	struct StationSpec **stations;
-	struct HouseSpec **housespec;
-	struct IndustrySpec **industryspec;
-	struct IndustryTileSpec **indtspec;
-	struct ObjectSpec **objectspec;
-	struct AirportSpec **airportspec;
-	struct AirportTileSpec **airtspec;
+	std::vector<std::unique_ptr<struct StationSpec>> stations;
+	std::vector<std::unique_ptr<struct HouseSpec>> housespec;
+	std::vector<std::unique_ptr<struct IndustrySpec>> industryspec;
+	std::vector<std::unique_ptr<struct IndustryTileSpec>> indtspec;
+	std::vector<std::unique_ptr<struct ObjectSpec>> objectspec;
+	std::vector<std::unique_ptr<struct AirportSpec>> airportspec;
+	std::vector<std::unique_ptr<struct AirportTileSpec>> airtspec;
+	std::vector<std::unique_ptr<struct RoadStopSpec>> roadstops;
 
 	uint32 param[0x80];
 	uint param_end;  ///< one more than the highest set parameter
@@ -199,7 +201,8 @@ void ReloadNewGRFData(); // in saveload/afterload.cpp
 void ResetNewGRFData();
 void ResetPersistentNewGRFData();
 
-void CDECL grfmsg(int severity, const char *str, ...) WARN_FORMAT(2, 3);
+void GrfMsgI(int severity, const std::string &msg);
+#define GrfMsg(severity, format_string, ...) GrfMsgI(severity, fmt::format(FMT_STRING(format_string), ## __VA_ARGS__))
 
 bool GetGlobalVariable(byte param, uint32 *value, const GRFFile *grffile);
 

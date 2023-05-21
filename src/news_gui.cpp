@@ -13,6 +13,7 @@
 #include "strings_func.h"
 #include "window_func.h"
 #include "date_func.h"
+#include "timer/timer_game_calendar.h"
 #include "vehicle_base.h"
 #include "vehicle_func.h"
 #include "vehicle_gui.h"
@@ -32,10 +33,11 @@
 #include "command_func.h"
 #include "company_base.h"
 #include "settings_internal.h"
-#include "guitimer_func.h"
 #include "group_gui.h"
 #include "zoom_func.h"
 #include "news_cmd.h"
+#include "timer/timer.h"
+#include "timer/timer_window.h"
 
 #include "widgets/news_widget.h"
 
@@ -267,9 +269,6 @@ struct NewsWindow : Window {
 	const NewsItem *ni;   ///< News item to display.
 	static int duration;  ///< Remaining time for showing the current news message (may only be access while a news item is displayed).
 
-	static const uint TIMER_INTERVAL = 210; ///< Scrolling interval, scaled by line text line height. This value chosen to maintain the 15ms at normal zoom.
-	GUITimer timer;
-
 	NewsWindow(WindowDesc *desc, const NewsItem *ni) : Window(desc), ni(ni)
 	{
 		NewsWindow::duration = 16650;
@@ -322,11 +321,6 @@ struct NewsWindow : Window {
 		PositionNewsMessage(this);
 	}
 
-	void OnInit() override
-	{
-		this->timer.SetInterval(TIMER_INTERVAL / FONT_HEIGHT_NORMAL);
-	}
-
 	void DrawNewsBorder(const Rect &r) const
 	{
 		Rect ir = r.Shrink(WidgetDimensions::scaled.bevel);
@@ -359,7 +353,7 @@ struct NewsWindow : Window {
 			}
 
 			case WID_N_MGR_FACE:
-				*size = maxdim(*size, GetSpriteSize(SPR_GRADIENT));
+				*size = maxdim(*size, GetScaledSpriteSize(SPR_GRADIENT));
 				break;
 
 			case WID_N_MGR_NAME:
@@ -442,7 +436,7 @@ struct NewsWindow : Window {
 
 			case WID_N_MGR_FACE: {
 				const CompanyNewsInformation *cni = static_cast<const CompanyNewsInformation*>(this->ni->data.get());
-				DrawCompanyManagerFace(cni->face, cni->colour, r.left, r.top);
+				DrawCompanyManagerFace(cni->face, cni->colour, r);
 				GfxFillRect(r.left, r.top, r.right, r.bottom, PALETTE_NEWSPAPER, FILLRECT_RECOLOUR);
 				break;
 			}
@@ -554,17 +548,27 @@ struct NewsWindow : Window {
 
 	void OnRealtimeTick(uint delta_ms) override
 	{
-		int count = this->timer.CountElapsed(delta_ms);
-		if (count > 0) {
-			/* Scroll up newsmessages from the bottom */
-			int newtop = std::max(this->top - 2 * count, _screen.height - this->height - this->status_height - this->chat_height - _settings_client.gui.statusbar_pos_offset);
-			this->SetWindowTop(newtop);
-		}
+//		int count = this->timer.CountElapsed(delta_ms);
+//		if (count > 0) {
+//			/* Scroll up newsmessages from the bottom */
+//			int newtop = std::max(this->top - 2 * count, _screen.height - this->height - this->status_height - this->chat_height - _settings_client.gui.statusbar_pos_offset);
+//			this->SetWindowTop(newtop);
+//		}
 
 		/* Decrement the news timer. We don't need to action an elapsed event here,
 		 * so no need to use TimerElapsed(). */
 		if (NewsWindow::duration > 0) NewsWindow::duration -= delta_ms;
 	}
+
+	/**
+	 * Scroll the news message slowly up from the bottom.
+	 *
+	 * The interval of 210ms is chosen to maintain 15ms at normal zoom: 210 / FONT_HEIGHT_NORMAL = 15ms.
+	 */
+	IntervalTimer<TimerWindow> scroll_interval = {std::chrono::milliseconds(210) / FONT_HEIGHT_NORMAL, [this](uint count) {
+		int newtop = std::max(this->top - 2 * static_cast<int>(count), _screen.height - this->height - this->status_height - this->chat_height);
+		this->SetWindowTop(newtop);
+	}};
 
 private:
 	/**
@@ -601,7 +605,7 @@ private:
 				return STR_NEWS_NEW_VEHICLE_NOW_AVAILABLE;
 
 			case WID_N_VEH_NAME:
-				SetDParam(0, engine);
+				SetDParam(0, PackEngineNameDParam(engine, EngineNameContext::PreviewNews));
 				return STR_NEWS_NEW_VEHICLE_TYPE;
 
 			default:
@@ -690,7 +694,7 @@ static void MoveToNextTickerItem()
 		const NewsType type = ni->type;
 
 		/* check the date, don't show too old items */
-		if (_date - _news_type_data[type].age > ni->date) continue;
+		if (TimerGameCalendar::date - _news_type_data[type].age > ni->date) continue;
 
 		switch (_news_type_data[type].GetDisplay()) {
 			default: NOT_REACHED();
@@ -727,7 +731,7 @@ static void MoveToNextNewsItem()
 		const NewsType type = ni->type;
 
 		/* check the date, don't show too old items */
-		if (_date - _news_type_data[type].age > ni->date) continue;
+		if (TimerGameCalendar::date - _news_type_data[type].age > ni->date) continue;
 
 		switch (_news_type_data[type].GetDisplay()) {
 			default: NOT_REACHED();
@@ -804,10 +808,10 @@ static void DeleteNewsItem(NewsItem *ni)
  * @see NewsSubtype
  */
 NewsItem::NewsItem(StringID string_id, NewsType type, NewsFlag flags, NewsReferenceType reftype1, uint32 ref1, NewsReferenceType reftype2, uint32 ref2, const NewsAllocatedData *data) :
-	string_id(string_id), date(_date), type(type), flags(flags), reftype1(reftype1), reftype2(reftype2), ref1(ref1), ref2(ref2), data(data)
+	string_id(string_id), date(TimerGameCalendar::date), type(type), flags(flags), reftype1(reftype1), reftype2(reftype2), ref1(ref1), ref2(ref2), data(data)
 {
 	/* show this news message in colour? */
-	if (_cur_year >= _settings_client.gui.coloured_news_year) this->flags |= NF_INCOLOUR;
+	if (TimerGameCalendar::year >= _settings_client.gui.coloured_news_year) this->flags |= NF_INCOLOUR;
 	CopyOutDParam(this->params, 0, lengthof(this->params));
 }
 
@@ -987,7 +991,7 @@ static void RemoveOldNewsItems()
 	NewsItem *next;
 	for (NewsItem *cur = _oldest_news; _total_news > MIN_NEWS_AMOUNT && cur != nullptr; cur = next) {
 		next = cur->next;
-		if (_date - _news_type_data[cur->type].age * _settings_client.gui.news_message_timeout > cur->date) DeleteNewsItem(cur);
+		if (TimerGameCalendar::date - _news_type_data[cur->type].age * _settings_client.gui.news_message_timeout > cur->date) DeleteNewsItem(cur);
 	}
 }
 
@@ -1013,9 +1017,9 @@ void NewsLoop()
 
 	static byte _last_clean_month = 0;
 
-	if (_last_clean_month != _cur_month) {
+	if (_last_clean_month != TimerGameCalendar::month) {
 		RemoveOldNewsItems();
-		_last_clean_month = _cur_month;
+		_last_clean_month = TimerGameCalendar::month;
 	}
 
 	if (ReadyForNextTickerItem()) MoveToNextTickerItem();

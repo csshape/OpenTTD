@@ -29,7 +29,7 @@
 #include "object_base.h"
 #include "newgrf_config.h"
 #include "newgrf_object.h"
-#include "date_func.h"
+#include "timer/timer_game_calendar.h"
 #include "newgrf_debug.h"
 #include "vehicle_func.h"
 #include "station_func.h"
@@ -61,7 +61,7 @@ uint16 Object::counts[NUM_OBJECTS];
  * @pre IsTileType(t, MP_OBJECT)
  * @return the type.
  */
-ObjectType GetObjectType(TileIndex t)
+ObjectType GetObjectType(Tile t)
 {
 	assert(IsTileType(t, MP_OBJECT));
 	return Object::GetByTile(t)->type;
@@ -92,7 +92,7 @@ void BuildObject(ObjectType type, TileIndex tile, CompanyID owner, Town *town, u
 	o->type          = type;
 	o->location      = ta;
 	o->town          = town == nullptr ? CalcClosestTownFromTile(tile) : town;
-	o->build_date    = _date;
+	o->build_date    = TimerGameCalendar::date;
 	o->view          = view;
 
 	/* If nothing owns the object, the colour will be random. Otherwise
@@ -120,7 +120,7 @@ void BuildObject(ObjectType type, TileIndex tile, CompanyID owner, Town *town, u
 	for (TileIndex t : ta) {
 		WaterClass wc = (IsWaterTile(t) ? GetWaterClass(t) : WATER_CLASS_INVALID);
 		/* Update company infrastructure counts for objects build on canals owned by nobody. */
-		if (wc == WATER_CLASS_CANAL && owner != OWNER_NONE && (IsTileOwner(tile, OWNER_NONE) || IsTileOwner(tile, OWNER_WATER))) {
+		if (wc == WATER_CLASS_CANAL && owner != OWNER_NONE && (IsTileOwner(t, OWNER_NONE) || IsTileOwner(t, OWNER_WATER))) {
 			Company::Get(owner)->infrastructure.water++;
 			DirtyCompanyInfrastructureWindows(owner);
 		}
@@ -207,7 +207,7 @@ CommandCost CmdBuildObject(DoCommandFlag flags, TileIndex tile, ObjectType type,
 {
 	CommandCost cost(EXPENSES_CONSTRUCTION);
 
-	if (type >= NUM_OBJECTS) return CMD_ERROR;
+	if (type >= ObjectSpec::Count()) return CMD_ERROR;
 	const ObjectSpec *spec = ObjectSpec::Get(type);
 	if (_game_mode == GM_NORMAL && !spec->IsAvailable() && !_generating_world) return CMD_ERROR;
 	if ((_game_mode == GM_EDITOR || _generating_world) && !spec->WasEverAvailable()) return CMD_ERROR;
@@ -388,7 +388,7 @@ CommandCost CmdBuildObjectArea(DoCommandFlag flags, TileIndex tile, TileIndex st
 {
 	if (start_tile >= Map::Size()) return CMD_ERROR;
 
-	if (type >= NUM_OBJECTS) return CMD_ERROR;
+	if (type >= ObjectSpec::Count()) return CMD_ERROR;
 	const ObjectSpec *spec = ObjectSpec::Get(type);
 	if (view >= spec->views) return CMD_ERROR;
 
@@ -486,7 +486,7 @@ static void DrawTile_Object(TileInfo *ti)
 	DrawBridgeMiddle(ti);
 }
 
-static int GetSlopePixelZ_Object(TileIndex tile, uint x, uint y)
+static int GetSlopePixelZ_Object(TileIndex tile, uint x, uint y, bool ground_vehicle)
 {
 	if (IsObjectType(tile, OBJECT_OWNED_LAND)) {
 		int z;
@@ -588,7 +588,7 @@ static CommandCost ClearTile_Object(TileIndex tile, DoCommandFlag flags)
 			if (flags & DC_EXEC) {
 				c->location_of_HQ = INVALID_TILE; // reset HQ position
 				SetWindowDirty(WC_COMPANY, c->index);
-				CargoPacket::InvalidateAllFrom(ST_HEADQUARTERS, c->index);
+				CargoPacket::InvalidateAllFrom(SourceType::Headquarters, c->index);
 			}
 
 			/* cost of relocating company is 1% of company value */
@@ -686,7 +686,7 @@ static void TileLoop_Object(TileIndex tile)
 	if (GB(r, 0, 8) < (256 / 4 / (6 - level))) {
 		uint amt = GB(r, 0, 8) / 8 / 4 + 1;
 		if (EconomyIsInRecession()) amt = (amt + 1) >> 1;
-		MoveGoodsToStation(CT_PASSENGERS, amt, ST_HEADQUARTERS, GetTileOwner(tile), stations.GetStations());
+		MoveGoodsToStation(CT_PASSENGERS, amt, SourceType::Headquarters, GetTileOwner(tile), stations.GetStations());
 	}
 
 	/* Top town building generates 90, HQ can make up to 196. The
@@ -695,7 +695,7 @@ static void TileLoop_Object(TileIndex tile)
 	if (GB(r, 8, 8) < (196 / 4 / (6 - level))) {
 		uint amt = GB(r, 8, 8) / 8 / 4 + 1;
 		if (EconomyIsInRecession()) amt = (amt + 1) >> 1;
-		MoveGoodsToStation(CT_MAIL, amt, ST_HEADQUARTERS, GetTileOwner(tile), stations.GetStations());
+		MoveGoodsToStation(CT_MAIL, amt, SourceType::Headquarters, GetTileOwner(tile), stations.GetStations());
 	}
 }
 
@@ -792,7 +792,7 @@ static bool TryBuildTransmitter()
 void GenerateObjects()
 {
 	/* Set a guestimate on how much we progress */
-	SetGeneratingWorldProgress(GWP_OBJECT, NUM_OBJECTS);
+	SetGeneratingWorldProgress(GWP_OBJECT, (uint)ObjectSpec::Count());
 
 	/* Determine number of water tiles at map border needed for freeform_edges */
 	uint num_water_tiles = 0;
@@ -808,21 +808,20 @@ void GenerateObjects()
 	}
 
 	/* Iterate over all possible object types */
-	for (uint i = 0; i < NUM_OBJECTS; i++) {
-		const ObjectSpec *spec = ObjectSpec::Get(i);
+	for (const auto &spec : ObjectSpec::Specs()) {
 
 		/* Continue, if the object was never available till now or shall not be placed */
-		if (!spec->WasEverAvailable() || spec->generate_amount == 0) continue;
+		if (!spec.WasEverAvailable() || spec.generate_amount == 0) continue;
 
-		uint16 amount = spec->generate_amount;
+		uint16 amount = spec.generate_amount;
 
 		/* Scale by map size */
-		if ((spec->flags & OBJECT_FLAG_SCALE_BY_WATER) && _settings_game.construction.freeform_edges) {
+		if ((spec.flags & OBJECT_FLAG_SCALE_BY_WATER) && _settings_game.construction.freeform_edges) {
 			/* Scale the amount of lighthouses with the amount of land at the borders.
 			 * The -6 is because the top borders are MP_VOID (-2) and all corners
 			 * are counted twice (-4). */
 			amount = Map::ScaleBySize1D(amount * num_water_tiles) / (2 * Map::MaxY() + 2 * Map::MaxX() - 6);
-		} else if (spec->flags & OBJECT_FLAG_SCALE_BY_WATER) {
+		} else if (spec.flags & OBJECT_FLAG_SCALE_BY_WATER) {
 			amount = Map::ScaleBySize1D(amount);
 		} else {
 			amount = Map::ScaleBySize(amount);
@@ -830,7 +829,7 @@ void GenerateObjects()
 
 		/* Now try to place the requested amount of this object */
 		for (uint j = Map::ScaleBySize(1000); j != 0 && amount != 0 && Object::CanAllocateItem(); j--) {
-			switch (i) {
+			switch (spec.Index()) {
 				case OBJECT_TRANSMITTER:
 					if (TryBuildTransmitter()) amount--;
 					break;
@@ -840,8 +839,8 @@ void GenerateObjects()
 					break;
 
 				default:
-					uint8 view = RandomRange(spec->views);
-					if (CmdBuildObject(DC_EXEC | DC_AUTO | DC_NO_TEST_TOWN_RATING | DC_NO_MODIFY_TOWN_RATING, RandomTile(), i, view).Succeeded()) amount--;
+					uint8 view = RandomRange(spec.views);
+					if (CmdBuildObject(DC_EXEC | DC_AUTO | DC_NO_TEST_TOWN_RATING | DC_NO_MODIFY_TOWN_RATING, RandomTile(), spec.Index(), view).Succeeded()) amount--;
 					break;
 			}
 		}

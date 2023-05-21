@@ -9,6 +9,10 @@ on:
     branches:
     - master
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
 jobs:
   analyze:
     name: Analyze
@@ -31,6 +35,7 @@ jobs:
         echo "::group::Install dependencies"
         sudo apt-get install -y --no-install-recommends \
           liballegro4-dev \
+          libcurl4-openssl-dev \
           libfontconfig-dev \
           libicu-dev \
           liblzma-dev \
@@ -69,6 +74,7 @@ jobs:
           +**/*.*
           -**/table/*.*
           -**/generated/**/*.*
+          -**/tests/*.*
         input: sarif-results/cpp.sarif
         output: sarif-results/cpp.sarif
 

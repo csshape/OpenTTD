@@ -30,6 +30,7 @@
 #include "viewport_func.h"
 #include "window_func.h"
 #include "date_func.h"
+#include "timer/timer_game_calendar.h"
 #include "company_func.h"
 #include "gamelog.h"
 #include "ai/ai.hpp"
@@ -384,7 +385,8 @@ DEF_CONSOLE_CMD(ConSave)
 	}
 
 	if (argc == 2) {
-		char *filename = str_fmt("%s.sav", argv[1]);
+		std::string filename = argv[1];
+		filename += ".sav";
 		IConsolePrint(CC_DEFAULT, "Saving map...");
 
 		if (SaveOrLoad(filename, SLO_SAVE, DFT_GAME_FILE, SAVE_DIR) != SL_OK) {
@@ -392,7 +394,6 @@ DEF_CONSOLE_CMD(ConSave)
 		} else {
 			IConsolePrint(CC_INFO, "Map successfully saved to '{}'.", filename);
 		}
-		free(filename);
 		return true;
 	}
 
@@ -1130,7 +1131,7 @@ DEF_CONSOLE_CMD(ConNewGame)
 		return true;
 	}
 
-	StartNewGameWithoutGUI((argc == 2) ? strtoul(argv[1], nullptr, 10) : GENERATE_NEW_SEED);
+	StartNewGameWithoutGUI((argc == 2) ? std::strtoul(argv[1], nullptr, 10) : GENERATE_NEW_SEED);
 	return true;
 }
 
@@ -1451,7 +1452,7 @@ DEF_CONSOLE_CMD(ConGetDate)
 	}
 
 	YearMonthDay ymd;
-	ConvertDateToYMD(_date, &ymd);
+	ConvertDateToYMD(TimerGameCalendar::date, &ymd);
 	IConsolePrint(CC_DEFAULT, "Date: {:04d}-{:02d}-{:02d}", ymd.year, ymd.month + 1, ymd.day);
 	return true;
 }
@@ -1606,7 +1607,7 @@ DEF_CONSOLE_CMD(ConDebugLevel)
 	if (argc == 1) {
 		IConsolePrint(CC_DEFAULT, "Current debug-level: '{}'", GetDebugString());
 	} else {
-		SetDebugString(argv[1], [](const char *err) { IConsolePrint(CC_ERROR, std::string(err)); });
+		SetDebugString(argv[1], [](const std::string &err) { IConsolePrint(CC_ERROR, err); });
 	}
 
 	return true;
@@ -2290,7 +2291,7 @@ DEF_CONSOLE_CMD(ConNewGRFProfile)
 			IConsolePrint(CC_DEBUG, "Started profiling for GRFID{} {}.", (started > 1) ? "s" : "", grfids);
 			if (argc >= 3) {
 				int days = std::max(atoi(argv[2]), 1);
-				_newgrf_profile_end_date = _date + days;
+				_newgrf_profile_end_date = TimerGameCalendar::date + days;
 
 				char datestrbuf[32]{ 0 };
 				SetDParam(0, _newgrf_profile_end_date);

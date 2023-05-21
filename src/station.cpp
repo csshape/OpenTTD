@@ -13,7 +13,6 @@
 #include "roadveh.h"
 #include "viewport_func.h"
 #include "viewport_kdtree.h"
-#include "date_func.h"
 #include "command_func.h"
 #include "news_func.h"
 #include "aircraft.h"
@@ -104,9 +103,9 @@ Station::~Station()
 		if (lg == nullptr) continue;
 
 		for (NodeID node = 0; node < lg->Size(); ++node) {
-			Station *st = Station::Get((*lg)[node].Station());
+			Station *st = Station::Get((*lg)[node].station);
 			st->goods[c].flows.erase(this->index);
-			if ((*lg)[node][this->goods[c].node].LastUpdate() != INVALID_DATE) {
+			if ((*lg)[node].HasEdgeTo(this->goods[c].node) && (*lg)[node][this->goods[c].node].LastUpdate() != INVALID_DATE) {
 				st->goods[c].flows.DeleteFlows(this->index);
 				RerouteCargo(st, c, this->index, st->index);
 			}
@@ -170,6 +169,36 @@ void BaseStation::PostDestructor(size_t index)
 	InvalidateWindowData(WC_SELECT_STATION, 0, 0);
 }
 
+void BaseStation::SetRoadStopTileData(TileIndex tile, byte data, bool animation)
+{
+	for (RoadStopTileData &tile_data : this->custom_roadstop_tile_data) {
+		if (tile_data.tile == tile) {
+			if (animation) {
+				tile_data.animation_frame = data;
+			} else {
+				tile_data.random_bits = data;
+			}
+			return;
+		}
+	}
+	RoadStopTileData tile_data;
+	tile_data.tile = tile;
+	tile_data.animation_frame = animation ? data : 0;
+	tile_data.random_bits = animation ? 0 : data;
+	this->custom_roadstop_tile_data.push_back(tile_data);
+}
+
+void BaseStation::RemoveRoadStopTileData(TileIndex tile)
+{
+	for (RoadStopTileData &tile_data : this->custom_roadstop_tile_data) {
+		if (tile_data.tile == tile) {
+			tile_data = this->custom_roadstop_tile_data.back();
+			this->custom_roadstop_tile_data.pop_back();
+			return;
+		}
+	}
+}
+
 /**
  * Get the primary road stop (the first road stop) that the given vehicle can load/unload.
  * @param v the vehicle to get the first road stop for
@@ -204,7 +233,7 @@ void Station::AddFacility(StationFacility new_facility_bit, TileIndex facil_xy)
 	}
 	this->facilities |= new_facility_bit;
 	this->owner = _current_company;
-	this->build_date = _date;
+	this->build_date = TimerGameCalendar::date;
 }
 
 /**
@@ -425,11 +454,12 @@ bool Station::CatchmentCoversTown(TownID t) const
 /**
  * Recompute tiles covered in our catchment area.
  * This will additionally recompute nearby towns and industries.
+ * @param no_clear_nearby_lists If Station::RemoveFromAllNearbyLists does not need to be called.
  */
-void Station::RecomputeCatchment()
+void Station::RecomputeCatchment(bool no_clear_nearby_lists)
 {
 	this->industries_near.clear();
-	this->RemoveFromAllNearbyLists();
+	if (!no_clear_nearby_lists) this->RemoveFromAllNearbyLists();
 
 	if (this->rect.IsEmpty()) {
 		this->catchment_tiles.Reset();
@@ -496,7 +526,9 @@ void Station::RecomputeCatchment()
  */
 /* static */ void Station::RecomputeCatchmentForAll()
 {
-	for (Station *st : Station::Iterate()) { st->RecomputeCatchment(); }
+	for (Town *t : Town::Iterate()) { t->stations_near.clear(); }
+	for (Industry *i : Industry::Iterate()) { i->stations_near.clear(); }
+	for (Station *st : Station::Iterate()) { st->RecomputeCatchment(true); }
 }
 
 /************************************************************************/

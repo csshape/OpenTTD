@@ -32,9 +32,9 @@
 
 #include "../../../string_type.h"
 
-typedef __int64_t SQInteger;
-typedef __uint64_t SQUnsignedInteger;
-typedef __uint64_t SQHash; /*should be the same size of a pointer*/
+typedef int64_t SQInteger;
+typedef uint64_t SQUnsignedInteger;
+typedef uint64_t SQHash; /*should be the same size of a pointer*/
 typedef int SQInt32;
 
 
@@ -44,7 +44,7 @@ typedef double SQFloat;
 typedef float SQFloat;
 #endif
 
-typedef __int64_t SQRawObjectVal; //must be 64bits
+typedef int64_t SQRawObjectVal; //must be 64bits
 #define SQ_OBJECT_RAWINIT() { _unVal.raw = 0; }
 
 typedef void* SQUserPointer;
@@ -174,7 +174,7 @@ typedef SQObject HSQOBJECT;
 typedef SQInteger (*SQFUNCTION)(HSQUIRRELVM);
 typedef SQInteger (*SQRELEASEHOOK)(SQUserPointer,SQInteger size);
 typedef void (*SQCOMPILERERROR)(HSQUIRRELVM,const SQChar * /*desc*/,const SQChar * /*source*/,SQInteger /*line*/,SQInteger /*column*/);
-typedef void (*SQPRINTFUNCTION)(HSQUIRRELVM,const SQChar * ,...);
+typedef void (*SQPRINTFUNCTION)(HSQUIRRELVM,const std::string &);
 
 typedef SQInteger (*SQWRITEFUNC)(SQUserPointer,SQUserPointer,SQInteger);
 typedef SQInteger (*SQREADFUNC)(SQUserPointer,SQUserPointer,SQInteger);

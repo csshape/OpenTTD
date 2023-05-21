@@ -196,6 +196,7 @@ STR_UNITS_VELOCITY_IMPERIAL                                     :{COMMA}{NBSP}mp
 STR_UNITS_VELOCITY_METRIC                                       :{COMMA}{NBSP}km/h
 STR_UNITS_VELOCITY_SI                                           :{COMMA}{NBSP}m/s
 STR_UNITS_VELOCITY_GAMEUNITS                                    :{DECIMAL}{NBSP}cel·les/dia
+STR_UNITS_VELOCITY_KNOTS                                        :{COMMA}{NBSP}{P nus nusos}
 
 STR_UNITS_POWER_IMPERIAL                                        :{COMMA}{NBSP}cv
 STR_UNITS_POWER_METRIC                                          :{COMMA}{NBSP}cv
@@ -344,9 +345,9 @@ STR_GOTO_ORDER_VIEW_TOOLTIP                                     :{BLACK}Obre la 
 ###length 31
 STR_TOOLBAR_TOOLTIP_PAUSE_GAME                                  :{BLACK}Posa en pausa o reprèn la partida
 STR_TOOLBAR_TOOLTIP_FORWARD                                     :{BLACK}Avança la partida el més ràpid possible
-STR_TOOLBAR_TOOLTIP_OPTIONS                                     :{BLACK}Opcions
-STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Desa la partida, abandona-la o surt del programa
-STR_TOOLBAR_TOOLTIP_DISPLAY_MAP                                 :{BLACK}Mostra el mapa, finestres de visualització o llista de senyals, entre d'altres
+STR_TOOLBAR_TOOLTIP_OPTIONS                                     :{BLACK}Opcions i configuració
+STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Desa o carrega una partida, abandona-la o surt del programa.
+STR_TOOLBAR_TOOLTIP_DISPLAY_MAP                                 :{BLACK}Mostra el mapa, vistes addicionals, la llista de senyals o el flux de càrrega.
 STR_TOOLBAR_TOOLTIP_DISPLAY_TOWN_DIRECTORY                      :{BLACK}Mostra la llista de poblacions
 STR_TOOLBAR_TOOLTIP_DISPLAY_SUBSIDIES                           :{BLACK}Mostra les subvencions
 STR_TOOLBAR_TOOLTIP_DISPLAY_LIST_OF_COMPANY_STATIONS            :{BLACK}Mostra la llista d'estacions de la companyia
@@ -356,7 +357,7 @@ STR_TOOLBAR_TOOLTIP_DISPLAY_STORY_BOOK                          :{BLACK}Mostra e
 STR_TOOLBAR_TOOLTIP_DISPLAY_GOALS_LIST                          :{BLACK}Mostra la llista d'objectius
 STR_TOOLBAR_TOOLTIP_DISPLAY_GRAPHS                              :{BLACK}Mostra gràfics de l'evolució de les companyies i les tarifes de transport.
 STR_TOOLBAR_TOOLTIP_DISPLAY_COMPANY_LEAGUE                      :{BLACK}Mostra la taula de la lliga de companyies.
-STR_TOOLBAR_TOOLTIP_FUND_CONSTRUCTION_OF_NEW                    :{BLACK}Finança la construcció d'una nova indústria
+STR_TOOLBAR_TOOLTIP_FUND_CONSTRUCTION_OF_NEW                    :{BLACK}Examina les indústries o finança la construcció d'una indústria nova.
 STR_TOOLBAR_TOOLTIP_DISPLAY_LIST_OF_COMPANY_TRAINS              :{BLACK}Mostra la llista de trens de la companyia. Ctrl+Clic commuta l'obertura de la llista de grups/vehicles.
 STR_TOOLBAR_TOOLTIP_DISPLAY_LIST_OF_COMPANY_ROAD_VEHICLES       :{BLACK}Mostra la llista de vehicles de la companyia. Ctrl+Clic commuta l'obertura de la llista de grups/vehicles.
 STR_TOOLBAR_TOOLTIP_DISPLAY_LIST_OF_COMPANY_SHIPS               :{BLACK}Mostra la llista de vaixells de la companyia. Ctrl+Clic canvia entre l'obertura de la llista de grups/vehicles.
@@ -370,8 +371,8 @@ STR_TOOLBAR_TOOLTIP_BUILD_SHIP_DOCKS                            :{BLACK}Construe
 STR_TOOLBAR_TOOLTIP_BUILD_AIRPORTS                              :{BLACK}Construeix aeroports
 STR_TOOLBAR_TOOLTIP_LANDSCAPING                                 :{BLACK}Obre la barra d'eines del terreny per elevar/rebaixar el terreny, plantar arbres, etc.
 STR_TOOLBAR_TOOLTIP_SHOW_SOUND_MUSIC_WINDOW                     :{BLACK}Mostra la finestra de so/música
-STR_TOOLBAR_TOOLTIP_SHOW_LAST_MESSAGE_NEWS                      :{BLACK}Mostra els darrers missatges/notícies i l'historial disponible
-STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Informació de terreny, consola, depuració de scripts, captures de pantalla, informació de l'OpenTTD...
+STR_TOOLBAR_TOOLTIP_SHOW_LAST_MESSAGE_NEWS                      :{BLACK}Mostra els darrers missatges/notícies i l'historial disponible o esborra tots els missatges.
+STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Informació de terreny, captures de pantalla i informació sobre l'OpenTTD i eines de desenvolupament.
 STR_TOOLBAR_TOOLTIP_SWITCH_TOOLBAR                              :{BLACK}Commuta barres d'eines
 
 # Extra tooltips for the scenario editor toolbar
@@ -983,10 +984,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Seleccio
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Inactiu
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Cada mes
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Cada 3 mesos
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Cada 6 mesos
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Cada 12 mesos
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Idioma
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Selecciona l'idioma de la interfície
@@ -1207,6 +1204,9 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Dreta
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Préstec inicial màxim: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Quantitat màxima del préstec que pot demanar una companyia (sense tenir en compte la inflació)
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_VALUE                   :{CURRENCY_LONG}
+###setting-zero-is-special
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_DISABLED                :Sense préstec {RED}Fa falta un script de partida que doni els fons inicials
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Taxa d'interès: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Tipus d'interès dels préstecs; també controla la inflació, si està activada
@@ -1806,6 +1806,9 @@ STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :Permet comprar 
 
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :Edat mínima de la companyia per negociar participacions: {STRING}
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_HELPTEXT                :Estableix l'edat mínima d'una companyia per tal que els altres competidors puguin comprar-ne o vendre accions.
+STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_VALUE                   :{COMMA} any{P "" s}
+###setting-zero-is-special
+STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_NO_MIN                  :Sense mínim
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Percentatge del benefici total a pagar en transferències: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Percentatge del benefici donat a branques intermediàries dins els sistemes, donant més control sobre els beneficis
@@ -1920,10 +1923,6 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :Cap
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Multiplicador de mida inicial de ciutats: {STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :La grandària mitjana de les ciutats en relació als pobles a l'inici de la partida.
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :Actualitza el graf de distribució cada {STRING}{NBSP}di{P 0:2 a es}
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL_HELPTEXT                  :Temps entre recàlculs successius del graf de distribució. Cada recàlcul calcula els plans per un component del graf. Això significa que un valor X per aquest paràmetre no implica que tot el graf serà actualitzat cada X dies. Només alguns components ho seran. Com més curt el valor, més temps de processador es requerirà per calcular-ho. Com més llarg, més temps passarà fins que la distribució de càrregues comenci en noves rutes.
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :Empra {STRING}{NBSP}di{P 0:2 a es} per al recàlcul del graf de distribució
-STR_CONFIG_SETTING_LINKGRAPH_TIME_HELPTEXT                      :Temps dedicat a cada recàlcul d'un component del graf de connexions. Quan un recàlcul s'inicia, el programa crea un fil que pot executar-se durant aquest nombre de dies. Com més curt el valor, més probable que el fil no hagi acabat quan s'espera. Aleshores el programa s'atura fins que el fil acaba ("ralentització"). Com més llarg el valor, més temps requereix l'actualització de la distribució quan les rutes canvien.
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :Mode de distribució per passatgers: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :"Simètric" vol dir que aproximadament el mateix nombre de passatgers aniran des de l'estació A a la B que de B a A. "Asimètric" significa que un nombre arbitrari de passatgers poden anar en qualsevol dels dos sentits. "Manual" vol dir que no s'aplicarà una distribució automàtica pels passatgers.
@@ -1949,13 +1948,15 @@ STR_CONFIG_SETTING_DEMAND_SIZE_HELPTEXT                         :Indicant menys 
 STR_CONFIG_SETTING_SHORT_PATH_SATURATION                        :Saturació de camins curts abans d'usar camins d'alta capacitat: {STRING}
 STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :Sovint hi ha diversos camins entre dues estacions donades. Cargodist primer saturarà el camí més curt, després usarà el segon camí més curt fins a saturar-lo i així successivament. La saturació és determinada per una estimació de la capacitat i l'ús previst. Un cop ha saturat tots els camins, si encara hi ha demanda, sobrecarregarà tots els camins, preferint aquells de major capacitat. No obstant, molt sovint l'algoritme no farà una estimació acurada de la capacitat. Aquest paràmetre us permet especificar fins a quin percentatge un camí més curt ha de ser saturat en la primera ronda abans d'escollir el següent en longitud. Indiqueu menys del 100% per evitar la superpoblació d'estacions en cas de capacitat sobreestimada.
 
-STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Unitats de velocitat: {STRING}
+STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Unitats de velocitat (terrestres): {STRING}
+STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_NAUTICAL         :Unitats de velocitat (nàutiques): {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Quan es mostren velocitats a la interfície d'usuari, presenta-les en les unitats seleccionades
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :Imperial (mph)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :Mètric (km/h)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (m/s)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_GAMEUNITS        :Unitats del joc (cel·les/dia)
+STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_KNOTS            :Nusos
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_POWER                     :Unitats de potència dels vehicles: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_POWER_HELPTEXT            :Quan es mostra la potència d'un vehicle a la interfície d'usuari, presenta-la en les unitats seleccionades
@@ -2356,7 +2357,8 @@ STR_NETWORK_CLIENT_LIST_NEW_COMPANY                             :(Companyia nova
 STR_NETWORK_CLIENT_LIST_NEW_COMPANY_TOOLTIP                     :{BLACK}Crea una companyia nova i uniu-vos.
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_SELF_TOOLTIP                :{BLACK}Aquest ets tu.
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_HOST_TOOLTIP                :{BLACK}Aquest és l'hoste de la partida.
-STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} client{P "" s} / {NUM} companyi{P a es}
+STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} client{P "" s} - {NUM}/{NUM} companyi{P a es}
+STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT_TOOLTIP            :{BLACK}El nombre de clients connectats actualment, el nombre de companyies i el nombre màxim de companyies permeses per l'administrador del servidor.
 
 # Matches ConnectionType
 ###length 5
@@ -2993,7 +2995,7 @@ STR_LAI_TREE_NAME_CACTUS_PLANTS                                 :Plantes de Cact
 STR_LAI_STATION_DESCRIPTION_RAILROAD_STATION                    :Estació de Ferrocarril
 STR_LAI_STATION_DESCRIPTION_AIRCRAFT_HANGAR                     :Hangar d'Avions
 STR_LAI_STATION_DESCRIPTION_AIRPORT                             :Aeroport
-STR_LAI_STATION_DESCRIPTION_TRUCK_LOADING_AREA                  :Àrea de càrrega de camions
+STR_LAI_STATION_DESCRIPTION_TRUCK_LOADING_AREA                  :Moll de càrrega de camions
 STR_LAI_STATION_DESCRIPTION_BUS_STATION                         :Parada d'autobús
 STR_LAI_STATION_DESCRIPTION_SHIP_DOCK                           :Moll per vaixells
 STR_LAI_STATION_DESCRIPTION_BUOY                                :Boia
@@ -3350,8 +3352,8 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Alerta: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Error: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Fatal: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}S'ha produït un error fatal de NewGRF:{}{STRING}
-STR_NEWGRF_ERROR_POPUP                                          :{WHITE}S'ha produït un error relacionat amb els NewGRF:{}{STRING}
+STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}El NewGRF "{STRING}" ha retornat un error fatal:{}{STRING}
+STR_NEWGRF_ERROR_POPUP                                          :{WHITE}El NewGRF "{STRING}" ha retornat un error:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} no funcionarà amb la versió TTDPatch informada per l'OpenTTD
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} és per a la versió {2:STRING} del TTD
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} està dissenyat per a fer-se servir amb {2:STRING}
@@ -4527,7 +4529,7 @@ STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Esborra 
 STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Esborra la velocitat de viatge màxima de l'ordre seleccionada. Amb Ctrl+clic s'esborra la velocitat per a totes les ordres.
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Restablir Retard
-STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Restableix el comptador de retards, de manera que el vehicle serà puntual
+STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Restableix el comptador de retards, de manera que el vehicle serà puntual. Amb Ctrl+clic, es restableix el grup sencer de manera que el vehicle més endarrerit passa a anar a hora i els altres arribaran abans d'hora.
 
 STR_TIMETABLE_AUTOFILL                                          :{BLACK}Autoomple
 STR_TIMETABLE_AUTOFILL_TOOLTIP                                  :{BLACK}Omple automàticament l'horari amb valors del proper viatge. CTRL+clic per a intentar mantenir els temps d'espera.
@@ -4581,6 +4583,7 @@ STR_AI_CONFIG_AILIST_TOOLTIP                                    :{BLACK}Aquesta 
 STR_AI_CONFIG_HUMAN_PLAYER                                      :Jugador humà
 STR_AI_CONFIG_RANDOM_AI                                         :IA aleatòria
 STR_AI_CONFIG_NONE                                              :(cap)
+STR_AI_CONFIG_NAME_VERSION                                      :{STRING} {YELLOW}v{NUM}
 STR_AI_CONFIG_MAX_COMPETITORS                                   :{LTBLUE}Nombre màxim de competidors: {ORANGE}{COMMA}
 
 STR_AI_CONFIG_MOVE_UP                                           :{BLACK}Mou amunt
@@ -4594,7 +4597,7 @@ STR_AI_CONFIG_AI                                                :{SILVER}IA
 
 STR_AI_CONFIG_CHANGE_AI                                         :{BLACK}Trieu una IA
 STR_AI_CONFIG_CHANGE_GAMESCRIPT                                 :{BLACK}Tria un script de partida
-STR_AI_CONFIG_CHANGE_TOOLTIP                                    :{BLACK}Carrega un altre script
+STR_AI_CONFIG_CHANGE_TOOLTIP                                    :{BLACK}Carrega un altre script. Si feu Ctrl + clic, es mostraran totes les versions disponibles.
 STR_AI_CONFIG_CONFIGURE                                         :{BLACK}Configura
 STR_AI_CONFIG_CONFIGURE_TOOLTIP                                 :{BLACK}Configura els paràmetres de l'script
 
@@ -4621,12 +4624,13 @@ STR_SCREENSHOT_WORLD_SCREENSHOT                                 :{BLACK}Captura 
 STR_SCREENSHOT_HEIGHTMAP_SCREENSHOT                             :{BLACK}Captura de pantalla del mapa d'alçades
 STR_SCREENSHOT_MINIMAP_SCREENSHOT                               :{BLACK}Captura de pantalla del minimapa
 
-# AI Parameters
-STR_AI_SETTINGS_CAPTION_AI                                      :{WHITE}Paràmetres de la IA
+# Script Parameters
+STR_AI_SETTINGS_CAPTION                                         :{WHITE}{STRING}Paràmetres
+STR_AI_SETTINGS_CAPTION_AI                                      :IA
+STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :Script de la partida
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Tanca
 STR_AI_SETTINGS_RESET                                           :{BLACK}Restableix
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Dies des de l'inici de la IA prèvia fins que s'inicia aquesta: {ORANGE}{STRING}
 
 
 # Textfile window
@@ -5080,6 +5084,20 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}No es po
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... massa lluny del destí previ
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... l'avió no té prou autonomia
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+STR_ERROR_NO_RAIL_STATION                                       :{WHITE}No hi ha cap estació ferroviària
+STR_ERROR_NO_BUS_STATION                                        :{WHITE}No hi ha cap estació d'autobusos
+STR_ERROR_NO_TRUCK_STATION                                      :{WHITE}No hi ha cap estació de camions
+STR_ERROR_NO_DOCK                                               :{WHITE}No hi ha cap port
+STR_ERROR_NO_AIRPORT                                            :{WHITE}No hi ha cap aeroport/heliport
+STR_ERROR_NO_STOP_COMPATIBLE_ROAD_TYPE                          :{WHITE}No hi ha parades amb un tipus de carretera compatible
+STR_ERROR_NO_STOP_COMPATIBLE_TRAM_TYPE                          :{WHITE}No hi ha parades amb un tipus de tramvia compatible
+STR_ERROR_NO_STOP_ARTICULATED_VEHICLE                           :{WHITE}No hi ha parades que siguin adequades per a vehicles de carretera articulats.{}Aquest tipus de vehicles necessiten una estació de pas, no pas una estació final
+STR_ERROR_AIRPORT_NO_PLANES                                     :{WHITE}L'avió no pot aterrar en aquest aeroport
+STR_ERROR_AIRPORT_NO_HELICOPTERS                                :{WHITE}L'helicòpter no pot aterrar en aquest aeroport
+STR_ERROR_NO_RAIL_WAYPOINT                                      :{WHITE}No hi ha cap punt de pas ferroviari
+STR_ERROR_NO_BUOY                                               :{WHITE}No hi ha cap boia
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Impossible establir l'horari del vehicle...
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Els vehicles només poden esperar a les estacions
@@ -5495,10 +5513,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :{G=Masculin}Hel
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :{G=Femenin}(Companyia {COMMA})
 STR_FORMAT_GROUP_NAME                                           :{G=Masculin}Grup {COMMA}
@@ -5580,7 +5598,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

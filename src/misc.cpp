@@ -11,11 +11,12 @@
 #include "landscape.h"
 #include "news_func.h"
 #include "ai/ai.hpp"
-#include "ai/ai_gui.hpp"
+#include "script/script_gui.h"
 #include "newgrf.h"
 #include "newgrf_house.h"
 #include "economy_func.h"
 #include "date_func.h"
+#include "timer/timer_game_tick.h"
 #include "texteff.hpp"
 #include "gfx_func.h"
 #include "gamelog.h"
@@ -65,7 +66,7 @@ void InitializeGame(uint size_x, uint size_y, bool reset_date, bool reset_settin
 
 	_pause_mode = PM_UNPAUSED;
 	_game_speed = 100;
-	_tick_counter = 0;
+	TimerGameTick::counter = 0;
 	_cur_tileloop_tile = 1;
 	_thd.redsq = INVALID_TILE;
 	if (reset_settings) MakeNewgameSettingsLive();
@@ -73,7 +74,7 @@ void InitializeGame(uint size_x, uint size_y, bool reset_date, bool reset_settin
 	_newgrf_profilers.clear();
 
 	if (reset_date) {
-		SetDate(ConvertYMDToDate(_settings_game.game_creation.starting_year, 0, 1), 0);
+		TimerGameCalendar::SetDate(ConvertYMDToDate(_settings_game.game_creation.starting_year, 0, 1), 0);
 		InitializeOldNames();
 	}
 
@@ -100,7 +101,7 @@ void InitializeGame(uint size_x, uint size_y, bool reset_date, bool reset_settin
 	InitializeGraphGui();
 	InitializeObjectGui();
 	InitializeTownGui();
-	InitializeAIGui();
+	InitializeScriptGui();
 	InitializeTrees();
 	InitializeIndustries();
 	InitializeObjects();

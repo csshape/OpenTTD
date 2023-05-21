@@ -13,6 +13,7 @@
 #include "compat/misc_sl_compat.h"
 
 #include "../date_func.h"
+#include "../timer/timer_game_calendar.h"
 #include "../zoom_func.h"
 #include "../window_gui.h"
 #include "../window_func.h"
@@ -20,6 +21,8 @@
 #include "../gfx_func.h"
 #include "../core/random_func.hpp"
 #include "../fios.h"
+#include "../timer/timer.h"
+#include "../timer/timer_game_tick.h"
 
 #include "../safeguards.h"
 
@@ -67,13 +70,14 @@ void ResetViewportAfterLoadGame()
 }
 
 byte _age_cargo_skip_counter; ///< Skip aging of cargo? Used before savegame version 162.
+extern TimeoutTimer<TimerGameTick> _new_competitor_timeout;
 
 static const SaveLoad _date_desc[] = {
-	SLEG_CONDVAR("date",                   _date,                   SLE_FILE_U16 | SLE_VAR_I32,  SL_MIN_VERSION,  SLV_31),
-	SLEG_CONDVAR("date",                   _date,                   SLE_INT32,                  SLV_31, SL_MAX_VERSION),
-	    SLEG_VAR("date_fract",             _date_fract,             SLE_UINT16),
-	SLEG_CONDVAR("tick_counter",           _tick_counter,           SLE_FILE_U16 | SLE_VAR_U64,  SL_MIN_VERSION, SLV_U64_TICK_COUNTER),
-	SLEG_CONDVAR("tick_counter",           _tick_counter,           SLE_UINT64,                  SLV_U64_TICK_COUNTER, SL_MAX_VERSION),
+	SLEG_CONDVAR("date",                   TimerGameCalendar::date,                   SLE_FILE_U16 | SLE_VAR_I32,  SL_MIN_VERSION,  SLV_31),
+	SLEG_CONDVAR("date",                   TimerGameCalendar::date,                   SLE_INT32,                  SLV_31, SL_MAX_VERSION),
+	    SLEG_VAR("date_fract",             TimerGameCalendar::date_fract,             SLE_UINT16),
+	SLEG_CONDVAR("tick_counter",           TimerGameTick::counter,           SLE_FILE_U16 | SLE_VAR_U64,  SL_MIN_VERSION, SLV_U64_TICK_COUNTER),
+	SLEG_CONDVAR("tick_counter",           TimerGameTick::counter,           SLE_UINT64,                  SLV_U64_TICK_COUNTER, SL_MAX_VERSION),
 	SLEG_CONDVAR("age_cargo_skip_counter", _age_cargo_skip_counter, SLE_UINT8,                   SL_MIN_VERSION, SLV_162),
 	SLEG_CONDVAR("cur_tileloop_tile",      _cur_tileloop_tile,      SLE_FILE_U16 | SLE_VAR_U32,  SL_MIN_VERSION, SLV_6),
 	SLEG_CONDVAR("cur_tileloop_tile",      _cur_tileloop_tile,      SLE_UINT32,                  SLV_6, SL_MAX_VERSION),
@@ -81,10 +85,14 @@ static const SaveLoad _date_desc[] = {
 	    SLEG_VAR("random_state[0]",        _random.state[0],        SLE_UINT32),
 	    SLEG_VAR("random_state[1]",        _random.state[1],        SLE_UINT32),
 	    SLEG_VAR("company_tick_counter", _cur_company_tick_index, SLE_FILE_U8  | SLE_VAR_U32),
-	SLEG_CONDVAR("next_competitor_start",  _next_competitor_start,  SLE_FILE_U16 | SLE_VAR_U32,  SL_MIN_VERSION, SLV_109),
-	SLEG_CONDVAR("next_competitor_start",  _next_competitor_start,  SLE_UINT32,                SLV_109, SL_MAX_VERSION),
 	    SLEG_VAR("trees_tick_counter",     _trees_tick_ctr,         SLE_UINT8),
 	SLEG_CONDVAR("pause_mode",             _pause_mode,             SLE_UINT8,                   SLV_4, SL_MAX_VERSION),
+	/* For older savegames, we load the current value as the "period"; afterload will set the "fired" and "elapsed". */
+	SLEG_CONDVAR("next_competitor_start",        _new_competitor_timeout.period,          SLE_FILE_U16 | SLE_VAR_U32,  SL_MIN_VERSION, SLV_109),
+	SLEG_CONDVAR("next_competitor_start",        _new_competitor_timeout.period,          SLE_UINT32,                  SLV_109, SLV_AI_START_DATE),
+	SLEG_CONDVAR("competitors_interval",         _new_competitor_timeout.period,          SLE_UINT32,                  SLV_AI_START_DATE, SL_MAX_VERSION),
+	SLEG_CONDVAR("competitors_interval_elapsed", _new_competitor_timeout.storage.elapsed, SLE_UINT32,                  SLV_AI_START_DATE, SL_MAX_VERSION),
+	SLEG_CONDVAR("competitors_interval_fired",   _new_competitor_timeout.fired,           SLE_BOOL,                    SLV_AI_START_DATE, SL_MAX_VERSION),
 };
 
 static const SaveLoad _date_check_desc[] = {

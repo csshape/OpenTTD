@@ -30,6 +30,8 @@
 #include "articulated_vehicles.h"
 #include "error.h"
 #include "engine_base.h"
+#include "timer/timer.h"
+#include "timer/timer_game_calendar.h"
 
 #include "table/strings.h"
 #include "table/engines.h"
@@ -45,7 +47,7 @@ EngineOverrideManager _engine_mngr;
  * Year that engine aging stops. Engines will not reduce in reliability
  * and no more engines will be introduced
  */
-static Year _year_engine_aging_stops;
+static TimerGameCalendar::Year _year_engine_aging_stops;
 
 /** Number of engines of each vehicle type in original engine data */
 const uint8 _engine_counts[4] = {
@@ -434,7 +436,7 @@ uint Engine::GetDisplayMaxTractiveEffort() const
  * Returns the vehicle's (not model's!) life length in days.
  * @return the life length
  */
-Date Engine::GetLifeLengthInDays() const
+TimerGameCalendar::Date Engine::GetLifeLengthInDays() const
 {
 	/* Assume leap years; this gives the player a bit more than the given amount of years, but never less. */
 	return (this->info.lifelength + _settings_game.vehicle.extend_vehicle_life) * DAYS_IN_LEAP_YEAR;
@@ -471,6 +473,30 @@ StringID Engine::GetAircraftTypeText() const
 
 		default: NOT_REACHED();
 	}
+}
+
+/**
+ * Check whether the engine variant chain is hidden in the GUI for the given company.
+ * @param c Company to check.
+ * @return \c true iff the engine variant chain is hidden in the GUI for the given company.
+ */
+bool Engine::IsVariantHidden(CompanyID c) const
+{
+	/* In case company is spectator. */
+	if (c >= MAX_COMPANIES) return false;
+
+	/* Shortcut if this engine is explicitly hidden. */
+	if (this->IsHidden(c)) return true;
+
+	/* Check for hidden parent variants. This is a bit convoluted as we must check hidden status of
+	 * the last display variant rather than the actual parent variant. */
+	const Engine *re = this;
+	const Engine *ve = re->GetDisplayVariant();
+	while (!(ve->IsHidden(c)) && re->info.variant_id != INVALID_ENGINE && re->info.variant_id != re->index) {
+		re = Engine::Get(re->info.variant_id);
+		ve = re->GetDisplayVariant();
+	}
+	return ve->IsHidden(c);
 }
 
 /**
@@ -650,7 +676,7 @@ void SetYearEngineAgingStops()
  * @param aging_date The date used for age calculations.
  * @param seed Random seed.
  */
-void StartupOneEngine(Engine *e, Date aging_date, uint32 seed)
+void StartupOneEngine(Engine *e, TimerGameCalendar::Date aging_date, uint32 seed)
 {
 	const EngineInfo *ei = &e->info;
 
@@ -672,10 +698,10 @@ void StartupOneEngine(Engine *e, Date aging_date, uint32 seed)
 	/* Don't randomise the start-date in the first two years after gamestart to ensure availability
 	 * of engines in early starting games.
 	 * Note: TTDP uses fixed 1922 */
-	e->intro_date = ei->base_intro <= ConvertYMDToDate(_settings_game.game_creation.starting_year + 2, 0, 1) ? ei->base_intro : (Date)GB(r, 0, 9) + ei->base_intro;
-	if (e->intro_date <= _date) {
+	e->intro_date = ei->base_intro <= ConvertYMDToDate(_settings_game.game_creation.starting_year + 2, 0, 1) ? ei->base_intro : (TimerGameCalendar::Date)GB(r, 0, 9) + ei->base_intro;
+	if (e->intro_date <= TimerGameCalendar::date) {
 		e->age = (aging_date - e->intro_date) >> 5;
-		e->company_avail = (CompanyMask)-1;
+		e->company_avail = MAX_UVALUE(CompanyMask);
 		e->flags |= ENGINE_AVAILABLE;
 	}
 
@@ -719,7 +745,7 @@ void StartupOneEngine(Engine *e, Date aging_date, uint32 seed)
 void StartupEngines()
 {
 	/* Aging of vehicles stops, so account for that when starting late */
-	const Date aging_date = std::min(_date, ConvertYMDToDate(_year_engine_aging_stops, 0, 1));
+	const TimerGameCalendar::Date aging_date = std::min(TimerGameCalendar::date, ConvertYMDToDate(_year_engine_aging_stops, 0, 1));
 	uint32 seed = Random();
 
 	for (Engine *e : Engine::Iterate()) {
@@ -804,7 +830,7 @@ static void AcceptEnginePreview(EngineID eid, CompanyID company, int recursion_d
 	Engine *e = Engine::Get(eid);
 
 	e->preview_company = INVALID_COMPANY;
-	e->preview_asked = (CompanyMask)-1;
+	e->preview_asked = MAX_UVALUE(CompanyMask);
 
 	EnableEngineForCompany(eid, company);
 
@@ -878,14 +904,14 @@ static bool IsVehicleTypeDisabled(VehicleType type, bool ai)
 }
 
 /** Daily check to offer an exclusive engine preview to the companies. */
-void EnginesDailyLoop()
+static IntervalTimer<TimerGameCalendar> _engines_daily({TimerGameCalendar::DAY, TimerGameCalendar::Priority::ENGINE}, [](auto)
 {
 	for (Company *c : Company::Iterate()) {
-		c->avail_railtypes = AddDateIntroducedRailTypes(c->avail_railtypes, _date);
-		c->avail_roadtypes = AddDateIntroducedRoadTypes(c->avail_roadtypes, _date);
+		c->avail_railtypes = AddDateIntroducedRailTypes(c->avail_railtypes, TimerGameCalendar::date);
+		c->avail_roadtypes = AddDateIntroducedRoadTypes(c->avail_roadtypes, TimerGameCalendar::date);
 	}
 
-	if (_cur_year >= _year_engine_aging_stops) return;
+	if (TimerGameCalendar::year >= _year_engine_aging_stops) return;
 
 	for (Engine *e : Engine::Iterate()) {
 		EngineID i = e->index;
@@ -899,7 +925,7 @@ void EnginesDailyLoop()
 				e->preview_company = GetPreviewCompany(e);
 
 				if (e->preview_company == INVALID_COMPANY) {
-					e->preview_asked = (CompanyMask)-1;
+					e->preview_asked = MAX_UVALUE(CompanyMask);
 					continue;
 				}
 
@@ -915,7 +941,7 @@ void EnginesDailyLoop()
 			}
 		}
 	}
-}
+});
 
 /**
  * Clear the 'hidden' flag for all engines of a new company.
@@ -1028,7 +1054,7 @@ static void NewVehicleAvailable(Engine *e)
 	AddRemoveEngineFromAutoreplaceAndBuildWindows(e->type);
 
 	/* Now available for all companies */
-	e->company_avail = (CompanyMask)-1;
+	e->company_avail = MAX_UVALUE(CompanyMask);
 
 	/* Do not introduce new rail wagons */
 	if (IsWagon(index)) return;
@@ -1036,11 +1062,11 @@ static void NewVehicleAvailable(Engine *e)
 	if (e->type == VEH_TRAIN) {
 		/* maybe make another rail type available */
 		assert(e->u.rail.railtype < RAILTYPE_END);
-		for (Company *c : Company::Iterate()) c->avail_railtypes = AddDateIntroducedRailTypes(c->avail_railtypes | GetRailTypeInfo(e->u.rail.railtype)->introduces_railtypes, _date);
+		for (Company *c : Company::Iterate()) c->avail_railtypes = AddDateIntroducedRailTypes(c->avail_railtypes | GetRailTypeInfo(e->u.rail.railtype)->introduces_railtypes, TimerGameCalendar::date);
 	} else if (e->type == VEH_ROAD) {
 		/* maybe make another road type available */
 		assert(e->u.road.roadtype < ROADTYPE_END);
-		for (Company* c : Company::Iterate()) c->avail_roadtypes = AddDateIntroducedRoadTypes(c->avail_roadtypes | GetRoadTypeInfo(e->u.road.roadtype)->introduces_roadtypes, _date);
+		for (Company* c : Company::Iterate()) c->avail_roadtypes = AddDateIntroducedRoadTypes(c->avail_roadtypes | GetRoadTypeInfo(e->u.road.roadtype)->introduces_roadtypes, TimerGameCalendar::date);
 	}
 
 	/* Only broadcast event if AIs are able to build this vehicle type. */
@@ -1049,7 +1075,7 @@ static void NewVehicleAvailable(Engine *e)
 	/* Only provide the "New Vehicle available" news paper entry, if engine can be built. */
 	if (!IsVehicleTypeDisabled(e->type, false) && (e->info.extra_flags & ExtraEngineFlags::NoNews) == ExtraEngineFlags::None) {
 		SetDParam(0, GetEngineCategoryName(index));
-		SetDParam(1, index);
+		SetDParam(1, PackEngineNameDParam(index, EngineNameContext::PreviewNews));
 		AddNewsItem(STR_NEWS_NEW_VEHICLE_NOW_AVAILABLE_WITH_TYPE, NT_NEW_VEHICLES, NF_VEHICLE, NR_ENGINE, index);
 	}
 
@@ -1065,7 +1091,7 @@ static void NewVehicleAvailable(Engine *e)
 /** Monthly update of the availability, reliability, and preview offers of the engines. */
 void EnginesMonthlyLoop()
 {
-	if (_cur_year < _year_engine_aging_stops) {
+	if (TimerGameCalendar::year < _year_engine_aging_stops) {
 		bool refresh = false;
 		for (Engine *e : Engine::Iterate()) {
 			/* Age the vehicle */
@@ -1078,10 +1104,10 @@ void EnginesMonthlyLoop()
 			/* Do not introduce invalid engines */
 			if (!e->IsEnabled()) continue;
 
-			if (!(e->flags & ENGINE_AVAILABLE) && _date >= (e->intro_date + DAYS_IN_YEAR)) {
+			if (!(e->flags & ENGINE_AVAILABLE) && TimerGameCalendar::date >= (e->intro_date + DAYS_IN_YEAR)) {
 				/* Introduce it to all companies */
 				NewVehicleAvailable(e);
-			} else if (!(e->flags & (ENGINE_AVAILABLE | ENGINE_EXCLUSIVE_PREVIEW)) && _date >= e->intro_date) {
+			} else if (!(e->flags & (ENGINE_AVAILABLE | ENGINE_EXCLUSIVE_PREVIEW)) && TimerGameCalendar::date >= e->intro_date) {
 				/* Introduction date has passed...
 				 * Check if it is allowed to build this vehicle type at all
 				 * based on the current game settings. If not, it does not
@@ -1109,6 +1135,11 @@ void EnginesMonthlyLoop()
 		}
 	}
 }
+
+static IntervalTimer<TimerGameCalendar> _engines_monthly({TimerGameCalendar::MONTH, TimerGameCalendar::Priority::ENGINE}, [](auto)
+{
+	EnginesMonthlyLoop();
+});
 
 /**
  * Is \a name still free as name for an engine?
@@ -1234,10 +1265,13 @@ bool IsEngineRefittable(EngineID engine)
  */
 void CheckEngines()
 {
-	Date min_date = INT32_MAX;
+	TimerGameCalendar::Date min_date = INT32_MAX;
 
 	for (const Engine *e : Engine::Iterate()) {
 		if (!e->IsEnabled()) continue;
+
+		/* Don't consider train wagons, we need a powered engine available. */
+		if (e->type == VEH_TRAIN && e->u.rail.railveh_type == RAILVEH_WAGON) continue;
 
 		/* We have an available engine... yay! */
 		if ((e->flags & ENGINE_AVAILABLE) != 0 && e->company_avail != 0) return;

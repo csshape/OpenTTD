@@ -951,10 +951,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Kies int
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Af
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Elke maand
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Elke 3 maande
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Elke 6 maande
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Elke 12 maande
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Taal
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Kies die koppelvlak taal om te gebruik
@@ -1145,6 +1141,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Regs
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Maksimum aanvanklike lening: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Maksimum bedrag wat 'n maatskappy kan leen (sonder die inagneming van inflasie)
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Rentekoers: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Lening rentekoers: beheer ook inflasie indien aangeskakel
@@ -1697,6 +1694,7 @@ STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :As dit geaktive
 
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :Minimum maatskappyouderdom om aandele te verhandel: {STRING}
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_HELPTEXT                :Stel die minimum ouderdom van 'n maatskappy in vir ander om aandele by hulle te kan koop en verkoop.
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Persentasie van wins om te betaal in voerder systeem: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Persentasie wins wat gedeel word met die tussengangerstasies in oordragstelsels vir beter beheer oor die wins
@@ -1798,10 +1796,6 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :Geen
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Aanvanklike stad grootte multiplier: {STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :Normale stede groote relatief na normale dorpe aan die begin van speletjie
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :Herreken die verspreingskaart elke {STRING}{NBSP}da{P 0:2 g e}
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL_HELPTEXT                  :Tyd tussen daaropvolgende herrekeninge van die verspreidingskaart. Elke herrekening is vir een komponent van die hele kaart, so net 'n gedeelte is dan op datum, nie die hele kaart nie. Hoe korter hierdie stelling is, hoe meer verwerkingskrag word benodig, hoe langer hierdie stelling is, hoe langer vat dit vir die vrag om op nuwe roetes te versprei.
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :Neem {STRING}{NBSP}da{P 0:2 g e} om verspreidingskaart te herreken
-STR_CONFIG_SETTING_LINKGRAPH_TIME_HELPTEXT                      :Tyd benodig vir die herrekening van elke komponent van die verspreidingskaart. Elke berekening kan vir hierdie aantal dae hardloop, as hierdie stelling te kort is en die berekening is nie klaar nie, dan kan die spel stop tot die berekening klaar gedoen is. Hoe meer tyd toegelaat word vir hierdie berekeninge, hoe langer vat dit vir die verspreidingskaart om te verander as roetes verander.
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :Verspreidingsmodel vir passasiers: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :"simmetries" beteken dat ongeveer dieselfde hoeveelheid passasiers tussen twee stasies gestuur word. "asimmetries" beteken passasiers word na willekeur tussen twee stasies gestuur. "handmatig" beteken dat passasiers nie outomaties versprei word nie.
@@ -1829,7 +1823,7 @@ STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :Daar is gereeld
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Spoed eenheid: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Wys spoed in die eenheid wat gekies is
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :Empiries (mph)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :Metries (km/h)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (m/s)
@@ -3069,7 +3063,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Waarskuwing: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Fout: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Fataal: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}'n Fataale NewGRF fout het gebeur:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} sal nie met die TTDPatch uitgawe rapporteer deur OpenTTD werk nie.
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} is vir die {STRING} uitgawe van TTD.
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} is onderwerp om saam met {STRING} gebruik te word
@@ -4285,12 +4278,11 @@ STR_SCREENSHOT_WORLD_SCREENSHOT                                 :{BLACK}Volledig
 STR_SCREENSHOT_HEIGHTMAP_SCREENSHOT                             :{BLACK}Hoogtekaart-skermkiekie
 STR_SCREENSHOT_MINIMAP_SCREENSHOT                               :{BLACK}Minimap-skermkiekie
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :AI
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Maak toe
 STR_AI_SETTINGS_RESET                                           :{BLACK}Herstel
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Aantal Dae om die AI te begin na die vorige een (omenby): {ORANGE}{STRING}
 
 
 # Textfile window
@@ -4732,6 +4724,8 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Kan nie 
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... te ver van vorige bestemming
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... vliegtuig kan nie so ver vlieg nie
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Kan nie voertuig 'n rooster gee nie...
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Voertuie kan slegs by stasies wag
@@ -5147,10 +5141,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Powernaut Helik
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Company {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Groep {COMMA}
@@ -5231,7 +5225,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

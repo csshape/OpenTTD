@@ -1260,10 +1260,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Інтэ
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Выключана
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Штомесяц
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Кожныя 3 месяцы
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Кожныя 6 месяцаў
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Кожныя 12 месяцаў
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Мова
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Выбраць мову інтэрфэйсу
@@ -1456,6 +1452,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :правару�
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Максымальная сума пазыкі: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Максымальная сума пазыкі для кампаніі (без уліку інфляцыі)
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Адсоткавая стаўка: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Адсоткавая стаўка па пазыках; таксама кантралюе інфляцыю, калі тая ўключана
@@ -2014,6 +2011,7 @@ STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :Калі ўкл
 
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :Мін. узрост кампаніі для выпуску акцыяў: {STRING}
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_HELPTEXT                :Мінімальны ўзрост, якога павінна дасягнуць кампанія для пачатку выпуску акцыяў, якімі змогуць гандляваць іншыя гульцы.
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Адсотак даходу, якi налiчваецца пры частковай перавозцы: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Адсотак даходу, які налічваецца на прамежкавых адцінках у вялікіх сетках, даючы большы кантроль над даходамі.
@@ -2117,10 +2115,6 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :нiводнае
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Першапачатковы множнік памеру населенага пункта: {STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :Адносная колькасьць гарадоў у параўнаньні з мястэчкамі на пачатку гульні.
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :Абнаўляць ґраф размеркаваньня раз у {STRING}{NBSP}д{P 0:2 зень ні зён}
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL_HELPTEXT                  :Перыяд пераразьліку ґрафаў размеркаваньня. У кожным цыкле разьлічваецца не ґраф цалкам, а толькі адзін зь яго кампанэнтаў. Чым менш гэта значэньне, тым больш будзе нагрузка на працэсар. Чым больш значэньне, тым больш часу пройдзе перад пачаткам разьліку ґрафаў для новых маршрутаў.
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :Пералічваць ґраф разьмеркаваньня раз у {STRING}{NBSP}д{P 0:2 зень ні зён}
-STR_CONFIG_SETTING_LINKGRAPH_TIME_HELPTEXT                      :Час, адведзены для пераразьліку кампанэнтаў ґрафа. Разьлік запускаецца асобным патокам і працягваецца на працягу паказанай колькасьці гульнявых дзён. Калі значэньне будзе надта малым, то, магчыма, разьлік не пасьпее завяршыцца, і гульня будзе чакаць завяршэньня (гэта прывядзе да затрымак). Пры вялікіх значэньнях ґрафы размеркаваньня будуць павольней абнаўляцца пры зьменах маршрутаў.
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :Разьмеркаваньне пасажыраў: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :«Сымэтрычнае» азначае, што прыкладна аднолькавая колькасьць пасажыраў будзе накіроўвацца па прамым і зваротным маршрутам.{}«Несымэтрычнае» азначае, што пасажырапатокі ў любых кірунках не будуць залежаць адзін ад аднаго.{}«Уручную» — не выкарыстоўваць аўтаматычнае разьмеркаваньне для пасажыраў.
@@ -2148,7 +2142,7 @@ STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :Пры наяў
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Сыстэма адзінак для хуткасьці: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Паказваць значэньні хуткасьці ў выбранай сыстэме адзінак
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :ангельскія (міль/г)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :мэтрычная (км/г)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :СІ (м/с)
@@ -3419,8 +3413,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Увага: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Памылка: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Крытычная памылка: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Памылка пры рабоце з NewGRF:{}{STRING}
-STR_NEWGRF_ERROR_POPUP                                          :{WHITE}Памылка, звязаная з модулем NewGRF:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} ня будзе працаваць з вэрсіяй TTDPatch, паведламленай OpenTTD.
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :Файл {1:STRING} патрабуе {STRING}-вэрсію TTD.
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} зроблены для выкарыстаньня сумесна з {STRING}
@@ -4642,12 +4634,11 @@ STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}Не з�
 
 STR_SCREENSHOT_ZOOMIN_SCREENSHOT                                :{BLACK}Бачная вобласць у максімальным набліжэнні
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :ШI
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Закрыць
 STR_AI_SETTINGS_RESET                                           :{BLACK}Ськід
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Колькасьць дзён да старту гэтага AI/ШI пасьля папярэдняга: {ORANGE}{STRING}
 
 
 # Textfile window
@@ -5084,6 +5075,8 @@ STR_ERROR_CAN_T_STOP_SHARING_ORDER_LIST                         :{WHITE}Нема
 STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Немагчыма скапіяаваць сьпіс заданьняў
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... занадта далёка ад папярэдняй кропкі
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... Паветранаму судну не хапае далёкасьцi
+
+# Extra messages which go on the third line of errors, explaining why orders failed
 
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Не атрымалася скласьці расклад руху...
@@ -5620,10 +5613,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Шрубалё�
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}.{STRING}.{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}.{ZEROFILL_NUM}.{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM} г.
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING.gen} {NUM} г.
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Кампанiя {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Група {COMMA}
@@ -5704,7 +5697,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

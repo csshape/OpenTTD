@@ -10,9 +10,9 @@
 #ifndef SAVELOAD_H
 #define SAVELOAD_H
 
+#include "saveload_error.hpp"
 #include "../fileio_type.h"
 #include "../fios.h"
-#include "../strings_type.h"
 #include "../core/span_type.hpp"
 #include <optional>
 #include <string>
@@ -340,9 +340,18 @@ enum SaveLoadVersion : uint16 {
 	SLV_LINKGRAPH_TRAVEL_TIME,              ///< 297  PR#9457 v12.0-RC1  Store travel time in the linkgraph.
 	SLV_DOCK_DOCKINGTILES,                  ///< 298  PR#9578 All tiles around docks may be docking tiles.
 	SLV_REPAIR_OBJECT_DOCKING_TILES,        ///< 299  PR#9594 v12.0  Fixing issue with docking tiles overlapping objects.
-	SLV_U64_TICK_COUNTER,                   ///< 300  PR#10035 Make _tick_counter 64bit to avoid wrapping.
+
+	SLV_U64_TICK_COUNTER,                   ///< 300  PR#10035 Make tick counter 64bit to avoid wrapping.
 	SLV_LAST_LOADING_TICK,                  ///< 301  PR#9693 Store tick of last loading for vehicles.
 	SLV_MULTITRACK_LEVEL_CROSSINGS,         ///< 302  PR#9931 v13.0  Multi-track level crossings.
+	SLV_NEWGRF_ROAD_STOPS,                  ///< 303  PR#10144 NewGRF road stops.
+	SLV_LINKGRAPH_EDGES,                    ///< 304  PR#10314 Explicitly store link graph edges destination, PR#10471 int64 instead of uint64 league rating
+
+	SLV_VELOCITY_NAUTICAL,                  ///< 305  PR#10594 Separation of land and nautical velocity (knots!)
+	SLV_CONSISTENT_PARTIAL_Z,               ///< 306  PR#10570 Conversion from an inconsistent partial Z calculation for slopes, to one that is (more) consistent.
+	SLV_MORE_CARGO_AGE,                     ///< 307  PR#10596 Track cargo age for a longer period.
+	SLV_LINKGRAPH_SECONDS,                  ///< 308  PR#10610 Store linkgraph update intervals in seconds instead of days.
+	SLV_AI_START_DATE,                      ///< 309  PR#10653 Removal of individual AI start dates and added a generic one.
 
 	SL_MAX_VERSION,                         ///< Highest possible saveload version
 };
@@ -442,6 +451,15 @@ struct ChunkHandler {
 	 * @param len Number of bytes to skip.
 	 */
 	virtual void LoadCheck(size_t len = 0) const;
+
+	std::string GetName() const
+	{
+		return std::string()
+			+ static_cast<char>(this->id >> 24)
+			+ static_cast<char>(this->id >> 16)
+			+ static_cast<char>(this->id >> 8)
+			+ static_cast<char>(this->id);
+	}
 };
 
 /** A reference to ChunkHandler. */
@@ -686,6 +704,7 @@ struct SaveLoadCompat {
 /**
  * Storage of simple variables, references (pointers), and arrays.
  * @param cmd      Load/save type. @see SaveLoadType
+ * @param name     Field name for table chunks.
  * @param base     Name of the class or struct containing the variable.
  * @param variable Name of the variable in the class or struct referenced by \a base.
  * @param type     Storage of the data in memory and in the savegame.
@@ -694,7 +713,20 @@ struct SaveLoadCompat {
  * @param extra    Extra data to pass to the address callback function.
  * @note In general, it is better to use one of the SLE_* macros below.
  */
-#define SLE_GENERAL(cmd, base, variable, type, length, from, to, extra) SaveLoad {#variable, cmd, type, length, from, to, cpp_sizeof(base, variable), [] (void *b, size_t) -> void * { assert(b != nullptr); return const_cast<void *>(static_cast<const void *>(std::addressof(static_cast<base *>(b)->variable))); }, extra, nullptr}
+#define SLE_GENERAL_NAME(cmd, name, base, variable, type, length, from, to, extra) SaveLoad {name, cmd, type, length, from, to, cpp_sizeof(base, variable), [] (void *b, size_t) -> void * { assert(b != nullptr); return const_cast<void *>(static_cast<const void *>(std::addressof(static_cast<base *>(b)->variable))); }, extra, nullptr}
+
+/**
+ * Storage of simple variables, references (pointers), and arrays with a custom name.
+ * @param cmd      Load/save type. @see SaveLoadType
+ * @param base     Name of the class or struct containing the variable.
+ * @param variable Name of the variable in the class or struct referenced by \a base.
+ * @param type     Storage of the data in memory and in the savegame.
+ * @param from     First savegame version that has the field.
+ * @param to       Last savegame version that has the field.
+ * @param extra    Extra data to pass to the address callback function.
+ * @note In general, it is better to use one of the SLE_* macros below.
+ */
+#define SLE_GENERAL(cmd, base, variable, type, length, from, to, extra) SLE_GENERAL_NAME(cmd, #variable, base, variable, type, length, from, to, extra)
 
 /**
  * Storage of a variable in some savegame versions.
@@ -705,6 +737,17 @@ struct SaveLoadCompat {
  * @param to       Last savegame version that has the field.
  */
 #define SLE_CONDVAR(base, variable, type, from, to) SLE_GENERAL(SL_VAR, base, variable, type, 0, from, to, 0)
+
+/**
+ * Storage of a variable in some savegame versions.
+ * @param base     Name of the class or struct containing the variable.
+ * @param variable Name of the variable in the class or struct referenced by \a base.
+ * @param name     Field name for table chunks.
+ * @param type     Storage of the data in memory and in the savegame.
+ * @param from     First savegame version that has the field.
+ * @param to       Last savegame version that has the field.
+ */
+#define SLE_CONDVARNAME(base, variable, name, type, from, to) SLE_GENERAL_NAME(SL_VAR, name, base, variable, type, 0, from, to, 0)
 
 /**
  * Storage of a reference in some savegame versions.
@@ -1132,8 +1175,6 @@ void SlCopy(void *object, size_t length, VarType conv);
 std::vector<SaveLoad> SlTableHeader(const SaveLoadTable &slt);
 std::vector<SaveLoad> SlCompatTableHeader(const SaveLoadTable &slt, const SaveLoadCompatTable &slct);
 void SlObject(void *object, const SaveLoadTable &slt);
-void NORETURN SlError(StringID string, const char *extra_msg = nullptr);
-void NORETURN SlErrorCorrupt(const char *msg);
 
 bool SaveloadCrashWithMissingNewGRFs();
 

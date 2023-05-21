@@ -18,6 +18,7 @@
 #include "road.h"
 #include "road_gui.h"
 #include "date_func.h"
+#include "timer/timer_game_calendar.h"
 #include "vehicle_func.h"
 #include "sound_func.h"
 #include "terraform_gui.h"
@@ -34,6 +35,7 @@
 #include "news_gui.h"
 #include "ai/ai_gui.hpp"
 #include "game/game_gui.hpp"
+#include "script/script_gui.h"
 #include "tilehighlight_func.h"
 #include "smallmap_gui.h"
 #include "graph_gui.h"
@@ -48,11 +50,12 @@
 #include "story_base.h"
 #include "toolbar_gui.h"
 #include "framerate_type.h"
-#include "guitimer_func.h"
 #include "screenshot_gui.h"
 #include "misc_cmd.h"
 #include "league_gui.h"
 #include "league_base.h"
+#include "timer/timer.h"
+#include "timer/timer_window.h"
 
 #include "widgets/toolbar_widget.h"
 
@@ -189,7 +192,7 @@ public:
  */
 static void PopupMainToolbMenu(Window *w, int widget, DropDownList &&list, int def)
 {
-	ShowDropDownList(w, std::move(list), def, widget, 0, true, true);
+	ShowDropDownList(w, std::move(list), def, widget, 0, true);
 	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 }
 
@@ -343,7 +346,7 @@ static CallBackFunction ToolbarOptionsClick(Window *w)
 	list.emplace_back(new DropDownListCheckedItem(STR_SETTINGS_MENU_TRANSPARENT_BUILDINGS,   OME_TRANSPARENTBUILDINGS, false, IsTransparencySet(TO_HOUSES)));
 	list.emplace_back(new DropDownListCheckedItem(STR_SETTINGS_MENU_TRANSPARENT_SIGNS,       OME_SHOW_STATIONSIGNS, false, IsTransparencySet(TO_SIGNS)));
 
-	ShowDropDownList(w, std::move(list), 0, WID_TN_SETTINGS, 140, true, true);
+	ShowDropDownList(w, std::move(list), 0, WID_TN_SETTINGS, 140, true);
 	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	return CBF_NONE;
 }
@@ -551,9 +554,7 @@ static CallBackFunction ToolbarSubsidiesClick(Window *w)
  */
 static CallBackFunction MenuClickSubsidies(int index)
 {
-	switch (index) {
-		case 0: ShowSubsidiesList(); break;
-	}
+	ShowSubsidiesList();
 	return CBF_NONE;
 }
 
@@ -716,7 +717,7 @@ static CallBackFunction ToolbarGraphsClick(Window *w)
 
 	if (_toolbar_mode != TB_NORMAL) AddDropDownLeagueTableOptions(list);
 
-	ShowDropDownList(w, std::move(list), GRMN_OPERATING_PROFIT_GRAPH, WID_TN_GRAPHS, 140, true, true);
+	ShowDropDownList(w, std::move(list), GRMN_OPERATING_PROFIT_GRAPH, WID_TN_GRAPHS, 140, true);
 	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 
 	return CBF_NONE;
@@ -729,7 +730,7 @@ static CallBackFunction ToolbarLeagueClick(Window *w)
 	AddDropDownLeagueTableOptions(list);
 
 	int selected = list[0]->result;
-	ShowDropDownList(w, std::move(list), selected, WID_TN_LEAGUE, 140, true, true);
+	ShowDropDownList(w, std::move(list), selected, WID_TN_LEAGUE, 140, true);
 	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 
 	return CBF_NONE;
@@ -906,7 +907,7 @@ static CallBackFunction ToolbarZoomOutClick(Window *w)
 
 static CallBackFunction ToolbarBuildRailClick(Window *w)
 {
-	ShowDropDownList(w, GetRailTypeDropDownList(), _last_built_railtype, WID_TN_RAILS, 140, true, true);
+	ShowDropDownList(w, GetRailTypeDropDownList(), _last_built_railtype, WID_TN_RAILS, 140, true);
 	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	return CBF_NONE;
 }
@@ -928,7 +929,7 @@ static CallBackFunction MenuClickBuildRail(int index)
 
 static CallBackFunction ToolbarBuildRoadClick(Window *w)
 {
-	ShowDropDownList(w, GetRoadTypeDropDownList(RTTB_ROAD), _last_built_roadtype, WID_TN_ROADS, 140, true, true);
+	ShowDropDownList(w, GetRoadTypeDropDownList(RTTB_ROAD), _last_built_roadtype, WID_TN_ROADS, 140, true);
 	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	return CBF_NONE;
 }
@@ -950,7 +951,7 @@ static CallBackFunction MenuClickBuildRoad(int index)
 
 static CallBackFunction ToolbarBuildTramClick(Window *w)
 {
-	ShowDropDownList(w, GetRoadTypeDropDownList(RTTB_TRAM), _last_built_tramtype, WID_TN_TRAMS, 140, true, true);
+	ShowDropDownList(w, GetRoadTypeDropDownList(RTTB_TRAM), _last_built_tramtype, WID_TN_TRAMS, 140, true);
 	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	return CBF_NONE;
 }
@@ -974,7 +975,7 @@ static CallBackFunction ToolbarBuildWaterClick(Window *w)
 {
 	DropDownList list;
 	list.emplace_back(new DropDownListIconItem(SPR_IMG_BUILD_CANAL, PAL_NONE, STR_WATERWAYS_MENU_WATERWAYS_CONSTRUCTION, 0, false));
-	ShowDropDownList(w, std::move(list), 0, WID_TN_WATER, 140, true, true);
+	ShowDropDownList(w, std::move(list), 0, WID_TN_WATER, 140, true);
 	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	return CBF_NONE;
 }
@@ -997,7 +998,7 @@ static CallBackFunction ToolbarBuildAirClick(Window *w)
 {
 	DropDownList list;
 	list.emplace_back(new DropDownListIconItem(SPR_IMG_AIRPORT, PAL_NONE, STR_AIRCRAFT_MENU_AIRPORT_CONSTRUCTION, 0, false));
-	ShowDropDownList(w, std::move(list), 0, WID_TN_AIR, 140, true, true);
+	ShowDropDownList(w, std::move(list), 0, WID_TN_AIR, 140, true);
 	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	return CBF_NONE;
 }
@@ -1022,7 +1023,7 @@ static CallBackFunction ToolbarForestClick(Window *w)
 	list.emplace_back(new DropDownListIconItem(SPR_IMG_LANDSCAPING, PAL_NONE, STR_LANDSCAPING_MENU_LANDSCAPING, 0, false));
 	list.emplace_back(new DropDownListIconItem(SPR_IMG_PLANTTREES, PAL_NONE, STR_LANDSCAPING_MENU_PLANT_TREES, 1, false));
 	list.emplace_back(new DropDownListIconItem(SPR_IMG_SIGN, PAL_NONE, STR_LANDSCAPING_MENU_PLACE_SIGN, 2, false));
-	ShowDropDownList(w, std::move(list), 0, WID_TN_LANDSCAPE, 100, true, true);
+	ShowDropDownList(w, std::move(list), 0, WID_TN_LANDSCAPE, 100, true);
 	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	return CBF_NONE;
 }
@@ -1144,13 +1145,13 @@ void ToggleDirtyBlocks()
  * Set the starting year for a scenario.
  * @param year New starting year.
  */
-void SetStartingYear(Year year)
+void SetStartingYear(TimerGameCalendar::Year year)
 {
 	_settings_game.game_creation.starting_year = Clamp(year, MIN_YEAR, MAX_YEAR);
-	Date new_date = ConvertYMDToDate(_settings_game.game_creation.starting_year, 0, 1);
+	TimerGameCalendar::Date new_date = ConvertYMDToDate(_settings_game.game_creation.starting_year, 0, 1);
 	/* If you open a savegame as scenario there may already be link graphs.*/
-	LinkGraphSchedule::instance.ShiftDates(new_date - _date);
-	SetDate(new_date, 0);
+	LinkGraphSchedule::instance.ShiftDates(new_date - TimerGameCalendar::date);
+	TimerGameCalendar::SetDate(new_date, 0);
 }
 
 /**
@@ -1163,7 +1164,7 @@ static CallBackFunction MenuClickHelp(int index)
 	switch (index) {
 		case  0: return PlaceLandBlockInfo();
 		case  2: IConsoleSwitch();                 break;
-		case  3: ShowAIDebugWindow();              break;
+		case  3: ShowScriptDebugWindow();          break;
 		case  4: ShowScreenshotWindow();           break;
 		case  5: ShowFramerateWindow();            break;
 		case  6: ShowAboutWindow();                break;
@@ -1256,7 +1257,7 @@ static CallBackFunction ToolbarScenGenIndustry(Window *w)
 
 static CallBackFunction ToolbarScenBuildRoadClick(Window *w)
 {
-	ShowDropDownList(w, GetScenRoadTypeDropDownList(RTTB_ROAD), _last_built_roadtype, WID_TE_ROADS, 140, true, true);
+	ShowDropDownList(w, GetScenRoadTypeDropDownList(RTTB_ROAD), _last_built_roadtype, WID_TE_ROADS, 140, true);
 	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	return CBF_NONE;
 }
@@ -1276,7 +1277,7 @@ static CallBackFunction ToolbarScenBuildRoad(int index)
 
 static CallBackFunction ToolbarScenBuildTramClick(Window *w)
 {
-	ShowDropDownList(w, GetScenRoadTypeDropDownList(RTTB_TRAM), _last_built_tramtype, WID_TE_TRAMS, 140, true, true);
+	ShowDropDownList(w, GetScenRoadTypeDropDownList(RTTB_TRAM), _last_built_tramtype, WID_TE_TRAMS, 140, true);
 	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	return CBF_NONE;
 }
@@ -1993,8 +1994,6 @@ static ToolbarButtonProc * const _toolbar_button_procs[] = {
 
 /** Main toolbar. */
 struct MainToolbarWindow : Window {
-	GUITimer timer;
-
 	MainToolbarWindow(WindowDesc *desc) : Window(desc)
 	{
 		this->InitNested(0);
@@ -2005,8 +2004,6 @@ struct MainToolbarWindow : Window {
 		this->SetWidgetDisabledState(WID_TN_FAST_FORWARD, _networking); // if networking, disable fast-forward button
 		PositionMainToolbar(this);
 		DoZoomInOutWindow(ZOOM_NONE, this);
-
-		this->timer.SetInterval(MILLISECONDS_PER_TICK);
 	}
 
 	void FindWindowPlacementAndResize(int def_width, int def_height) override
@@ -2073,7 +2070,7 @@ struct MainToolbarWindow : Window {
 			case MTHK_BUILD_AIRPORT: ShowBuildAirToolbar(); break;
 			case MTHK_BUILD_TREES: ShowBuildTreesToolbar(); break;
 			case MTHK_MUSIC: ShowMusicWindow(); break;
-			case MTHK_AI_DEBUG: ShowAIDebugWindow(); break;
+			case MTHK_SCRIPT_DEBUG: ShowScriptDebugWindow(); break;
 			case MTHK_SMALL_SCREENSHOT: MakeScreenshotWithConfirm(SC_VIEWPORT); break;
 			case MTHK_ZOOMEDIN_SCREENSHOT: MakeScreenshotWithConfirm(SC_ZOOMEDIN); break;
 			case MTHK_DEFAULTZOOM_SCREENSHOT: MakeScreenshotWithConfirm(SC_DEFAULTZOOM); break;
@@ -2110,11 +2107,8 @@ struct MainToolbarWindow : Window {
 		_last_started_action = CBF_NONE;
 	}
 
-	void OnRealtimeTick(uint delta_ms) override
-	{
-		if (!this->timer.Elapsed(delta_ms)) return;
-		this->timer.SetInterval(MILLISECONDS_PER_TICK);
-
+	/** Refresh the state of pause / game-speed on a regular interval.*/
+	IntervalTimer<TimerWindow> refresh_interval = {std::chrono::milliseconds(30), [this](auto) {
 		if (this->IsWidgetLowered(WID_TN_PAUSE) != !!_pause_mode) {
 			this->ToggleWidgetLoweredState(WID_TN_PAUSE);
 			this->SetWidgetDirty(WID_TN_PAUSE);
@@ -2124,7 +2118,7 @@ struct MainToolbarWindow : Window {
 			this->ToggleWidgetLoweredState(WID_TN_FAST_FORWARD);
 			this->SetWidgetDirty(WID_TN_FAST_FORWARD);
 		}
-	}
+	}};
 
 	void OnTimeout() override
 	{
@@ -2187,7 +2181,7 @@ static Hotkey maintoolbar_hotkeys[] = {
 	Hotkey(WKC_SHIFT | WKC_F10, "build_airport", MTHK_BUILD_AIRPORT),
 	Hotkey(WKC_SHIFT | WKC_F11, "build_trees", MTHK_BUILD_TREES),
 	Hotkey(WKC_SHIFT | WKC_F12, "music", MTHK_MUSIC),
-	Hotkey((uint16)0, "ai_debug", MTHK_AI_DEBUG),
+	Hotkey((uint16)0, "ai_debug", MTHK_SCRIPT_DEBUG),
 	Hotkey(WKC_CTRL  | 'S', "small_screenshot", MTHK_SMALL_SCREENSHOT),
 	Hotkey(WKC_CTRL  | 'P', "zoomedin_screenshot", MTHK_ZOOMEDIN_SCREENSHOT),
 	Hotkey(WKC_CTRL  | 'D', "defaultzoom_screenshot", MTHK_DEFAULTZOOM_SCREENSHOT),
@@ -2354,8 +2348,6 @@ enum MainToolbarEditorHotkeys {
 };
 
 struct ScenarioEditorToolbarWindow : Window {
-	GUITimer timer;
-
 	ScenarioEditorToolbarWindow(WindowDesc *desc) : Window(desc)
 	{
 		this->InitNested(0);
@@ -2364,8 +2356,6 @@ struct ScenarioEditorToolbarWindow : Window {
 		CLRBITS(this->flags, WF_WHITE_BORDER);
 		PositionMainToolbar(this);
 		DoZoomInOutWindow(ZOOM_NONE, this);
-
-		this->timer.SetInterval(MILLISECONDS_PER_TICK);
 	}
 
 	void FindWindowPlacementAndResize(int def_width, int def_height) override
@@ -2496,11 +2486,8 @@ struct ScenarioEditorToolbarWindow : Window {
 		this->SetWidgetDirty(WID_TE_DATE_FORWARD);
 	}
 
-	void OnRealtimeTick(uint delta_ms) override
-	{
-		if (!this->timer.Elapsed(delta_ms)) return;
-		this->timer.SetInterval(MILLISECONDS_PER_TICK);
-
+	/** Refresh the state of pause / game-speed on a regular interval.*/
+	IntervalTimer<TimerWindow> refresh_interval = {std::chrono::milliseconds(30), [this](auto) {
 		if (this->IsWidgetLowered(WID_TE_PAUSE) != !!_pause_mode) {
 			this->ToggleWidgetLoweredState(WID_TE_PAUSE);
 			this->SetDirty();
@@ -2510,7 +2497,7 @@ struct ScenarioEditorToolbarWindow : Window {
 			this->ToggleWidgetLoweredState(WID_TE_FAST_FORWARD);
 			this->SetDirty();
 		}
-	}
+	}};
 
 	/**
 	 * Some data on this window has become invalid.

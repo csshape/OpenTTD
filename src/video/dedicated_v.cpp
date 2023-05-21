@@ -10,6 +10,7 @@
 #include "../stdafx.h"
 
 #include "../gfx_func.h"
+#include "../error_func.h"
 #include "../network/network.h"
 #include "../network/network_internal.h"
 #include "../console_func.h"
@@ -103,10 +104,10 @@ static void CreateWindowsConsoleThread()
 	/* Create event to signal when console input is ready */
 	_hInputReady = CreateEvent(nullptr, false, false, nullptr);
 	_hWaitForInputHandling = CreateEvent(nullptr, false, false, nullptr);
-	if (_hInputReady == nullptr || _hWaitForInputHandling == nullptr) usererror("Cannot create console event!");
+	if (_hInputReady == nullptr || _hWaitForInputHandling == nullptr) UserError("Cannot create console event!");
 
 	_hThread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)CheckForConsoleInput, nullptr, 0, &dwThreadId);
-	if (_hThread == nullptr) usererror("Cannot create console thread!");
+	if (_hThread == nullptr) UserError("Cannot create console thread!");
 
 	Debug(driver, 2, "Windows console thread started");
 }
@@ -251,17 +252,6 @@ void VideoDriver_Dedicated::MainLoop()
 	/* If SwitchMode is SM_LOAD_GAME, it means that the user used the '-g' options */
 	if (_switch_mode != SM_LOAD_GAME) {
 		StartNewGameWithoutGUI(GENERATE_NEW_SEED);
-	} else {
-		/* First we need to test if the savegame can be loaded, else we will end up playing the
-		 *  intro game... */
-		if (SaveOrLoad(_file_to_saveload.name, _file_to_saveload.file_op, _file_to_saveload.detail_ftype, BASE_DIR) == SL_ERROR) {
-			/* Loading failed, pop out.. */
-			Debug(net, 0, "Loading requested map failed; closing server.");
-			return;
-		} else {
-			/* We can load this game, so go ahead */
-			_switch_mode = SM_LOAD_GAME;
-		}
 	}
 
 	this->is_game_threaded = false;

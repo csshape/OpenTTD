@@ -971,10 +971,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Roghnaig
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :As
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Gach mí
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Gach 3 mí
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Gach 6 mí
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Gach 12 mí
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Teanga
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Roghnaigh an teanga comhéadain le húsáid
@@ -1182,6 +1178,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Ar dheis
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Iasacht tosaigh uasta: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Uasmhéid is féidir le cuideachta a chur ar iasacht (gan boilsciú a chur san áireamh)
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Ráta úis: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Ráta úis ar iasachtaí; rialaíonn sé seo boilsciú freisin, má tá sé cumasaithe
@@ -1766,6 +1763,7 @@ STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :Má tá sé cum
 
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :Aois íosta na gcuideachtaí le bheith in ann scaireanna a thrádáil: {STRING}
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_HELPTEXT                :Socraigh aois íosta na gcuideachtaí sula mbeidh daoine eile in ann scaireanna iontu a cheannach agus a dhíol.
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :An céatadán den bhrabús a íocfar ar chuid den turas i gcórais fhriothálacha: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :An céatadán den bhrabús a thugtar as lastais a thabhairt cuid den bhealach i gcórais fhriothálacha, rud a fhágann go bhfuil tuilleadh smachta agat ar an ioncam
@@ -1880,10 +1878,6 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :Ceann ar bith
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Iolraitheoir tosaigh mhéid na gcathracha: {STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :Meánmhéid na gcathracha i gcomórtas le gnáthbhailte ag tús an chluiche
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :Nuashonraigh an graf dáileacháin gach {STRING}{NBSP}lá
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL_HELPTEXT                  :An t-aga idir gach athríomh ina dhiadh sin ar ghraf na nasc. Déantar na pleananna a ríomh do chomhpháirt amháin den ghraf gach uair a dhéantar athríomh. Mar sin, má shocraíonn tú luach X don socrú seo, ní chiallaíonn sé go ndéanfar an graf iomlá a thabhairt cothrom le dáta gach X lá, ní thabharfar ach comhpháirteanna áirithe de cothrom le dáta. Dá ghiorra an luach a shocraíonn tú is é is mó ama CPU a thógfaidh sé chun é a ríomh. Dá fhaide a shocraíonn tú é is é is faide a thógfaidh sé chun an dáileadh lastais a thosú ar bhealaí nua.
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :Tóg {STRING}{NBSP}lá chun an graf dáileacháin a athríomh
-STR_CONFIG_SETTING_LINKGRAPH_TIME_HELPTEXT                      :An t-am a thógfar ar gach athríomh ar chomhpháirt de ghraf na nasc. Nuair a thosaítear ar athríomh, gintear snáithe agus ligfear don snáithe sin rith ar feadh an líon sin laethanta. Dá ghiorra an luach a shocróidh tú anseo is mó an seans nach mbeidh an snáithe críochnaithe nuair atá sé in ainm is a bheith. Ansin stopfaidh an cluiche go dtí go mbeidh sé críochnaithe (i.e. beidh "moill" ann). Dá fhaide a shocraíonn tú é is é is faide a thógfaidh sé chun an dáileachán a thabhairt cothrom le dáta nuair nuair a athraíonn na bealaí.
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :An mód dáileacháin do phaisinéirí: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :Ciallaíonn "siméadrach" go rachaidh thart ar an méid céanna paisinéirí ó stáisiún A go stáisiún B agus a rachaidh ó B go A. Ciallaíonn "neamhshiméadrach" gur féidir méideanna neamhshrianta paisinéiri dul i gceachtar den dá threo. Ciallaíonn "de láimh" nach ndéanfar dáileadh uathoibríoch ar phaisinéirí.
@@ -1911,7 +1905,7 @@ STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :Go minic bíonn
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Aonaid luais: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Aon áit a thaispeántar luas sa chomhéadan úsáideora, taispeain sna haonaid roghnaithe é
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :Impiriúil (msu)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :Méadrach (km/u)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (m/s)
@@ -2312,7 +2306,6 @@ STR_NETWORK_CLIENT_LIST_NEW_COMPANY                             :(Cuideachta nua
 STR_NETWORK_CLIENT_LIST_NEW_COMPANY_TOOLTIP                     :{BLACK}Cruthaigh cuideachta nua agus téigh isteach ann
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_SELF_TOOLTIP                :{BLACK}Seo tusa
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_HOST_TOOLTIP                :{BLACK}Is é seo óstach an chluiche
-STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} {P ch ch ch gc c}liant / {NUM} {P ch ch ch gc c}uideachta
 
 # Matches ConnectionType
 ###length 5
@@ -3285,8 +3278,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Rabhadh: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Earráid: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Marfach: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Tharla earráid mharfach NewGRF:{}{STRING}
-STR_NEWGRF_ERROR_POPUP                                          :{WHITE}Tharla earráid NewGRF:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :Ní oibreoidh {1:STRING} leis an leagan de TTDPatch a thuairiscigh OpenTTD.
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING}: Is don leagan {STRING} de TTD é
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :Tá {1:STRING} deartha le húsáid le {STRING}
@@ -4532,12 +4523,11 @@ STR_SCREENSHOT_WORLD_SCREENSHOT                                 :{BLACK}Seat sc�
 STR_SCREENSHOT_HEIGHTMAP_SCREENSHOT                             :{BLACK}Seat scáileáin den mhapa airde
 STR_SCREENSHOT_MINIMAP_SCREENSHOT                               :{BLACK}Seat scáileáin den mhion-léarscáil
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :AI
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Dún
 STR_AI_SETTINGS_RESET                                           :{BLACK}Athshocraigh
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Líon na laethanta a thógfaidh sé chun an AI seo a thosú tar éis an ceann roimhe (a bheag nó a mhór): {ORANGE}{STRING}
 
 
 # Textfile window
@@ -4984,6 +4974,8 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Ní féi
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... rófhada ón gceann scríbe roimhe seo
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... níl raon fada go leor ag an aerárthach
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Ní féidir amchlár a thabhairt d'fheithicil...
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Ní féidir le feithiclí fanacht ach ag stáisiúin.
@@ -5399,10 +5391,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Héileacaptar P
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Cuideachta {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Grúpa {COMMA}
@@ -5484,7 +5476,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

@@ -34,7 +34,6 @@
 #include "town.h"
 #include "company_func.h"
 #include "strings_func.h"
-#include "date_func.h"
 #include "viewport_func.h"
 #include "vehicle_func.h"
 #include "sound_func.h"
@@ -47,6 +46,8 @@
 #include "core/random_func.hpp"
 #include "core/backup_type.hpp"
 #include "landscape_cmd.h"
+#include "timer/timer.h"
+#include "timer/timer_game_calendar.h"
 
 #include "table/strings.h"
 
@@ -899,9 +900,9 @@ static void Disaster_CoalMine_Init()
 }
 
 struct Disaster {
-	DisasterInitProc *init_proc; ///< The init function for this disaster.
-	Year min_year;               ///< The first year this disaster will occur.
-	Year max_year;               ///< The last year this disaster will occur.
+	DisasterInitProc *init_proc;      ///< The init function for this disaster.
+	TimerGameCalendar::Year min_year; ///< The first year this disaster will occur.
+	TimerGameCalendar::Year max_year; ///< The last year this disaster will occur.
 };
 
 static const Disaster _disasters[] = {
@@ -921,7 +922,7 @@ static void DoDisaster()
 
 	byte j = 0;
 	for (size_t i = 0; i != lengthof(_disasters); i++) {
-		if (_cur_year >= _disasters[i].min_year && _cur_year < _disasters[i].max_year) buf[j++] = (byte)i;
+		if (TimerGameCalendar::year >= _disasters[i].min_year && TimerGameCalendar::year < _disasters[i].max_year) buf[j++] = (byte)i;
 	}
 
 	if (j == 0) return;
@@ -935,14 +936,14 @@ static void ResetDisasterDelay()
 	_disaster_delay = GB(Random(), 0, 9) + 730;
 }
 
-void DisasterDailyLoop()
+static IntervalTimer<TimerGameCalendar> _disaster_daily({TimerGameCalendar::DAY, TimerGameCalendar::Priority::DISASTER}, [](auto)
 {
 	if (--_disaster_delay != 0) return;
 
 	ResetDisasterDelay();
 
 	if (_settings_game.difficulty.disasters != 0) DoDisaster();
-}
+});
 
 void StartupDisasters()
 {

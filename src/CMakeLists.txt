@@ -23,6 +23,8 @@ add_subdirectory(saveload)
 add_subdirectory(sound)
 add_subdirectory(spriteloader)
 add_subdirectory(table)
+add_subdirectory(tests)
+add_subdirectory(timer)
 add_subdirectory(video)
 add_subdirectory(widgets)
 
@@ -149,6 +151,8 @@ add_files(
     engine_gui.h
     engine_type.h
     error.h
+    error.cpp
+    error_func.h
     error_gui.cpp
     fileio.cpp
     fileio_func.h
@@ -190,7 +194,6 @@ add_files(
     group_gui.h
     group_type.h
     gui.h
-    guitimer_func.h
     heightmap.cpp
     heightmap.h
     highscore.cpp
@@ -274,6 +277,8 @@ add_files(
     newgrf_properties.h
     newgrf_railtype.cpp
     newgrf_railtype.h
+    newgrf_roadstop.cpp
+    newgrf_roadstop.h
     newgrf_roadtype.cpp
     newgrf_roadtype.h
     newgrf_sound.cpp

@@ -82,20 +82,18 @@ ScriptObject::ActiveInstance::~ActiveInstance()
 	return GetStorage()->mode_instance;
 }
 
-/* static */ void ScriptObject::SetLastCommand(TileIndex tile, const CommandDataBuffer &data, Commands cmd)
+/* static */ void ScriptObject::SetLastCommand(const CommandDataBuffer &data, Commands cmd)
 {
 	ScriptStorage *s = GetStorage();
-	Debug(script, 6, "SetLastCommand company={:02d} tile={:06x} cmd={} data={}", s->root_company, tile, cmd, FormatArrayAsHex(data));
-	s->last_tile = tile;
+	Debug(script, 6, "SetLastCommand company={:02d} cmd={} data={}", s->root_company, cmd, FormatArrayAsHex(data));
 	s->last_data = data;
 	s->last_cmd = cmd;
 }
 
-/* static */ bool ScriptObject::CheckLastCommand(TileIndex tile, const CommandDataBuffer &data, Commands cmd)
+/* static */ bool ScriptObject::CheckLastCommand(const CommandDataBuffer &data, Commands cmd)
 {
 	ScriptStorage *s = GetStorage();
-	Debug(script, 6, "CheckLastCommand company={:02d} tile={:06x} cmd={} data={}", s->root_company, tile, cmd, FormatArrayAsHex(data));
-	if (s->last_tile != tile) return false;
+	Debug(script, 6, "CheckLastCommand company={:02d} cmd={} data={}", s->root_company, cmd, FormatArrayAsHex(data));
 	if (s->last_cmd != cmd) return false;
 	if (s->last_data != data) return false;
 	return true;
@@ -255,7 +253,7 @@ std::tuple<bool, bool, bool> ScriptObject::DoCommandPrep()
 
 	bool networking = _networking && !_generating_world;
 
-	if (ScriptObject::GetCompany() != OWNER_DEITY && !::Company::IsValidID(ScriptObject::GetCompany())) {
+	if (!ScriptCompanyMode::IsDeity() && !ScriptCompanyMode::IsValid()) {
 		ScriptObject::SetLastError(ScriptError::ERR_PRECONDITION_INVALID_COMPANY);
 		return { true, estimate_only, networking };
 	}

@@ -195,6 +195,7 @@ STR_UNITS_VELOCITY_IMPERIAL                                     :{COMMA}{NBSP}mp
 STR_UNITS_VELOCITY_METRIC                                       :{COMMA}{NBSP}km/h
 STR_UNITS_VELOCITY_SI                                           :{COMMA}{NBSP}m/s
 STR_UNITS_VELOCITY_GAMEUNITS                                    :{DECIMAL}{NBSP}ruutua/vrk
+STR_UNITS_VELOCITY_KNOTS                                        :{COMMA}{NBSP}solmua
 
 STR_UNITS_POWER_IMPERIAL                                        :{COMMA}{NBSP}hv
 STR_UNITS_POWER_METRIC                                          :{COMMA}{NBSP}hv
@@ -343,9 +344,9 @@ STR_GOTO_ORDER_VIEW_TOOLTIP                                     :{BLACK}Avaa kä
 ###length 31
 STR_TOOLBAR_TOOLTIP_PAUSE_GAME                                  :{BLACK}Tauko
 STR_TOOLBAR_TOOLTIP_FORWARD                                     :{BLACK}Nopeuta peliä
-STR_TOOLBAR_TOOLTIP_OPTIONS                                     :{BLACK}Asetukset
-STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Tallenna peli, hylkää peli, sulje
-STR_TOOLBAR_TOOLTIP_DISPLAY_MAP                                 :{BLACK}Näytä kartta, lisänäkymä ja kylttilista
+STR_TOOLBAR_TOOLTIP_OPTIONS                                     :{BLACK}Valinnat ja asetukset
+STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Tallenna, lataa tai hylkää peli, lopeta ohjelma
+STR_TOOLBAR_TOOLTIP_DISPLAY_MAP                                 :{BLACK}Näytä kartta, lisänäkymä, rahtivirrat tai kylttilista
 STR_TOOLBAR_TOOLTIP_DISPLAY_TOWN_DIRECTORY                      :{BLACK}Näytä kuntahakemisto
 STR_TOOLBAR_TOOLTIP_DISPLAY_SUBSIDIES                           :{BLACK}Näytä tukitarjoukset
 STR_TOOLBAR_TOOLTIP_DISPLAY_LIST_OF_COMPANY_STATIONS            :{BLACK}Näytä luettelo yhtiön asemista
@@ -353,9 +354,9 @@ STR_TOOLBAR_TOOLTIP_DISPLAY_COMPANY_FINANCES                    :{BLACK}Näytä 
 STR_TOOLBAR_TOOLTIP_DISPLAY_COMPANY_GENERAL                     :{BLACK}Näytä yhtiön yleiset tiedot
 STR_TOOLBAR_TOOLTIP_DISPLAY_STORY_BOOK                          :{BLACK}Näytä yhtiöhistoria
 STR_TOOLBAR_TOOLTIP_DISPLAY_GOALS_LIST                          :{BLACK}Näytä tavoitteet
-STR_TOOLBAR_TOOLTIP_DISPLAY_GRAPHS                              :{BLACK}Näytä kuvaajat
+STR_TOOLBAR_TOOLTIP_DISPLAY_GRAPHS                              :{BLACK}Näytä yhtiökuvaajat ja rahtitaksat
 STR_TOOLBAR_TOOLTIP_DISPLAY_COMPANY_LEAGUE                      :{BLACK}Näytä yhtiökilpataulukko
-STR_TOOLBAR_TOOLTIP_FUND_CONSTRUCTION_OF_NEW                    :{BLACK}Rahoita uuden teollisuuden rakentamista ja näytä teollisuushakemisto
+STR_TOOLBAR_TOOLTIP_FUND_CONSTRUCTION_OF_NEW                    :{BLACK}Tutki teollisuuslaitoksia tai rahoita uuden teollisuuden rakentamista
 STR_TOOLBAR_TOOLTIP_DISPLAY_LIST_OF_COMPANY_TRAINS              :{BLACK}Näytä luettelo yhtiön junista. Ctrl+napsautus näyttää luettelon ilman ryhmäluetteloa.
 STR_TOOLBAR_TOOLTIP_DISPLAY_LIST_OF_COMPANY_ROAD_VEHICLES       :{BLACK}Näytä luettelo yhtiön ajoneuvoista. Ctrl+napsautus näyttää luettelon ilman ryhmäluetteloa.
 STR_TOOLBAR_TOOLTIP_DISPLAY_LIST_OF_COMPANY_SHIPS               :{BLACK}Näytä luettelo yhtiön laivoista. Ctrl+napsautus näyttää luettelon ilman ryhmäluetteloa.
@@ -369,8 +370,8 @@ STR_TOOLBAR_TOOLTIP_BUILD_SHIP_DOCKS                            :{BLACK}Rakenna 
 STR_TOOLBAR_TOOLTIP_BUILD_AIRPORTS                              :{BLACK}Rakenna lentokenttiä
 STR_TOOLBAR_TOOLTIP_LANDSCAPING                                 :{BLACK}Avaa maastonmuokkaustyökalupalkki maan kohottamiseen/madaltamiseen, puiden istuttamiseen, jne.
 STR_TOOLBAR_TOOLTIP_SHOW_SOUND_MUSIC_WINDOW                     :{BLACK}Näytä ääni- ja musiikkiasetukset
-STR_TOOLBAR_TOOLTIP_SHOW_LAST_MESSAGE_NEWS                      :{BLACK}Näytä viimeisin viesti/uutisraportti, näytä viestiasetukset
-STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Maa-aluetiedot, konsoli, skriptin virheenjäljitys, kuvankaappaukset, tietoja OpenTTD:stä
+STR_TOOLBAR_TOOLTIP_SHOW_LAST_MESSAGE_NEWS                      :{BLACK}Näytä viimeisin viesti/uutisraportti, näytä viestihistoria tai poista kaikki viestit
+STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Maa-aluetiedot, kuvakaappaus, tietoja OpenTTD:stä, kehittäjätyökalut
 STR_TOOLBAR_TOOLTIP_SWITCH_TOOLBAR                              :{BLACK}Vaihda työkalupalkkeja
 
 # Extra tooltips for the scenario editor toolbar
@@ -982,10 +983,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Valitse 
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Pois
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Kuukausittain
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Joka 3. kuukausi
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Joka 6. kuukausi
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Kerran vuodessa
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Kieli
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Valitse käyttöliittymän kieli
@@ -1206,6 +1203,9 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :oikealla
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Suurin mahdollinen laina alussa: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Suurin mahdollinen yhtiön ottama laina (ottamatta huomioon inflaatiota)
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_VALUE                   :{CURRENCY_LONG}
+###setting-zero-is-special
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_DISABLED                :Ei lainaa {RED}Vaatii peliskriptin, joka tarjoaa alkupääoman
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Korko: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Lainan korko; ohjaa myös inflaatiota mikäli käytössä
@@ -1708,7 +1708,7 @@ STR_CONFIG_SETTING_SCRIPT_MAX_MEMORY_HELPTEXT                   :Kuinka paljon m
 STR_CONFIG_SETTING_SCRIPT_MAX_MEMORY_VALUE                      :{COMMA} MiB
 
 STR_CONFIG_SETTING_SERVINT_ISPERCENT                            :Huoltovälit ovat prosentteina: {STRING}
-STR_CONFIG_SETTING_SERVINT_ISPERCENT_HELPTEXT                   :Määritä, aiheuttaako edellisestä huollosta kulunut aika vai luotettavuuden laskeminen kulkuneuvon huoltamisen
+STR_CONFIG_SETTING_SERVINT_ISPERCENT_HELPTEXT                   :Kun tämä on valittuna, kulkuneuvot yrittävät mennä huoltoon niiden luotettavuuden laskettua annetun prosenttiosuuden verran enimmäisluotettavuudesta.{}{}Jos esimerkiksi kulkuneuvon enimmäisluotettavuus on 90 % ja huoltoväli 20 %, kulkuneuvo pyrkii huoltoon luotettavuuden laskettua 72 %:iin.
 
 STR_CONFIG_SETTING_SERVINT_TRAINS                               :Junien oletushuoltoväli: {STRING}
 STR_CONFIG_SETTING_SERVINT_TRAINS_HELPTEXT                      :Määritä oletushuoltoväli uusille junille, mikäli kulkuneuvolle ei ole määritelty erillistä huoltoväliä
@@ -1805,6 +1805,9 @@ STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :Mikäli käytö
 
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :Yhtiön vähimmäisikä osakekaupoille: {STRING}
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_HELPTEXT                :Aseta yhtiölle vähimmäisikä, jonka jälkeen muut voivat ostaa ja myydä yhtiön osakkeita.
+STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_VALUE                   :{COMMA} vuo{P 0 si tta}
+###setting-zero-is-special
+STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_NO_MIN                  :Ei vähimmäisaikaa
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Syöttöjärjestelmään maksettavan tuoton osuus: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Osuus tuotosta, joka annetaan välittäjille syöttöjärjestelmissä
@@ -1919,10 +1922,10 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :Ei yhtään
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Kasvukerroin alussa: {STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :Kaupunkien keskimääräinen koko suhteessa muihin kuntiin pelin alussa
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :Päivitä rahdin jakautuminen {STRING}{NBSP}päivän välein
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL_HELPTEXT                  :Yhteyskuvaajan uudelleenlaskujen välinen aika. Kukin uudelleenlasku laskee yhden kuvaajan komponentin. Tämä tarkoittaa sitä, että koko kuvaajaa ei lasketa uudelleen määrittämäsi ajan välein, vaan ainoastaan yksi komponentti. Mitä lyhyemmäksi määrität asetuksen, sitä enemmän prosessoriaikaa komponentin laskemiseen vaaditaan. Mitä pidemmäksi määrität sen, sitä pidempi aika kuluu, kunnes rahdin jakaminen alkaa uusilla reiteillä.
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :Käytä {STRING}{NBSP}päivä{P 0:2 "" ä} rahtijakauman päivittämiseen
-STR_CONFIG_SETTING_LINKGRAPH_TIME_HELPTEXT                      :Jokaisen yhteyskuvaajan komponentin uudelleenlaskemiseen käytettävä aika. Uudelleenlaskun alkaessa käynnistetään uusi säie, jonka annetaan toimia näin monta päivää. Mitä lyhyemmäksi määrität tämän, sitä todennäköisempää on, että säie ei ole valmis ajoissa. Tällöin peli pysähtyy kunnes lasku on suoritettu loppuun (peli pätkii). Mitä pidemmäksi määrität asetuksen, sitä pitempään rahdin jakauman päivittämiseen kuluu aikaa reittien muuttuessa.
+STR_CONFIG_SETTING_LINKGRAPH_RECALC_INTERVAL                    :Päivitä yhteyskuvaaja {STRING}{NBSP}sekunnin välein
+STR_CONFIG_SETTING_LINKGRAPH_RECALC_INTERVAL_HELPTEXT           :Yhteyskuvaajan uudelleenlaskentojen välinen aika. Jokainen uudelleenlaskenta laskee suunnitelmat kuvaajan yhdelle osalle. Tämän asetuksen arvo X ei siis tarkoita, että koko kuvaaja päivittyisi X sekunnin välein, vaan ainoastaan sen yksi osa. Mitä lyhyemmäksi asetat tämän ajan, sitä enemmän suoritinaikaa kuluu laskentaan. Mitä pitemmäksi asetat ajan, sitä pitempään kestää rahdin jakautumisen alkaminen uusille reiteille.
+STR_CONFIG_SETTING_LINKGRAPH_RECALC_TIME                        :Käytä {STRING}{NBSP}sekunti{P 0:2 "" a} yhteyskuvaajan uudelleenlaskentaan
+STR_CONFIG_SETTING_LINKGRAPH_RECALC_TIME_HELPTEXT               :Yhteyskuvaajan kunkin osan uudelleenlaskentaan käytettävä aika. Uudelleenlaskennan alkaessa käynnistetään säie, jonka annetaan toimia näin monta sekuntia. Mitä lyhyemmäksi asetat tämän ajan, sitä todennäköisemmin säie ei ehdi päättymään ajoissa, jolloin peli pysähtyy (”jumii”) säikeen valmistumiseen asti. Mitä pitemmäksi asetat ajan, sitä pitempään rahdin jakautumisen päivittyminen kestää reittien muuttuessa.
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :Matkustajien jakautuminen: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :”Symmetrinen” tarkoittaa, että suunnilleen sama määrä matkustajia kulkee asemalta A asemalle B kuin asemalta B asemalle A. ”Epäsymmetrinen” tarkoittaa, että matkustajia voi kulkea mielivaltainen määrä kumpaankin suuntaan. ”Manuaalinen” tarkoittaa, että automaattista jakautumista ei sovelleta matkustajiin.
@@ -1948,13 +1951,15 @@ STR_CONFIG_SETTING_DEMAND_SIZE_HELPTEXT                         :Mikäli asetuks
 STR_CONFIG_SETTING_SHORT_PATH_SATURATION                        :Lyhyiden reittien kuormittuminen ennen vapaampien reittien käyttämistä: {STRING}
 STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :Kahden aseman välillä on usein useita reittejä. Lyhintä reittiä käytetään ensisijaisesti, toiseksi lyhintä ensimmäisen kuormittuessa ja niin edelleen. Kuormitus määritellään arvioidun kapasiteetin ja suunnitellun käytön mukaan. Kaikkien reittien ollessa kuormittuneita reittejä aletaan ylikuormittaa, suurimman kapasiteetin omaavista reiteista aloittaen. Algoritmi ei kuitenkaan aina arvioi kapasiteettia oikein. Tämä asetus mahdollistaa reitin kuormitustason määrittämisen ennen seuraavan reitin käyttämistä. Määritä arvoksi vähemmän kuin 100{NBSP}% välttääksesi ylikuormittuneita asemia, jos kapasiteetti yliarvioidaan.
 
-STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Nopeuden yksikkö: {STRING}
+STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Nopeuden yksikkö (maaliikenne): {STRING}
+STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_NAUTICAL         :Nopeuden yksikkö (vesiliikenne): {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Kun käyttöliittymässä näytetään nopeus, näytä se valittua yksikköä käyttäen
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :Brittiläinen (mph)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :Metrinen (km/h)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (m/s)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_GAMEUNITS        :Pelin yksiköt (ruutuja vuorokaudessa)
+STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_KNOTS            :Solmut
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_POWER                     :Kulkuneuvon tehon yksikkö: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_POWER_HELPTEXT            :Kun käyttöliittymässä näytetään kulkuneuvon teho, näytä se valittua yksikköä käyttäen
@@ -2355,7 +2360,8 @@ STR_NETWORK_CLIENT_LIST_NEW_COMPANY                             :(Uusi yhtiö)
 STR_NETWORK_CLIENT_LIST_NEW_COMPANY_TOOLTIP                     :{BLACK}Perusta uusi yhtiö ja liity siihen
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_SELF_TOOLTIP                :{BLACK}Tämä olet sinä
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_HOST_TOOLTIP                :{BLACK}Tämä on pelin ylläpitäjä
-STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} pelaaja{P "" a} / {NUM} yhtiö{P "" tä}
+STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} pelaaja{P "" a} – {NUM}/{NUM} yhtiö{P "" tä}
+STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT_TOOLTIP            :{BLACK}Tällä hetkellä kytkeytyneiden asiakkaiden määrä, yhtiöiden määrä sekä palvelimen ylläpitäjän sallima yhtiöiden enimmäismäärä
 
 # Matches ConnectionType
 ###length 5
@@ -3349,8 +3355,8 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Varoitus: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Virhe: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Virhe: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Vakava NewGRF-virhe on tapahtunut:{}{STRING}
-STR_NEWGRF_ERROR_POPUP                                          :{WHITE}NewGRF-virhe on tapahtunut:{}{STRING}
+STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}NewGRF ”{STRING}” on kohdannut vakavan virheen:{}{STRING}
+STR_NEWGRF_ERROR_POPUP                                          :{WHITE}NewGRF ”{STRING}” on kohdannut virheen:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} ei toimi OpenTTD:n ilmoittaman TTDPatch-version kanssa
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} on TTD:n {2:STRING}-versiota varten
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} on suunniteltu toimimaan lisäosan {2:STRING} kanssa
@@ -4526,7 +4532,7 @@ STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Tyhjenn�
 STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Poista suurin sallittu nopeus valitulta käskyltä. Ctrl+napsautus poistaa kaikkien käskyjen nopeusrajoitukset
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Nollaa myöhästymislaskuri
-STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Nollaa myöhästymislaskuri, jotta vaunu olisi taas aikataulussa
+STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Nollaa myöhästymislaskuri, jotta kulkuneuvo olisi taas aikataulussa. Ctrl+napsautus nollaa koko ryhmän, minkä jälkeen eniten myöhässä ollut kulkuneuvo on aikataulussa ja muut ovat etuajassa
 
 STR_TIMETABLE_AUTOFILL                                          :{BLACK}Automaattinen
 STR_TIMETABLE_AUTOFILL_TOOLTIP                                  :{BLACK}Täytä aikataulu automaattisesti seuraavan matkan arvoilla. Ctrl+napsautus: yritä säilyttää odotusajat
@@ -4580,7 +4586,9 @@ STR_AI_CONFIG_AILIST_TOOLTIP                                    :{BLACK}Seuraava
 STR_AI_CONFIG_HUMAN_PLAYER                                      :Ihmispelaaja
 STR_AI_CONFIG_RANDOM_AI                                         :Sattumanvarainen tekoäly
 STR_AI_CONFIG_NONE                                              :(ei mitään)
+STR_AI_CONFIG_NAME_VERSION                                      :{STRING} {YELLOW}v{NUM}
 STR_AI_CONFIG_MAX_COMPETITORS                                   :{LTBLUE}Vastustajien enimmäismäärä: {ORANGE}{COMMA}
+STR_AI_CONFIG_COMPETITORS_INTERVAL                              :{LTBLUE}Kilpailijoiden käynnistämisen välinen aika: {ORANGE}{COMMA} minuutti{P "" a}
 
 STR_AI_CONFIG_MOVE_UP                                           :{BLACK}Siirrä ylöspäin
 STR_AI_CONFIG_MOVE_UP_TOOLTIP                                   :{BLACK}Siirrä valittua tekoälyä ylöspäin listalla
@@ -4593,14 +4601,14 @@ STR_AI_CONFIG_AI                                                :{SILVER}Tekoäl
 
 STR_AI_CONFIG_CHANGE_AI                                         :{BLACK}Valitse tekoäly
 STR_AI_CONFIG_CHANGE_GAMESCRIPT                                 :{BLACK}Valitse peliskripti
-STR_AI_CONFIG_CHANGE_TOOLTIP                                    :{BLACK}Lataa toinen skripti
+STR_AI_CONFIG_CHANGE_TOOLTIP                                    :{BLACK}Lataa toinen skripti. Ctrl+napsautus näyttää kaikki saatavilla olevat versiot
 STR_AI_CONFIG_CONFIGURE                                         :{BLACK}Määritä
 STR_AI_CONFIG_CONFIGURE_TOOLTIP                                 :{BLACK}Määritä skriptin parametrit
 
 # Available AIs window
-STR_AI_LIST_CAPTION                                             :{WHITE}Saatavilla {STRING}
-STR_AI_LIST_CAPTION_AI                                          :Tekoälyt
-STR_AI_LIST_CAPTION_GAMESCRIPT                                  :Peliskriptit
+STR_AI_LIST_CAPTION                                             :{WHITE}Saatavilla olevat {STRING}
+STR_AI_LIST_CAPTION_AI                                          :tekoälyt
+STR_AI_LIST_CAPTION_GAMESCRIPT                                  :peliskriptit
 STR_AI_LIST_TOOLTIP                                             :{BLACK}Napsauta valitaksesi skriptin
 
 STR_AI_LIST_AUTHOR                                              :{LTBLUE}Tekijä: {ORANGE}{STRING}
@@ -4620,12 +4628,13 @@ STR_SCREENSHOT_WORLD_SCREENSHOT                                 :{BLACK}Koko kar
 STR_SCREENSHOT_HEIGHTMAP_SCREENSHOT                             :{BLACK}Korkeuskartan kuvakaappaus
 STR_SCREENSHOT_MINIMAP_SCREENSHOT                               :{BLACK}Pienoiskartan kuvakaappaus
 
-# AI Parameters
-STR_AI_SETTINGS_CAPTION_AI                                      :{WHITE}Tekoälyn parametrit
+# Script Parameters
+STR_AI_SETTINGS_CAPTION                                         :{WHITE}{STRING} Parametrit
+STR_AI_SETTINGS_CAPTION_AI                                      :Tekoäly
+STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :Peliskripti
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Sulje
 STR_AI_SETTINGS_RESET                                           :{BLACK}Palauta
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Päiviä edellisen tekoälyn aloittamisesta tämän tekoälyn aloittamiseen (arvio): {ORANGE}{STRING}
 
 
 # Textfile window
@@ -5079,10 +5088,25 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Käskyj�
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... liian kaukana edellisestä määränpäästä
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... ilma-aluksen toimintasäde ei riitä
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+STR_ERROR_NO_RAIL_STATION                                       :{WHITE}Rautatieasemaa ei ole
+STR_ERROR_NO_BUS_STATION                                        :{WHITE}Linja-autopysäkkiä ei ole
+STR_ERROR_NO_TRUCK_STATION                                      :{WHITE}Lastauslaituria ei ole
+STR_ERROR_NO_DOCK                                               :{WHITE}Satamaa ei ole
+STR_ERROR_NO_AIRPORT                                            :{WHITE}Lento-/helikopterikenttää ei ole
+STR_ERROR_NO_STOP_COMPATIBLE_ROAD_TYPE                          :{WHITE}Ei ole pysäkkejä sopivalla tien tyypillä
+STR_ERROR_NO_STOP_COMPATIBLE_TRAM_TYPE                          :{WHITE}Ei ole pysäkkejä sopivalla raitiotien tyypillä
+STR_ERROR_NO_STOP_ARTICULATED_VEHICLE                           :{WHITE}Ei ole nivelajoneuvoille sopivia pysäkkejä.{}Nivelletyt ajoneuvot vaativat pysäkin, joka ei ole kääntöpysäkki vaan läpiajettava
+STR_ERROR_AIRPORT_NO_PLANES                                     :{WHITE}Tämä lentokone ei voi laskeutua tälle helikopterikentälle
+STR_ERROR_AIRPORT_NO_HELICOPTERS                                :{WHITE}Tämä helikopteri ei voi laskeutua tälle lentokentälle
+STR_ERROR_NO_RAIL_WAYPOINT                                      :{WHITE}Rautatien reittipistettä ei ole
+STR_ERROR_NO_BUOY                                               :{WHITE}Poijua ei ole
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Ei voi asettaa aikataulua.
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Kulkuneuvo voi odottaa vain asemalla
 STR_ERROR_TIMETABLE_NOT_STOPPING_HERE                           :{WHITE}Tämä kulkuneuvo ei pysähdy tällä asemalla
+STR_ERROR_TIMETABLE_INCOMPLETE                                  :{WHITE}… aikataulu on puutteellinen
 
 # Sign related errors
 STR_ERROR_TOO_MANY_SIGNS                                        :{WHITE}... liian monta kylttiä.
@@ -5494,10 +5518,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Powernaut-helik
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(yhtiö {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Ryhmä {COMMA}
@@ -5579,7 +5603,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

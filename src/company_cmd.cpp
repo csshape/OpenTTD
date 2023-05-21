@@ -23,7 +23,6 @@
 #include "company_manager_face.h"
 #include "window_func.h"
 #include "strings_func.h"
-#include "date_func.h"
 #include "sound_func.h"
 #include "rail.h"
 #include "core/pool_func.hpp"
@@ -36,6 +35,9 @@
 #include "story_base.h"
 #include "widgets/statusbar_widget.h"
 #include "company_cmd.h"
+#include "timer/timer.h"
+#include "timer/timer_game_calendar.h"
+#include "timer/timer_game_tick.h"
 
 #include "table/strings.h"
 
@@ -48,7 +50,6 @@ CompanyID _local_company;   ///< Company controlled by the human player at this 
 CompanyID _current_company; ///< Company currently doing an action.
 Colours _company_colours[MAX_COMPANIES];  ///< NOSAVE: can be determined from company structs.
 CompanyManagerFace _company_manager_face; ///< for company manager face storage in openttd.cfg
-uint _next_competitor_start;              ///< the number of ticks before the next AI is started
 uint _cur_company_tick_index;             ///< used to generate a name for one company that doesn't have a name yet per tick
 
 CompanyPool _company_pool("Company"); ///< Pool of companies.
@@ -561,13 +562,14 @@ Company *DoStartupNewCompany(bool is_ai, CompanyID company = INVALID_COMPANY)
 	ResetCompanyLivery(c);
 	_company_colours[c->index] = (Colours)c->colour;
 
-	c->money = c->current_loan = (std::min<int64>(INITIAL_LOAN, _economy.max_loan) * _economy.inflation_prices >> 16) / 50000 * 50000;
+	/* Scale the initial loan based on the inflation rounded down to the loan interval. The maximum loan has already been inflation adjusted. */
+	c->money = c->current_loan = std::min<int64>((INITIAL_LOAN * _economy.inflation_prices >> 16) / LOAN_INTERVAL * LOAN_INTERVAL, _economy.max_loan);
 
 	std::fill(c->share_owners.begin(), c->share_owners.end(), INVALID_OWNER);
 
 	c->avail_railtypes = GetCompanyRailtypes(c->index);
 	c->avail_roadtypes = GetCompanyRoadTypes(c->index);
-	c->inaugurated_year = _cur_year;
+	c->inaugurated_year = TimerGameCalendar::year;
 
 	/* If starting a player company in singleplayer and a favorite company manager face is selected, choose it. Otherwise, use a random face.
 	 * In a network game, we'll choose the favorite face later in CmdCompanyCtrl to sync it to all clients. */
@@ -596,16 +598,10 @@ Company *DoStartupNewCompany(bool is_ai, CompanyID company = INVALID_COMPANY)
 	return c;
 }
 
-/** Start the next competitor now. */
-void StartupCompanies()
-{
-	_next_competitor_start = 0;
-}
-
 /** Start a new competitor company if possible. */
-static bool MaybeStartNewCompany()
-{
-	if (_networking && Company::GetNumItems() >= _settings_client.network.max_companies) return false;
+TimeoutTimer<TimerGameTick> _new_competitor_timeout(0, []() {
+	if (_game_mode == GM_MENU || !AI::CanStartNew()) return;
+	if (_networking && Company::GetNumItems() >= _settings_client.network.max_companies) return;
 
 	/* count number of competitors */
 	uint n = 0;
@@ -613,13 +609,26 @@ static bool MaybeStartNewCompany()
 		if (c->is_ai) n++;
 	}
 
-	if (n < (uint)_settings_game.difficulty.max_no_competitors) {
-		/* Send a command to all clients to start up a new AI.
-		 * Works fine for Multiplayer and Singleplayer */
-		return Command<CMD_COMPANY_CTRL>::Post(CCA_NEW_AI, INVALID_COMPANY, CRR_NONE, INVALID_CLIENT_ID );
-	}
+	if (n >= (uint)_settings_game.difficulty.max_no_competitors) return;
 
-	return false;
+	/* Send a command to all clients to start up a new AI.
+	 * Works fine for Multiplayer and Singleplayer */
+	Command<CMD_COMPANY_CTRL>::Post(CCA_NEW_AI, INVALID_COMPANY, CRR_NONE, INVALID_CLIENT_ID);
+});
+
+/** Start of a new game. */
+void StartupCompanies()
+{
+	/* Ensure the timeout is aborted, so it doesn't fire based on information of the last game. */
+	_new_competitor_timeout.Abort();
+
+	/* If there is no delay till the start of the next competitor, start all competitors at the start of the game. */
+	if (_settings_game.difficulty.competitors_interval == 0 && _game_mode != GM_MENU && AI::CanStartNew()) {
+		for (auto i = 0; i < _settings_game.difficulty.max_no_competitors; i++) {
+			if (_networking && Company::GetNumItems() >= _settings_client.network.max_companies) break;
+			Command<CMD_COMPANY_CTRL>::Post(CCA_NEW_AI, INVALID_COMPANY, CRR_NONE, INVALID_CLIENT_ID);
+		}
+	}
 }
 
 /** Initialize the pool of companies. */
@@ -701,9 +710,9 @@ static void HandleBankruptcyTakeover(Company *c)
 	SetBit(c->bankrupt_asked, best->index);
 
 	c->bankrupt_timeout = TAKE_OVER_TIMEOUT;
-	if (best->is_ai) {
-		AI::NewEvent(best->index, new ScriptEventCompanyAskMerger(c->index, ClampToI32(c->bankrupt_value)));
-	} else if (IsInteractiveCompany(best->index)) {
+
+	AI::NewEvent(best->index, new ScriptEventCompanyAskMerger(c->index, c->bankrupt_value));
+	if (IsInteractiveCompany(best->index)) {
 		ShowBuyCompanyDialog(c->index);
 	}
 }
@@ -719,20 +728,15 @@ void OnTick_Companies()
 		if (c->bankrupt_asked != 0) HandleBankruptcyTakeover(c);
 	}
 
-	if (_next_competitor_start == 0) {
-		/* AI::GetStartNextTime() can return 0. */
-		_next_competitor_start = std::max(1, AI::GetStartNextTime() * DAY_TICKS);
-	}
+	if (_new_competitor_timeout.HasFired() && _game_mode != GM_MENU && AI::CanStartNew()) {
+		int32 timeout = _settings_game.difficulty.competitors_interval * 60 * TICKS_PER_SECOND;
+		/* If the interval is zero, check every ~10 minutes if a company went bankrupt and needs replacing. */
+		if (timeout == 0) timeout = 10 * 60 * TICKS_PER_SECOND;
 
-	if (_game_mode != GM_MENU && AI::CanStartNew() && --_next_competitor_start == 0) {
-		/* Allow multiple AIs to possibly start in the same tick. */
-		do {
-			if (!MaybeStartNewCompany()) break;
+		/* Randomize a bit when the AI is actually going to start; ranges from 87.5% .. 112.5% of indicated value. */
+		timeout += ScriptObject::GetRandomizer(OWNER_NONE).Next(timeout / 4) - timeout / 8;
 
-			/* In networking mode, we can only send a command to start but it
-			 * didn't execute yet, so we cannot loop. */
-			if (_networking) break;
-		} while (AI::GetStartNextTime() == 0);
+		_new_competitor_timeout.Reset(std::max(1, timeout));
 	}
 
 	_cur_company_tick_index = (_cur_company_tick_index + 1) % MAX_COMPANIES;
@@ -742,7 +746,7 @@ void OnTick_Companies()
  * A year has passed, update the economic data of all companies, and perhaps show the
  * financial overview window of the local company.
  */
-void CompaniesYearlyLoop()
+static IntervalTimer<TimerGameCalendar> _companies_yearly({TimerGameCalendar::YEAR, TimerGameCalendar::Priority::COMPANY}, [](auto)
 {
 	/* Copy statistics */
 	for (Company *c : Company::Iterate()) {
@@ -760,7 +764,7 @@ void CompaniesYearlyLoop()
 			if (_settings_client.sound.new_year) SndPlayFx(SND_00_GOOD_YEAR);
 		}
 	}
-}
+});
 
 /**
  * Fill the CompanyNewsInformation struct with the required data.
@@ -921,8 +925,8 @@ CommandCost CmdCompanyCtrl(DoCommandFlag flags, CompanyCtrlAction cca, CompanyID
 	}
 
 	InvalidateWindowClassesData(WC_GAME_OPTIONS);
-	InvalidateWindowClassesData(WC_AI_SETTINGS);
-	InvalidateWindowClassesData(WC_AI_LIST);
+	InvalidateWindowClassesData(WC_SCRIPT_SETTINGS);
+	InvalidateWindowClassesData(WC_SCRIPT_LIST);
 
 	return CommandCost();
 }

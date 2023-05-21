@@ -20,32 +20,10 @@
 #include "saveload/saveload.h"
 #include "newgrf_profiling.h"
 #include "widgets/statusbar_widget.h"
+#include "timer/timer.h"
+#include "timer/timer_game_calendar.h"
 
 #include "safeguards.h"
-
-Year      _cur_year;   ///< Current year, starting at 0
-Month     _cur_month;  ///< Current month (0..11)
-Date      _date;       ///< Current date in days (day counter)
-DateFract _date_fract; ///< Fractional part of the day.
-uint64 _tick_counter;  ///< Ever incrementing tick counter for setting off various events
-
-/**
- * Set the date.
- * @param date  New date
- * @param fract The number of ticks that have passed on this date.
- */
-void SetDate(Date date, DateFract fract)
-{
-	assert(fract < DAY_TICKS);
-
-	YearMonthDay ymd;
-
-	_date = date;
-	_date_fract = fract;
-	ConvertDateToYMD(date, &ymd);
-	_cur_year = ymd.year;
-	_cur_month = ymd.month;
-}
 
 #define M(a, b) ((a << 5) | b)
 static const uint16 _month_date_from_year_day[] = {
@@ -91,14 +69,14 @@ static const uint16 _accum_days_for_month[] = {
  * @param date the date to convert from
  * @param ymd  the year, month and day to write to
  */
-void ConvertDateToYMD(Date date, YearMonthDay *ymd)
+void ConvertDateToYMD(TimerGameCalendar::Date date, YearMonthDay *ymd)
 {
 	/* Year determination in multiple steps to account for leap
 	 * years. First do the large steps, then the smaller ones.
 	 */
 
 	/* There are 97 leap years in 400 years */
-	Year yr = 400 * (date / (DAYS_IN_YEAR * 400 + 97));
+	TimerGameCalendar::Year yr = 400 * (date / (DAYS_IN_YEAR * 400 + 97));
 	int rem = date % (DAYS_IN_YEAR * 400 + 97);
 	uint16 x;
 
@@ -146,7 +124,7 @@ void ConvertDateToYMD(Date date, YearMonthDay *ymd)
  * @param month is a number between 0..11
  * @param day   is a number between 1..31
  */
-Date ConvertYMDToDate(Year year, Month month, Day day)
+TimerGameCalendar::Date ConvertYMDToDate(TimerGameCalendar::Year year, TimerGameCalendar::Month month, TimerGameCalendar::Day day)
 {
 	/* Day-offset in a leap year */
 	int days = _accum_days_for_month[month] + day - 1;
@@ -155,151 +133,4 @@ Date ConvertYMDToDate(Year year, Month month, Day day)
 	if (!IsLeapYear(year) && days >= ACCUM_MAR) days--;
 
 	return DAYS_TILL(year) + days;
-}
-
-/** Functions used by the IncreaseDate function */
-
-extern void EnginesDailyLoop();
-extern void DisasterDailyLoop();
-extern void IndustryDailyLoop();
-
-extern void CompaniesMonthlyLoop();
-extern void EnginesMonthlyLoop();
-extern void TownsMonthlyLoop();
-extern void IndustryMonthlyLoop();
-extern void StationMonthlyLoop();
-extern void SubsidyMonthlyLoop();
-
-extern void CompaniesYearlyLoop();
-extern void VehiclesYearlyLoop();
-extern void TownsYearlyLoop();
-
-extern void ShowEndGameChart();
-
-
-/** Available settings for autosave intervals. */
-static const Month _autosave_months[] = {
-	 0, ///< never
-	 1, ///< every month
-	 3, ///< every 3 months
-	 6, ///< every 6 months
-	12, ///< every 12 months
-};
-
-/**
- * Runs various procedures that have to be done yearly
- */
-static void OnNewYear()
-{
-	CompaniesYearlyLoop();
-	VehiclesYearlyLoop();
-	TownsYearlyLoop();
-	InvalidateWindowClassesData(WC_BUILD_STATION);
-	if (_network_server) NetworkServerYearlyLoop();
-
-	if (_cur_year == _settings_client.gui.semaphore_build_before) ResetSignalVariant();
-
-	/* check if we reached end of the game (end of ending year); 0 = never */
-	if (_cur_year == _settings_game.game_creation.ending_year + 1 && _settings_game.game_creation.ending_year != 0) {
-		ShowEndGameChart();
-	}
-
-	/* check if we reached the maximum year, decrement dates by a year */
-	if (_cur_year == MAX_YEAR + 1) {
-		int days_this_year;
-
-		_cur_year--;
-		days_this_year = IsLeapYear(_cur_year) ? DAYS_IN_LEAP_YEAR : DAYS_IN_YEAR;
-		_date -= days_this_year;
-		for (Vehicle *v : Vehicle::Iterate()) v->ShiftDates(-days_this_year);
-		for (LinkGraph *lg : LinkGraph::Iterate()) lg->ShiftDates(-days_this_year);
-
-		/* Because the _date wraps here, and text-messages expire by game-days, we have to clean out
-		 *  all of them if the date is set back, else those messages will hang for ever */
-		NetworkInitChatMessage();
-	}
-
-	if (_settings_client.gui.auto_euro) CheckSwitchToEuro();
-}
-
-/**
- * Runs various procedures that have to be done monthly
- */
-static void OnNewMonth()
-{
-	if (_settings_client.gui.autosave != 0 && (_cur_month % _autosave_months[_settings_client.gui.autosave]) == 0) {
-		_do_autosave = true;
-		SetWindowDirty(WC_STATUS_BAR, 0);
-	}
-
-	SetWindowClassesDirty(WC_CHEATS);
-	CompaniesMonthlyLoop();
-	EnginesMonthlyLoop();
-	TownsMonthlyLoop();
-	IndustryMonthlyLoop();
-	SubsidyMonthlyLoop();
-	StationMonthlyLoop();
-	if (_network_server) NetworkServerMonthlyLoop();
-}
-
-/**
- * Runs various procedures that have to be done daily
- */
-static void OnNewDay()
-{
-	if (!_newgrf_profilers.empty() && _newgrf_profile_end_date <= _date) {
-		NewGRFProfiler::FinishAll();
-	}
-
-	if (_network_server) NetworkServerDailyLoop();
-
-	DisasterDailyLoop();
-	IndustryDailyLoop();
-
-	SetWindowWidgetDirty(WC_STATUS_BAR, 0, WID_S_LEFT);
-	EnginesDailyLoop();
-
-	/* Refresh after possible snowline change */
-	SetWindowClassesDirty(WC_TOWN_VIEW);
-}
-
-/**
- * Increases the tick counter, increases date  and possibly calls
- * procedures that have to be called daily, monthly or yearly.
- */
-void IncreaseDate()
-{
-	/* increase day, and check if a new day is there? */
-	_tick_counter++;
-
-	if (_game_mode == GM_MENU) return;
-
-	_date_fract++;
-	if (_date_fract < DAY_TICKS) return;
-	_date_fract = 0;
-
-	/* increase day counter */
-	_date++;
-
-	YearMonthDay ymd;
-	ConvertDateToYMD(_date, &ymd);
-
-	/* check if we entered a new month? */
-	bool new_month = ymd.month != _cur_month;
-
-	/* check if we entered a new year? */
-	bool new_year = ymd.year != _cur_year;
-
-	/* update internal variables before calling the daily/monthly/yearly loops */
-	_cur_month = ymd.month;
-	_cur_year  = ymd.year;
-
-	/* yes, call various daily loops */
-	OnNewDay();
-
-	/* yes, call various monthly loops */
-	if (new_month) OnNewMonth();
-
-	/* yes, call various yearly loops */
-	if (new_year) OnNewYear();
 }

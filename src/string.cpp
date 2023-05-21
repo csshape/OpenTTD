@@ -11,6 +11,7 @@
 #include "debug.h"
 #include "core/alloc_func.hpp"
 #include "core/math_func.hpp"
+#include "error_func.h"
 #include "string_func.h"
 #include "string_base.h"
 
@@ -48,23 +49,6 @@
  * tasks. As such this one must be allowed, and makes sure it's terminated. */
 #include "safeguards.h"
 #undef vsnprintf
-
-/**
- * Safer implementation of vsnprintf; same as vsnprintf except:
- * - last instead of size, i.e. replace sizeof with lastof.
- * - return gives the amount of characters added, not what it would add.
- * @param str    buffer to write to up to last
- * @param last   last character we may write to
- * @param format the formatting (see snprintf)
- * @param ap     the list of arguments for the format
- * @return the number of added characters
- */
-int CDECL vseprintf(char *str, const char *last, const char *format, va_list ap)
-{
-	ptrdiff_t diff = last - str;
-	if (diff < 0) return 0;
-	return std::min(static_cast<int>(diff), vsnprintf(str, diff + 1, format, ap));
-}
 
 /**
  * Appends characters from one string to another.
@@ -120,7 +104,7 @@ char *strecpy(char *dst, const char *src, const char *last)
 
 	if (dst == last && *src != '\0') {
 #if defined(STRGEN) || defined(SETTINGSGEN)
-		error("String too long for destination buffer");
+		FatalError("String too long for destination buffer");
 #else /* STRGEN || SETTINGSGEN */
 		Debug(misc, 0, "String too long for destination buffer");
 #endif /* STRGEN || SETTINGSGEN */
@@ -141,24 +125,6 @@ char *stredup(const char *s, const char *last)
 	char *tmp = CallocT<char>(len + 1);
 	memcpy(tmp, s, len);
 	return tmp;
-}
-
-/**
- * Format, "printf", into a newly allocated string.
- * @param str The formatting string.
- * @return The formatted string. You must free this!
- */
-char *CDECL str_fmt(const char *str, ...)
-{
-	char buf[4096];
-	va_list va;
-
-	va_start(va, str);
-	int len = vseprintf(buf, lastof(buf), str, va);
-	va_end(va);
-	char *p = MallocT<char>(len + 1);
-	memcpy(p, buf, len + 1);
-	return p;
 }
 
 /**
@@ -553,10 +519,14 @@ int CDECL vsnprintf(char *str, size_t size, const char *format, va_list ap)
  */
 int CDECL seprintf(char *str, const char *last, const char *format, ...)
 {
+	ptrdiff_t diff = last - str;
+	if (diff < 0) return 0;
+
 	va_list ap;
 
 	va_start(ap, format);
-	int ret = vseprintf(str, last, format, ap);
+	int ret = std::min(static_cast<int>(diff), vsnprintf(str, diff + 1, format, ap));
+
 	va_end(ap);
 	return ret;
 }

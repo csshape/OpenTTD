@@ -196,6 +196,7 @@ STR_UNITS_VELOCITY_IMPERIAL                                     :{COMMA}{NBSP}mp
 STR_UNITS_VELOCITY_METRIC                                       :{COMMA}{NBSP}km/h
 STR_UNITS_VELOCITY_SI                                           :{COMMA}{NBSP}m/s
 STR_UNITS_VELOCITY_GAMEUNITS                                    :{DECIMAL}{NBSP}cases/jour
+STR_UNITS_VELOCITY_KNOTS                                        :{COMMA}{NBSP}nœuds
 
 STR_UNITS_POWER_IMPERIAL                                        :{COMMA}{NBSP}hp
 STR_UNITS_POWER_METRIC                                          :{COMMA}{NBSP}ch
@@ -344,9 +345,9 @@ STR_GOTO_ORDER_VIEW_TOOLTIP                                     :{BLACK}Ouvrir l
 ###length 31
 STR_TOOLBAR_TOOLTIP_PAUSE_GAME                                  :{BLACK}Mettre le jeu en pause
 STR_TOOLBAR_TOOLTIP_FORWARD                                     :{BLACK}Avance rapide du jeu
-STR_TOOLBAR_TOOLTIP_OPTIONS                                     :{BLACK}Options
-STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Sauvegarder, abandonner, quitter
-STR_TOOLBAR_TOOLTIP_DISPLAY_MAP                                 :{BLACK}Afficher la mini-carte, vue supplémentaire ou liste des panneaux
+STR_TOOLBAR_TOOLTIP_OPTIONS                                     :{BLACK}Options et paramètres
+STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Sauvegarder, charger ou abandonner une partie, quitter le programme
+STR_TOOLBAR_TOOLTIP_DISPLAY_MAP                                 :{BLACK}Afficher la mini-carte, vue supplémentaire, le flux des marchandises ou la liste des panneaux
 STR_TOOLBAR_TOOLTIP_DISPLAY_TOWN_DIRECTORY                      :{BLACK}Afficher l'annuaire des villes
 STR_TOOLBAR_TOOLTIP_DISPLAY_SUBSIDIES                           :{BLACK}Afficher les subventions
 STR_TOOLBAR_TOOLTIP_DISPLAY_LIST_OF_COMPANY_STATIONS            :{BLACK}Afficher la liste des stations de la compagnie
@@ -354,9 +355,9 @@ STR_TOOLBAR_TOOLTIP_DISPLAY_COMPANY_FINANCES                    :{BLACK}Afficher
 STR_TOOLBAR_TOOLTIP_DISPLAY_COMPANY_GENERAL                     :{BLACK}Afficher les informations générales
 STR_TOOLBAR_TOOLTIP_DISPLAY_STORY_BOOK                          :{BLACK}Afficher le livre d'histoire
 STR_TOOLBAR_TOOLTIP_DISPLAY_GOALS_LIST                          :{BLACK}Afficher la liste des objectifs
-STR_TOOLBAR_TOOLTIP_DISPLAY_GRAPHS                              :{BLACK}Afficher les graphiques
+STR_TOOLBAR_TOOLTIP_DISPLAY_GRAPHS                              :{BLACK}Afficher les graphiques de compagnie et les valeurs des marchandises
 STR_TOOLBAR_TOOLTIP_DISPLAY_COMPANY_LEAGUE                      :{BLACK}Afficher le tableau de classement des compagnies
-STR_TOOLBAR_TOOLTIP_FUND_CONSTRUCTION_OF_NEW                    :{BLACK}Financer la construction de nouvelles industries ou lister toutes les industries
+STR_TOOLBAR_TOOLTIP_FUND_CONSTRUCTION_OF_NEW                    :{BLACK}Examiner les industries ou financer la construction de nouvelles industries
 STR_TOOLBAR_TOOLTIP_DISPLAY_LIST_OF_COMPANY_TRAINS              :{BLACK}Afficher la liste des trains de la compagnie. Ctrl-clic pour ouvrir dans l'autre mode (avancé/normal)
 STR_TOOLBAR_TOOLTIP_DISPLAY_LIST_OF_COMPANY_ROAD_VEHICLES       :{BLACK}Afficher la liste des véhicules routiers de la compagnie. Ctrl-clic pour ouvrir dans l'autre mode (avancé/normal)
 STR_TOOLBAR_TOOLTIP_DISPLAY_LIST_OF_COMPANY_SHIPS               :{BLACK}Afficher la liste des navires de la compagnie. Ctrl-clic pour ouvrir dans l'autre mode (avancé/normal)
@@ -370,8 +371,8 @@ STR_TOOLBAR_TOOLTIP_BUILD_SHIP_DOCKS                            :{BLACK}Construc
 STR_TOOLBAR_TOOLTIP_BUILD_AIRPORTS                              :{BLACK}Construction aéronautique
 STR_TOOLBAR_TOOLTIP_LANDSCAPING                                 :{BLACK}Ouvrir la barre d'outils de terraformation pour relever/abaisser du terrain, planter des arbres, etc.
 STR_TOOLBAR_TOOLTIP_SHOW_SOUND_MUSIC_WINDOW                     :{BLACK}Options son et musique
-STR_TOOLBAR_TOOLTIP_SHOW_LAST_MESSAGE_NEWS                      :{BLACK}Afficher le dernier message/bulletin, afficher les options des messages
-STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Outils d'inspection du paysage, console, débogage de script, copies d'écran, à propos d'OpenTTD
+STR_TOOLBAR_TOOLTIP_SHOW_LAST_MESSAGE_NEWS                      :{BLACK}Afficher le dernier message/bulletin, l'historique des messages ou supprimer tous les messages
+STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Outils d'inspection du paysage, copies d'écran, à propos d'OpenTTD et outils pour développeurs
 STR_TOOLBAR_TOOLTIP_SWITCH_TOOLBAR                              :{BLACK}Changer de barre d'outils
 
 # Extra tooltips for the scenario editor toolbar
@@ -983,10 +984,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Sélecti
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Désactivée
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Tous les mois
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Tous les 3 mois
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Tous les 6 mois
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Tous les 12 mois
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Langue
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Sélectionner la langue à utiliser pour l'interface
@@ -1207,6 +1204,9 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :À droite
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Emprunt initial maximum{NBSP}: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Montant maximum qu'une compagnie peut emprunter (sans tenir compte de l'inflation)
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_VALUE                   :{CURRENCY_LONG}
+###setting-zero-is-special
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_DISABLED                :Pas d'emprunt {RED}Nécessite un script de jeu qui fournit les fonds initiaux
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Taux d'intérêt{NBSP}: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Taux d’intérêt de l'emprunt{NBSP}; contrôle également l'inflation si activé
@@ -1806,6 +1806,9 @@ STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :Lorsqu'il est a
 
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :Âge minimum de la compagnie pour la vente d'actions{NBSP}: {STRING}
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_HELPTEXT                :Définir l'âge minimum qu'une compagnie doit avoir pour que les autres puissent acheter ou vendre ses parts.
+STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_VALUE                   :{COMMA} an{P "" s}
+###setting-zero-is-special
+STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_NO_MIN                  :Pas de minimum
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Pourcentage du profit de branche à payer dans les systèmes multimodaux{NBSP}: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Pourcentage du profit donné aux branches intermédiaires dans les systèmes multimodaux, donnant plus de contrôle sur les profits
@@ -1920,10 +1923,10 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :Aucune
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Multiplicateur initial pour la taille des métropoles{NBSP}: {STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :Taille moyenne des métropoles par rapport aux villes normales au début de la partie
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :Recalculer le graphe de distribution tous les {STRING}{NBSP}jour{P 0:2 "" s}
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL_HELPTEXT                  :Intervalle entre le recalcul du graphe de distribution. À chaque itération, une seule composante du graphe est recalculée. Donc, une valeur X pour ce réglage ne signifie pas que le graphe est réactualisé entièrement tous les X jours. Plus l'intervalle est court, plus de temps CPU est nécessaire pour la recalcul. Plus il est long, et plus de temps sera nécessaire pour que la distribution s'effectue sur de nouvelles routes.
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :Prendre {STRING}{NBSP}jour{P 0:2 "" s} pour recalculer le graphe de distribution
-STR_CONFIG_SETTING_LINKGRAPH_TIME_HELPTEXT                      :Durée maximale (en jours) du recalcul d'une composante du graphe. À chaque itération, un thread est initié, qui a une durée maximale définie par ce réglage. Plus celui-ci est court, plus la probabilité que le thread ne termine pas sa tâche à temps est élevée. Le jeu s'interrompt alors jusqu'à la fin du recalcul ("lag"). Plus le réglage est long, et moins rapidement la distribution sera réactualisée en cas de changement de routes.
+STR_CONFIG_SETTING_LINKGRAPH_RECALC_INTERVAL                    :Mise à jour le graphe de distribution toutes les {STRING}{NBSP}seconde{P 0:2 "" s}
+STR_CONFIG_SETTING_LINKGRAPH_RECALC_INTERVAL_HELPTEXT           :Intervalle entre les recalculs successifs du graphe de liaison. Chaque recalcul planifie un composant du graphe. Cela signifie qu'une valeur X pour ce paramètre ne signifie pas que l'ensemble du graphe sera mis à jour toutes les X secondes. Seul un composant le sera. Plus vous définissez cet intervalle court, plus le temps de processeur nécessaire pour le calcul sera important. Plus vous définissez cet intervalle long, plus il faudra de temps pour que la distribution de marchandises commence sur de nouveaux itinéraires.
+STR_CONFIG_SETTING_LINKGRAPH_RECALC_TIME                        :Prend {STRING}{NBSP}seconde{P 0:2 "" s} pour le recalcul du graphe de distribution
+STR_CONFIG_SETTING_LINKGRAPH_RECALC_TIME_HELPTEXT               :Temps pris pour chaque recalcul d'un composant du graphe de liaison. Lorsqu'un recalcul est lancé, un fil d'exécution est créé et autorisé à fonctionner pendant ce nombre de secondes. Plus vous définissez cette durée courte, plus il est probable que le fil ne soit pas terminé lorsqu'il est censé l'être. Ensuite, le jeu s'arrête jusqu'à ce qu'il le soit ("lag"). Plus vous définissez cette durée longue, plus il faut de temps pour que la distribution soit mise à jour lorsque les itinéraires changent.
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :Type de distribution pour les passagers{NBSP}: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :"Symétrique" signifie qu'autant de passagers iront d'une station A vers une station B, que de la station B vers la station A. "Asymétrique" signifie qu'un nombre arbitraire de passagers peut être envoyé dans les deux directions. "Manuel" signifie qu'aucune distribution n'est mise en place pour les passagers.
@@ -1949,13 +1952,15 @@ STR_CONFIG_SETTING_DEMAND_SIZE_HELPTEXT                         :Définir ici un
 STR_CONFIG_SETTING_SHORT_PATH_SATURATION                        :Saturation des chemins courts avant utilisation des chemins à forte capacité{NBSP}: {STRING}
 STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :Il y a souvent plusieurs routes possibles entre deux stations. Cargodist s'efforce d'utiliser d'abord le chemin le plus court jusqu'à saturation, ensuite les chemins un peu moins courts, et ainsi de suite. La saturation est déterminée par une estimation de la capacité et de la fréquentation prévue. Une fois que tous les chemins sont saturés, s'il y a encore une demande, il va surcharger tous les chemins, en privilégiant ceux à plus haute capacité. Mais la plupart du temps, la capacité n'est pas évaluée précisément. Ce réglage permets de spécifier jusqu'à quel pourcentage un chemin court doit être initialement saturé avant de passer au prochain chemin moins court. Il vaut mieux le régler à moins de 100% pour éviter que les stations soient surchargées en cas de surestimation de la capacité.
 
-STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Unité de vitesse{NBSP}: {STRING}
+STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Unité de vitesse (terrestre){NBSP}: {STRING}
+STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_NAUTICAL         :Unité de vitesse (nautique){NBSP}: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Quand une vitesse est affichée dans l'interface utilisateur, utiliser l'unité sélectionnée
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :Impérial (mph)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :Métrique (km/h)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (m/s)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_GAMEUNITS        :Unités du jeu (cases/jour)
+STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_KNOTS            :Nœuds
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_POWER                     :Unité de puissance de véhicule{NBSP}: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_POWER_HELPTEXT            :Quand une puissance de véhicule est affichée dans l'interface utilisateur, utiliser l'unité sélectionnée
@@ -2058,18 +2063,18 @@ STR_VIDEO_DRIVER_ERROR_NO_HARDWARE_ACCELERATION                 :{WHITE} ... auc
 # Intro window
 STR_INTRO_CAPTION                                               :{WHITE}OpenTTD {REV}
 
-STR_INTRO_NEW_GAME                                              :{BLACK}Nouvelle partie
+STR_INTRO_NEW_GAME                                              :{BLACK}Jouer une nouvelle partie
 STR_INTRO_LOAD_GAME                                             :{BLACK}Charger une partie
 STR_INTRO_PLAY_SCENARIO                                         :{BLACK}Jouer un scénario
 STR_INTRO_PLAY_HEIGHTMAP                                        :{BLACK}Jouer une carte d'altitude
 STR_INTRO_SCENARIO_EDITOR                                       :{BLACK}Éditeur de scénario
-STR_INTRO_MULTIPLAYER                                           :{BLACK}Mode multijoueurs
+STR_INTRO_MULTIPLAYER                                           :{BLACK}Jouer en multijoueur
 
-STR_INTRO_GAME_OPTIONS                                          :{BLACK}Options
+STR_INTRO_GAME_OPTIONS                                          :{BLACK}Options globales
 STR_INTRO_HIGHSCORE                                             :{BLACK}Meilleurs scores
-STR_INTRO_CONFIG_SETTINGS_TREE                                  :{BLACK}Paramètres
+STR_INTRO_CONFIG_SETTINGS_TREE                                  :{BLACK}Paramètres de jeu
 STR_INTRO_NEWGRF_SETTINGS                                       :{BLACK}Paramètres NewGRF
-STR_INTRO_ONLINE_CONTENT                                        :{BLACK}Vérifier le contenu en ligne
+STR_INTRO_ONLINE_CONTENT                                        :{BLACK}Contenue additionnel en ligne
 STR_INTRO_AI_SETTINGS                                           :{BLACK}Configuration des IAs
 STR_INTRO_GAMESCRIPT_SETTINGS                                   :{BLACK}Configuration du script de jeu
 STR_INTRO_QUIT                                                  :{BLACK}Quitter
@@ -2227,18 +2232,18 @@ STR_NETWORK_SERVER_VISIBILITY_INVITE_ONLY                       :Invitation uniq
 
 # Network server list
 STR_NETWORK_SERVER_LIST_CAPTION                                 :{WHITE}Multijoueurs
-STR_NETWORK_SERVER_LIST_PLAYER_NAME                             :{BLACK}Nom du joueur{NBSP}:
+STR_NETWORK_SERVER_LIST_PLAYER_NAME                             :{BLACK}Votre nom de joueur :
 STR_NETWORK_SERVER_LIST_ENTER_NAME_TOOLTIP                      :{BLACK}Ceci est le nom sous lequel vous serez connu des autres joueurs
 
-STR_NETWORK_SERVER_LIST_GAME_NAME                               :{BLACK}Nom
+STR_NETWORK_SERVER_LIST_GAME_NAME                               :{BLACK}Nom de la partie
 STR_NETWORK_SERVER_LIST_GAME_NAME_TOOLTIP                       :{BLACK}Nom de la partie
 STR_NETWORK_SERVER_LIST_GENERAL_ONLINE                          :{BLACK}{COMMA}/{COMMA} - {COMMA}/{COMMA}
-STR_NETWORK_SERVER_LIST_CLIENTS_CAPTION                         :{BLACK}Clients
+STR_NETWORK_SERVER_LIST_CLIENTS_CAPTION                         :{BLACK}Clients - Compagnies
 STR_NETWORK_SERVER_LIST_CLIENTS_CAPTION_TOOLTIP                 :{BLACK}Clients en ligne / clients max.{}Compagnies en ligne / compagnies max.
 STR_NETWORK_SERVER_LIST_MAP_SIZE_SHORT                          :{BLACK}{COMMA}{NBSP}×{NBSP}{COMMA}
 STR_NETWORK_SERVER_LIST_MAP_SIZE_CAPTION                        :{BLACK}Taille
 STR_NETWORK_SERVER_LIST_MAP_SIZE_CAPTION_TOOLTIP                :{BLACK}Taille de la carte{}Cliquer pour trier par surface
-STR_NETWORK_SERVER_LIST_DATE_CAPTION                            :{BLACK}Date
+STR_NETWORK_SERVER_LIST_DATE_CAPTION                            :{BLACK}Année en jeu
 STR_NETWORK_SERVER_LIST_DATE_CAPTION_TOOLTIP                    :{BLACK}Date courante
 STR_NETWORK_SERVER_LIST_YEARS_CAPTION                           :{BLACK}Années
 STR_NETWORK_SERVER_LIST_YEARS_CAPTION_TOOLTIP                   :{BLACK}Nombre d'années{}écoulées dans le jeu
@@ -2272,11 +2277,11 @@ STR_NETWORK_SERVER_LIST_REFRESH_TOOLTIP                         :{BLACK}Actualis
 
 STR_NETWORK_SERVER_LIST_SEARCH_SERVER_INTERNET                  :{BLACK}Recherche internet
 STR_NETWORK_SERVER_LIST_SEARCH_SERVER_INTERNET_TOOLTIP          :{BLACK}Rechercher des serveurs publiés sur internet
-STR_NETWORK_SERVER_LIST_SEARCH_SERVER_LAN                       :{BLACK}Recherche LAN
+STR_NETWORK_SERVER_LIST_SEARCH_SERVER_LAN                       :{BLACK}Recherche sur le réseau local
 STR_NETWORK_SERVER_LIST_SEARCH_SERVER_LAN_TOOLTIP               :{BLACK}Rechercher des serveurs sur le réseau local
 STR_NETWORK_SERVER_LIST_ADD_SERVER                              :{BLACK}Ajouter un serveur
 STR_NETWORK_SERVER_LIST_ADD_SERVER_TOOLTIP                      :{BLACK}Ajouter un serveur à la liste. Ce peut être soit une adresse de serveur, soit un code d'invitation
-STR_NETWORK_SERVER_LIST_START_SERVER                            :{BLACK}Héberger/créer un serveur de jeu
+STR_NETWORK_SERVER_LIST_START_SERVER                            :{BLACK}Créer un serveur de jeu
 STR_NETWORK_SERVER_LIST_START_SERVER_TOOLTIP                    :{BLACK}Démarrer son propre serveur, sur cet ordinateur-ci
 
 STR_NETWORK_SERVER_LIST_PLAYER_NAME_OSKTITLE                    :{BLACK}Entrer votre nom
@@ -2356,7 +2361,8 @@ STR_NETWORK_CLIENT_LIST_NEW_COMPANY                             :(Nouvelle compa
 STR_NETWORK_CLIENT_LIST_NEW_COMPANY_TOOLTIP                     :{BLACK}Créer une nouvelle compagnie et la rejoindre
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_SELF_TOOLTIP                :{BLACK}C'est vous
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_HOST_TOOLTIP                :{BLACK}C'est l'hôte du jeu
-STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} client{P "" s} / {NUM} compagnie{P "" s}
+STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} client{P "" s} - {NUM}/{NUM} companie{P "" s}
+STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT_TOOLTIP            :{BLACK}Actuellement, le nombre de clients connectés, le nombre d'entreprises et le nombre d'entreprises maximum autorisées par l'administrateur du serveur est atteint.
 
 # Matches ConnectionType
 ###length 5
@@ -3350,8 +3356,8 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Attention{NBSP}: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Erreur{NBSP}: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Erreur fatale{NBSP}: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Une erreur NewGRF fatale est survenue{NBSP}:{}{STRING}
-STR_NEWGRF_ERROR_POPUP                                          :{WHITE}Une erreur NewGRF est survenue{NBSP}:{}{STRING}
+STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Le NewGRF "{STRING}" a retourné une erreur fatale{NBSP}:{}{STRING}
+STR_NEWGRF_ERROR_POPUP                                          :{WHITE}Le NewGRF "{STRING}" a retourné une erreur{NBSP}:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} ne fonctionnera pas avec la version de TTDPatch rapportée par OpenTTD
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} est conçu pour la version {2:STRING} de TTD
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} est conçu pour être utilisé avec {2:STRING}
@@ -4527,7 +4533,7 @@ STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Annuler 
 STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Annuler la vitesse maximale de déplacement de l'ordre sélectionné. Ctrl-clic pour annuler la vitesse de tous les ordres
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}RAZ compteur de retard
-STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Remettre à zéro le compteur de retard (le véhicule sera donc à l'heure)
+STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Remettre à zéro le compteur de retard, le véhicule sera donc à l'heure. Ctrl-clic pour remettre à zéro le groupe entier, le véhicule le plus en retard sera donc à l'heure et les autres en avance
 
 STR_TIMETABLE_AUTOFILL                                          :{BLACK}Autoremplir
 STR_TIMETABLE_AUTOFILL_TOOLTIP                                  :{BLACK}Remplir l'horaire automatiquement avec les valeurs du prochain trajet. Ctrl-clic pour essayer de préserver les temps d'attente
@@ -4581,7 +4587,9 @@ STR_AI_CONFIG_AILIST_TOOLTIP                                    :{BLACK}Les IAs 
 STR_AI_CONFIG_HUMAN_PLAYER                                      :Joueur humain
 STR_AI_CONFIG_RANDOM_AI                                         :IA aléatoire
 STR_AI_CONFIG_NONE                                              :(aucun)
+STR_AI_CONFIG_NAME_VERSION                                      :{STRING} {YELLOW}v{NUM}
 STR_AI_CONFIG_MAX_COMPETITORS                                   :{LTBLUE}Nombre maximal de concurrents{NBSP}: {ORANGE}{COMMA}
+STR_AI_CONFIG_COMPETITORS_INTERVAL                              :{LTBLUE}Intervalle entre le démarrage des concurrents : {ORANGE}{COMMA} minute{P "" s}
 
 STR_AI_CONFIG_MOVE_UP                                           :{BLACK}Déplacer vers le haut
 STR_AI_CONFIG_MOVE_UP_TOOLTIP                                   :{BLACK}Déplacer l'IA sélectionnée vers le haut
@@ -4594,7 +4602,7 @@ STR_AI_CONFIG_AI                                                :{SILVER}IA
 
 STR_AI_CONFIG_CHANGE_AI                                         :{BLACK}Sélectionner une IA
 STR_AI_CONFIG_CHANGE_GAMESCRIPT                                 :{BLACK}Sélectionner le script de jeu
-STR_AI_CONFIG_CHANGE_TOOLTIP                                    :{BLACK}Charger un autre script
+STR_AI_CONFIG_CHANGE_TOOLTIP                                    :{BLACK}Charger un autre script. Ctrl-clic pour afficher toutes les versions disponibles
 STR_AI_CONFIG_CONFIGURE                                         :{BLACK}Configurer
 STR_AI_CONFIG_CONFIGURE_TOOLTIP                                 :{BLACK}Configurer les paramètres du script
 
@@ -4621,12 +4629,13 @@ STR_SCREENSHOT_WORLD_SCREENSHOT                                 :{BLACK}Capture 
 STR_SCREENSHOT_HEIGHTMAP_SCREENSHOT                             :{BLACK}Capture d'écran de la carte d'altitude
 STR_SCREENSHOT_MINIMAP_SCREENSHOT                               :{BLACK}Capture d'écran de la mini-carte
 
-# AI Parameters
-STR_AI_SETTINGS_CAPTION_AI                                      :{WHITE}Paramètres de l'IA
+# Script Parameters
+STR_AI_SETTINGS_CAPTION                                         :{WHITE}Paramètres {STRING}
+STR_AI_SETTINGS_CAPTION_AI                                      :de l'IA
+STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :du script de jeu
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Fermer
 STR_AI_SETTINGS_RESET                                           :{BLACK}Réinitialiser
 STR_AI_SETTINGS_SETTING                                         :{STRING}{NBSP}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Nombre de jours avant de démarrer cette IA après la précédente (approximativement){NBSP}: {ORANGE}{STRING}
 
 
 # Textfile window
@@ -5080,6 +5089,20 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Impossib
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... trop loin de la destination précédente
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... l'aéronef n'a pas un rayon d'action suffisant
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+STR_ERROR_NO_RAIL_STATION                                       :Il n'y a pas de gare
+STR_ERROR_NO_BUS_STATION                                        :Il n'y a pas de gare routière
+STR_ERROR_NO_TRUCK_STATION                                      :{WHITE}Il n'y a pas de station de camion
+STR_ERROR_NO_DOCK                                               :{WHITE}Il n'y a pas de quai
+STR_ERROR_NO_AIRPORT                                            :{WHITE}Il n'y a pas d'aéroport/héliport
+STR_ERROR_NO_STOP_COMPATIBLE_ROAD_TYPE                          :{WHITE}Il n'y a pas d'arrêts avec un type de route compatible
+STR_ERROR_NO_STOP_COMPATIBLE_TRAM_TYPE                          :{WHITE}Il n'y a pas d'arrêts avec un type de tram compatible
+STR_ERROR_NO_STOP_ARTICULATED_VEHICLE                           :{WHITE}Il n'y a pas d'arrêts convenables pour les véhicules routiers articulés. Ce type de véhicule nécessite un arrêt avec passage et non pas en baie
+STR_ERROR_AIRPORT_NO_PLANES                                     :{WHITE}Cet avion ne peut pas atterrir à cet héliport
+STR_ERROR_AIRPORT_NO_HELICOPTERS                                :{WHITE}Cet hélicoptère ne peut pas atterrir à cet aéroport
+STR_ERROR_NO_RAIL_WAYPOINT                                      :{WHITE}Il n'y a pas de point de passage ferroviaire
+STR_ERROR_NO_BUOY                                               :{WHITE}Il n'y a pas de bouée
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Impossible d'affecter un horaire au véhicule...
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Les véhicules ne peuvent attendre qu'aux stations
@@ -5495,10 +5518,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Hélicoptère P
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}/{STRING}/{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}/{ZEROFILL_NUM}/{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Compagnie {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Groupe {COMMA}
@@ -5580,7 +5603,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

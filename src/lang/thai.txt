@@ -947,10 +947,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}เล�
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :ปิด
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :ทุกๆเดือน
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :ทุก 3 เดือน
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :ทุก 6 เดือน
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :ทุก 12 เดือน
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}ภาษา
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}เลือกภาษาที่จะใช้
@@ -1141,6 +1137,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :ขวา
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :เงินกู้เริ่มต้นสูงสุด: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :บริษัท สามารถกู้ยืมเงินจำนวนสูงสุด (โดยไม่คำนึงถึงอัตราเงินเฟ้อเข้าบัญชี)
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :ดอกเบี้ย: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :อัตราดอกเบี้ยเงินกู้; มีผลกับอัตราเงินเฟ้อถ้าเปิดใช้งาน
@@ -1685,6 +1682,7 @@ STR_CONFIG_SETTING_ECONOMY_TYPE_HELPTEXT                        :หากเศ
 STR_CONFIG_SETTING_ALLOW_SHARES                                 :อนุญาตให้ซื้อหุ้นจากบริษัทอื่นได้: {STRING}
 STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :เมื่อเปิดการใช้งาน จะสามารถซื้่อชขายหุ้นระหว่างบริษัท จะสามารถซื้อขายหุ้นได้ต่อเมื่อบริษัทเปิดตัวมานานแล้วเท่านั้น
 
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :เปอเซนต์ของผลกำไรที่จะส่งเข้าสู่ระบบกระจายรายได้: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :เปอร์เซนต์ของรายได้ที่ส่งให้ฐานของระบบกระจายรายได้ ส่งผลต่อการควบคุมรายได้ทั้งหมด
@@ -1788,10 +1786,6 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :ไม่มี
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :ตัวคูณขนาดเมืองเริ่มต้น: {STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :ขนาดโดยเฉลี่ยของเมืองใหญ่ที่สัมพันธ์กับเมืองปกติ
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :อัพเดทกราฟการกระจายสินค้าทุกๆ {STRING} วัน
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL_HELPTEXT                  :เวลาระหว่างการคำนวณหาเส้นทางการเชื่อมต่อของกราฟ. ทุกครั้งที่มีำการคำนวณใหม่ มีการวางแผนสำหรับหนึ่งชิ้นส่วนในกราฟ ค่าที่ตั้งไว้นี้ คือค่าที่จะให้มีการอัพเดททุกๆเวลากี่วัน การตั้งให้คำนวณถี่มากๆจะกินทรัพยากรเครื่องของท่าน
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :ใช้เวลา {STRING} วัน{P 0:2 s} ในการคำนวนกราฟการกระจายสินค้า
-STR_CONFIG_SETTING_LINKGRAPH_TIME_HELPTEXT                      :เวลาในการคำนวณการกระจายสินค้าสู่จุดหมายต่างๆที่แสดงเป็นเส้นกราฟบนแผนที่ การตั้งค่าถี่เกินไปอาจก่อให้เกิดอาการ lag ได้
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :โหมตการกระจายสินค้าสำหรับผู้โดยสาร: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :ผู้โดยสารจากเมืองหนึ่งเมื่อเดินทางออกไปที่ใดก็ตาม จะต้องย้อนกลับเข้ามายังจุดเริ่มค้น การตั้งค่าเป็นแบบ "สมมาตร" จะทำให้เกิดวงจรปกติเหมือนกับการโดยสารของผู้โดยสาร
@@ -1819,7 +1813,7 @@ STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :ความถ
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :หน่วยวัดความเร็ว: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :หน่วยวัดความเร็ว แสดงผลในหน้าต่างรายละเอียดยานพาหนะ
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :อิมพิเรียล (ไมล์ต่อชั่วโมง)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :เมตริก (กิโลเมตรต่อชั่วโมง)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :มาตรฐานสากล (เมตร/วินาที)
@@ -3081,8 +3075,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}อันตราย: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Error: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}ร้ายแรง: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}เกิดความผิดพลาดร้ายแรงเกี่ยวกับ NewGRF:{}{STRING}
-STR_NEWGRF_ERROR_POPUP                                          :{WHITE}มี NewGRF ที่เกิดข้อผิดพลาดขึ้น! :{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING}ไม่สามารถทำงานได้บน TTDPatchเวอร์ชั่นนี่ รายงานโดย OpenTTD
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} สำหรับ {STRING} version of TTD
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} ออกแบบมาสำหรับใช้งานกับ {STRING}
@@ -4270,12 +4262,11 @@ STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}ไม�
 STR_SCREENSHOT_HEIGHTMAP_SCREENSHOT                             :{BLACK}บันทึกหน้าจอของ Heightmap
 STR_SCREENSHOT_MINIMAP_SCREENSHOT                               :{BLACK}จับภาพหน้าจอ มินิแมพ
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :AI
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}ปิด
 STR_AI_SETTINGS_RESET                                           :{BLACK}เริ่มใหม่
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :จำนวนที่จะให้เริ่มต้น AI นี้หลังจากที่มีการเริ่มต้น AI ก่อนหน้านี้ไป: {ORANGE}{STRING}
 
 
 # Textfile window
@@ -4710,6 +4701,8 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}ไม�
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... ไกลจากจุดก่อนหน้านี้มากเกินไป
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... อากาศยานมีพิสัยการบินไม่พอ
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}ไม่สามารถจัดตารางเวลาให้ยานพาหนะนี้ได้...
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}พาหนะสามารถหยุดรอได้เฉพาะที่สถานี
@@ -5125,10 +5118,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Powernaut Helic
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(บริษัท {COMMA})
 STR_FORMAT_GROUP_NAME                                           :กลุ่ม {COMMA}
@@ -5208,7 +5201,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

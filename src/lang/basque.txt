@@ -922,10 +922,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Aukeratu
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Ez
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Hilabetero
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :3 hilabetero
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :6 hilabetero
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :12 hilabetero
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Hizkuntza
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Aukeratu interfazean erabiltzeko hizkuntza
@@ -1108,6 +1104,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Eskuina
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Gehienezko mailegua joko hasieran: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Konpainiek eskatu dezaketen gehienezko mailegua(inflazioa kontua hartu gabe)
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Interes tasa: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Maileguen interes tasa; inflazioa ere kontrolatuko du, gaitzen bada
@@ -1609,6 +1606,7 @@ STR_CONFIG_SETTING_ENDING_YEAR_VALUE                            :{NUM}
 STR_CONFIG_SETTING_ALLOW_SHARES                                 :Beste konpainien akzioak erostea baimendu: {STRING}
 STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :Gaitua dagoenean, konpainiaren akzioak erostea eta saltzea baimendu. Konpainiak akzioak izateko gutxiengo adin batera iritsi beharko dira
 
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Elikadura sistemetan ordaindu beharreko irabazien ehunekoa: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Elikadura sistemetan eman beharreko irabazien ehunekoa, irabaziengain kontrol gehiago emanez
@@ -1719,7 +1717,7 @@ STR_CONFIG_SETTING_LINKGRAPH_ACCURACY                           :Banaketen zehaz
 
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Abiadura unitateak: {STRING}
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :Inperiala (milia/orduko)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :Metrikoa (km/h)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (m/s)
@@ -2891,7 +2889,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Kontuz: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Akatsa {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Larria: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}NewGRF-an akats larria gertatu da:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} ez du funtzionatuko OpenTTD-k esandakoTTDPatch bertsioarekin
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} {STRING} TTD bertsioarentzat da
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} {STRING}arekin erabiltzeko diseinatua izan da
@@ -4030,12 +4027,11 @@ STR_AI_LIST_CANCEL                                              :{BLACK}Ezeztatu
 STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}Ez aldatu script-a
 
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :IA
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Itxi
 STR_AI_SETTINGS_RESET                                           :{BLACK}Berrabiarazi
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :IA hau abiarazteko pasa beharko diren egunak (gutxi gora behera): {ORANGE}{STRING}
 
 
 # Textfile window
@@ -4465,6 +4461,8 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Ezin da 
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... aurreko helmugatik urrutiegi
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... hegazkinaren irismen eremutik kanpo
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Ezin da ibilgailuren ordutegia egin...
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Ibilgailuek bakarrik geltokietan itxaron dezakete
@@ -4875,10 +4873,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Powernaut Helik
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :({COMMA} Konpainia)
 STR_FORMAT_GROUP_NAME                                           :Taldea {COMMA}
@@ -4959,7 +4957,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

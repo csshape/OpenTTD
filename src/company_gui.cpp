@@ -22,7 +22,7 @@
 #include "newgrf.h"
 #include "company_manager_face.h"
 #include "strings_func.h"
-#include "date_func.h"
+#include "timer/timer_game_calendar.h"
 #include "widgets/dropdown_type.h"
 #include "tilehighlight_func.h"
 #include "company_base.h"
@@ -42,6 +42,8 @@
 #include "group_cmd.h"
 #include "misc_cmd.h"
 #include "object_cmd.h"
+#include "timer/timer.h"
+#include "timer/timer_window.h"
 
 #include "widgets/company_widget.h"
 
@@ -432,10 +434,10 @@ struct CompanyFinancesWindow : Window {
 			case WID_CF_EXPS_PRICE2:
 			case WID_CF_EXPS_PRICE3: {
 				const Company *c = Company::Get((CompanyID)this->window_number);
-				int age = std::min(_cur_year - c->inaugurated_year, 2);
+				int age = std::min(TimerGameCalendar::year - c->inaugurated_year, 2);
 				int wid_offset = widget - WID_CF_EXPS_PRICE1;
 				if (wid_offset <= age) {
-					DrawYearColumn(r, _cur_year - (age - wid_offset), c->yearly_expenses[age - wid_offset]);
+					DrawYearColumn(r, TimerGameCalendar::year - (age - wid_offset), c->yearly_expenses[age - wid_offset]);
 				}
 				break;
 			}
@@ -519,15 +521,18 @@ struct CompanyFinancesWindow : Window {
 		}
 	}
 
-	void OnHundredthTick() override
-	{
+	/**
+	 * Check on a regular interval if the maximum amount of money has changed.
+	 * If it has, rescale the window to fit the new amount.
+	 */
+	IntervalTimer<TimerWindow> rescale_interval = {std::chrono::seconds(3), [this](auto) {
 		const Company *c = Company::Get((CompanyID)this->window_number);
 		if (c->money > CompanyFinancesWindow::max_money) {
 			CompanyFinancesWindow::max_money = std::max(c->money * 2, CompanyFinancesWindow::max_money * 4);
 			this->SetupWidgets();
 			this->ReInit();
 		}
-	}
+	}};
 };
 
 /** First conservative estimate of the maximum amount of money */
@@ -592,9 +597,14 @@ public:
 		return this->result >= COLOUR_END ? STR_COLOUR_DEFAULT : _colour_dropdown[this->result];
 	}
 
+	uint Width() const override
+	{
+		return ScaleGUITrad(28) + WidgetDimensions::scaled.hsep_normal + GetStringBoundingBox(this->String()).width + WidgetDimensions::scaled.dropdowntext.Horizontal();
+	}
+
 	uint Height(uint width) const override
 	{
-		return std::max(FONT_HEIGHT_NORMAL, ScaleGUITrad(12) + 2);
+		return std::max(FONT_HEIGHT_NORMAL, ScaleGUITrad(12) + WidgetDimensions::scaled.vsep_normal);
 	}
 
 	bool Selectable() const override
@@ -795,7 +805,7 @@ public:
 		/* Position scrollbar to selected group */
 		for (uint i = 0; i < this->rows; i++) {
 			if (this->groups[i]->index == sel) {
-				this->vscroll->SetPosition(Clamp(i - this->vscroll->GetCapacity() / 2, 0, std::max(this->vscroll->GetCount() - this->vscroll->GetCapacity(), 0)));
+				this->vscroll->SetPosition(i - this->vscroll->GetCapacity() / 2);
 				break;
 			}
 		}
@@ -1172,12 +1182,16 @@ void ShowCompanyLiveryWindow(CompanyID company, GroupID group)
  * Draws the face of a company manager's face.
  * @param cmf   the company manager's face
  * @param colour the (background) colour of the gradient
- * @param x     x-position to draw the face
- * @param y     y-position to draw the face
+ * @param r      position to draw the face
  */
-void DrawCompanyManagerFace(CompanyManagerFace cmf, int colour, int x, int y)
+void DrawCompanyManagerFace(CompanyManagerFace cmf, int colour, const Rect &r)
 {
 	GenderEthnicity ge = (GenderEthnicity)GetCompanyManagerFaceBits(cmf, CMFV_GEN_ETHN, GE_WM);
+
+	/* Determine offset from centre of drawing rect. */
+	Dimension d = GetSpriteSize(SPR_GRADIENT);
+	int x = CenterBounds(r.left, r.right, d.width);
+	int y = CenterBounds(r.top, r.bottom, d.height);
 
 	bool has_moustache   = !HasBit(ge, GENDER_FEMALE) && GetCompanyManagerFaceBits(cmf, CMFV_HAS_MOUSTACHE,   ge) != 0;
 	bool has_tie_earring = !HasBit(ge, GENDER_FEMALE) || GetCompanyManagerFaceBits(cmf, CMFV_HAS_TIE_EARRING, ge) != 0;
@@ -1481,7 +1495,7 @@ public:
 				break;
 
 			case WID_SCMF_FACE: {
-				Dimension face_size = GetSpriteSize(SPR_GRADIENT);
+				Dimension face_size = GetScaledSpriteSize(SPR_GRADIENT);
 				size->width  = std::max(size->width,  face_size.width);
 				size->height = std::max(size->height, face_size.height);
 				break;
@@ -1633,7 +1647,7 @@ public:
 	{
 		switch (widget) {
 			case WID_SCMF_FACE:
-				DrawCompanyManagerFace(this->face, Company::Get((CompanyID)this->window_number)->colour, r.left, r.top);
+				DrawCompanyManagerFace(this->face, Company::Get((CompanyID)this->window_number)->colour, r);
 				break;
 		}
 	}
@@ -1752,7 +1766,7 @@ public:
 		if (str == nullptr) return;
 		/* Set a new company manager face number */
 		if (!StrEmpty(str)) {
-			this->face = strtoul(str, nullptr, 10);
+			this->face = std::strtoul(str, nullptr, 10);
 			ScaleAllCompanyManagerFaceBits(this->face);
 			ShowErrorMessage(STR_FACE_FACECODE_SET, INVALID_STRING_ID, WL_INFO);
 			this->UpdateData();
@@ -2375,7 +2389,7 @@ struct CompanyWindow : Window
 	{
 		switch (widget) {
 			case WID_C_FACE: {
-				Dimension face_size = GetSpriteSize(SPR_GRADIENT);
+				Dimension face_size = GetScaledSpriteSize(SPR_GRADIENT);
 				size->width  = std::max(size->width,  face_size.width);
 				size->height = std::max(size->height, face_size.height);
 				break;
@@ -2444,12 +2458,76 @@ struct CompanyWindow : Window
 		}
 	}
 
+	void DrawVehicleCountsWidget(const Rect &r, const Company *c) const
+	{
+		static_assert(VEH_COMPANY_END == lengthof(_company_view_vehicle_count_strings));
+
+		int y = r.top;
+		for (VehicleType type = VEH_BEGIN; type < VEH_COMPANY_END; type++) {
+			uint amount = c->group_all[type].num_vehicle;
+			if (amount != 0) {
+				SetDParam(0, amount);
+				DrawString(r.left, r.right, y, _company_view_vehicle_count_strings[type]);
+				y += FONT_HEIGHT_NORMAL;
+			}
+		}
+
+		if (y == r.top) {
+			/* No String was emited before, so there must be no vehicles at all. */
+			DrawString(r.left, r.right, y, STR_COMPANY_VIEW_VEHICLES_NONE);
+		}
+	}
+
+	void DrawInfrastructureCountsWidget(const Rect &r, const Company *c) const
+	{
+		int y = r.top;
+
+		uint rail_pieces = c->infrastructure.signal;
+		for (uint i = 0; i < lengthof(c->infrastructure.rail); i++) rail_pieces += c->infrastructure.rail[i];
+		if (rail_pieces != 0) {
+			SetDParam(0, rail_pieces);
+			DrawString(r.left, r.right, y, STR_COMPANY_VIEW_INFRASTRUCTURE_RAIL);
+			y += FONT_HEIGHT_NORMAL;
+		}
+
+		uint road_pieces = 0;
+		for (uint i = 0; i < lengthof(c->infrastructure.road); i++) road_pieces += c->infrastructure.road[i];
+		if (road_pieces != 0) {
+			SetDParam(0, road_pieces);
+			DrawString(r.left, r.right, y, STR_COMPANY_VIEW_INFRASTRUCTURE_ROAD);
+			y += FONT_HEIGHT_NORMAL;
+		}
+
+		if (c->infrastructure.water != 0) {
+			SetDParam(0, c->infrastructure.water);
+			DrawString(r.left, r.right, y, STR_COMPANY_VIEW_INFRASTRUCTURE_WATER);
+			y += FONT_HEIGHT_NORMAL;
+		}
+
+		if (c->infrastructure.station != 0) {
+			SetDParam(0, c->infrastructure.station);
+			DrawString(r.left, r.right, y, STR_COMPANY_VIEW_INFRASTRUCTURE_STATION);
+			y += FONT_HEIGHT_NORMAL;
+		}
+
+		if (c->infrastructure.airport != 0) {
+			SetDParam(0, c->infrastructure.airport);
+			DrawString(r.left, r.right, y, STR_COMPANY_VIEW_INFRASTRUCTURE_AIRPORT);
+			y += FONT_HEIGHT_NORMAL;
+		}
+
+		if (y == r.top) {
+			/* No String was emited before, so there must be no infrastructure at all. */
+			DrawString(r.left, r.right, y, STR_COMPANY_VIEW_INFRASTRUCTURE_NONE);
+		}
+	}
+
 	void DrawWidget(const Rect &r, int widget) const override
 	{
 		const Company *c = Company::Get((CompanyID)this->window_number);
 		switch (widget) {
 			case WID_C_FACE:
-				DrawCompanyManagerFace(c->face, c->colour, r.left, r.top);
+				DrawCompanyManagerFace(c->face, c->colour, r);
 				break;
 
 			case WID_C_FACE_TITLE:
@@ -2465,70 +2543,13 @@ struct CompanyWindow : Window
 				break;
 			}
 
-			case WID_C_DESC_VEHICLE_COUNTS: {
-				uint amounts[4];
-				amounts[0] = c->group_all[VEH_TRAIN].num_vehicle;
-				amounts[1] = c->group_all[VEH_ROAD].num_vehicle;
-				amounts[2] = c->group_all[VEH_SHIP].num_vehicle;
-				amounts[3] = c->group_all[VEH_AIRCRAFT].num_vehicle;
-
-				int y = r.top;
-				if (amounts[0] + amounts[1] + amounts[2] + amounts[3] == 0) {
-					DrawString(r.left, r.right, y, STR_COMPANY_VIEW_VEHICLES_NONE);
-				} else {
-					static_assert(lengthof(amounts) == lengthof(_company_view_vehicle_count_strings));
-
-					for (uint i = 0; i < lengthof(amounts); i++) {
-						if (amounts[i] != 0) {
-							SetDParam(0, amounts[i]);
-							DrawString(r.left, r.right, y, _company_view_vehicle_count_strings[i]);
-							y += FONT_HEIGHT_NORMAL;
-						}
-					}
-				}
+			case WID_C_DESC_VEHICLE_COUNTS:
+				DrawVehicleCountsWidget(r, c);
 				break;
-			}
 
-			case WID_C_DESC_INFRASTRUCTURE_COUNTS: {
-				uint y = r.top;
-
-				/* Collect rail and road counts. */
-				uint rail_pieces = c->infrastructure.signal;
-				uint road_pieces = 0;
-				for (uint i = 0; i < lengthof(c->infrastructure.rail); i++) rail_pieces += c->infrastructure.rail[i];
-				for (uint i = 0; i < lengthof(c->infrastructure.road); i++) road_pieces += c->infrastructure.road[i];
-
-				if (rail_pieces == 0 && road_pieces == 0 && c->infrastructure.water == 0 && c->infrastructure.station == 0 && c->infrastructure.airport == 0) {
-					DrawString(r.left, r.right, y, STR_COMPANY_VIEW_INFRASTRUCTURE_NONE);
-				} else {
-					if (rail_pieces != 0) {
-						SetDParam(0, rail_pieces);
-						DrawString(r.left, r.right, y, STR_COMPANY_VIEW_INFRASTRUCTURE_RAIL);
-						y += FONT_HEIGHT_NORMAL;
-					}
-					if (road_pieces != 0) {
-						SetDParam(0, road_pieces);
-						DrawString(r.left, r.right, y, STR_COMPANY_VIEW_INFRASTRUCTURE_ROAD);
-						y += FONT_HEIGHT_NORMAL;
-					}
-					if (c->infrastructure.water != 0) {
-						SetDParam(0, c->infrastructure.water);
-						DrawString(r.left, r.right, y, STR_COMPANY_VIEW_INFRASTRUCTURE_WATER);
-						y += FONT_HEIGHT_NORMAL;
-					}
-					if (c->infrastructure.station != 0) {
-						SetDParam(0, c->infrastructure.station);
-						DrawString(r.left, r.right, y, STR_COMPANY_VIEW_INFRASTRUCTURE_STATION);
-						y += FONT_HEIGHT_NORMAL;
-					}
-					if (c->infrastructure.airport != 0) {
-						SetDParam(0, c->infrastructure.airport);
-						DrawString(r.left, r.right, y, STR_COMPANY_VIEW_INFRASTRUCTURE_AIRPORT);
-					}
-				}
-
+			case WID_C_DESC_INFRASTRUCTURE_COUNTS:
+				DrawInfrastructureCountsWidget(r, c);
 				break;
-			}
 
 			case WID_C_DESC_OWNERS: {
 				uint y = r.top;
@@ -2667,11 +2688,10 @@ struct CompanyWindow : Window
 		}
 	}
 
-	void OnHundredthTick() override
-	{
-		/* redraw the window every now and then */
+	/** Redraw the window on a regular interval. */
+	IntervalTimer<TimerWindow> redraw_interval = {std::chrono::seconds(3), [this](auto) {
 		this->SetDirty();
-	}
+	}};
 
 	void OnPlaceObject(Point pt, TileIndex tile) override
 	{
@@ -2694,7 +2714,7 @@ struct CompanyWindow : Window
 			default: NOT_REACHED();
 
 			case WID_C_GIVE_MONEY: {
-				Money money = (Money)(strtoull(str, nullptr, 10) / _currency->rate);
+				Money money = (Money)(std::strtoull(str, nullptr, 10) / _currency->rate);
 				uint32 money_c = Clamp(ClampToI32(money), 0, 20000000); // Clamp between 20 million and 0
 
 				Command<CMD_GIVE_MONEY>::Post(STR_ERROR_CAN_T_GIVE_MONEY, money_c, (CompanyID)this->window_number);
@@ -2784,7 +2804,7 @@ struct BuyCompanyWindow : Window {
 	{
 		switch (widget) {
 			case WID_BC_FACE:
-				*size = GetSpriteSize(SPR_GRADIENT);
+				*size = GetScaledSpriteSize(SPR_GRADIENT);
 				break;
 
 			case WID_BC_QUESTION:
@@ -2811,7 +2831,7 @@ struct BuyCompanyWindow : Window {
 		switch (widget) {
 			case WID_BC_FACE: {
 				const Company *c = Company::Get((CompanyID)this->window_number);
-				DrawCompanyManagerFace(c->face, c->colour, r.left, r.top);
+				DrawCompanyManagerFace(c->face, c->colour, r);
 				break;
 			}
 

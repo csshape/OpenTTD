@@ -10,25 +10,23 @@
 #ifndef DATE_TYPE_H
 #define DATE_TYPE_H
 
+#include "timer/timer_game_calendar.h"
 
-typedef int32  Date;      ///< The type to store our dates in
-typedef uint16 DateFract; ///< The fraction of a date we're in, i.e. the number of ticks since the last date changeover
 typedef int32  Ticks;     ///< The type to store ticks in
 
-typedef int32  Year;  ///< Type for the year, note: 0 based, i.e. starts at the year 0.
-typedef uint8  Month; ///< Type for the month, note: 0 based, i.e. 0 = January, 11 = December.
-typedef uint8  Day;   ///< Type for the day of the month, note: 1 based, first day of a month is 1.
 
 /**
- * 1 day is 74 ticks; _date_fract used to be uint16 and incremented by 885. On
+ * 1 day is 74 ticks; TimerGameCalendar::date_fract used to be uint16 and incremented by 885. On
  *                    an overflow the new day begun and 65535 / 885 = 74.
- * 1 tick is approximately 30 ms.
- * 1 day is thus about 2 seconds (74 * 30 = 2220) on a machine that can run OpenTTD normally
+ * 1 tick is approximately 27 ms.
+ * 1 day is thus about 2 seconds (74 * 27 = 1998) on a machine that can run OpenTTD normally
  */
 static const int DAY_TICKS         =  74; ///< ticks per day
 static const int DAYS_IN_YEAR      = 365; ///< days per year
 static const int DAYS_IN_LEAP_YEAR = 366; ///< sometimes, you need one day more...
 static const int MONTHS_IN_YEAR    =  12; ///< months per year
+
+static const int SECONDS_PER_DAY   = 2;   ///< approximate seconds per day, not for precise calculations
 
 static const int STATION_RATING_TICKS     = 185; ///< cycle duration for updating station rating
 static const int STATION_ACCEPTANCE_TICKS = 250; ///< cycle duration for updating station acceptance
@@ -43,15 +41,15 @@ static const int INDUSTRY_CUT_TREE_TICKS  = INDUSTRY_PRODUCE_TICKS * 2; ///< cyc
  * ORIGINAL_BASE_YEAR, ORIGINAL_MAX_YEAR and DAYS_TILL_ORIGINAL_BASE_YEAR are
  * primarily used for loading newgrf and savegame data and returning some
  * newgrf (callback) functions that were in the original (TTD) inherited
- * format, where '_date == 0' meant that it was 1920-01-01.
+ * format, where 'TimerGameCalendar::date == 0' meant that it was 1920-01-01.
  */
 
 /** The minimum starting year/base year of the original TTD */
-static const Year ORIGINAL_BASE_YEAR = 1920;
+static const TimerGameCalendar::Year ORIGINAL_BASE_YEAR = 1920;
 /** The original ending year */
-static const Year ORIGINAL_END_YEAR  = 2051;
+static const TimerGameCalendar::Year ORIGINAL_END_YEAR  = 2051;
 /** The maximum year of the original TTD */
-static const Year ORIGINAL_MAX_YEAR  = 2090;
+static const TimerGameCalendar::Year ORIGINAL_MAX_YEAR  = 2090;
 
 /**
  * Calculate the number of leap years till a given year.
@@ -75,24 +73,24 @@ static const Year ORIGINAL_MAX_YEAR  = 2090;
 #define DAYS_TILL(year) (DAYS_IN_YEAR * (year) + LEAP_YEARS_TILL(year))
 
 /**
- * The offset in days from the '_date == 0' till
+ * The offset in days from the 'TimerGameCalendar::date == 0' till
  * 'ConvertYMDToDate(ORIGINAL_BASE_YEAR, 0, 1)'
  */
 #define DAYS_TILL_ORIGINAL_BASE_YEAR DAYS_TILL(ORIGINAL_BASE_YEAR)
 
 /** The absolute minimum & maximum years in OTTD */
-static const Year MIN_YEAR = 0;
+static const TimerGameCalendar::Year MIN_YEAR = 0;
 
 /** The default starting year */
-static const Year DEF_START_YEAR = 1950;
+static const TimerGameCalendar::Year DEF_START_YEAR = 1950;
 /** The default scoring end year */
-static const Year DEF_END_YEAR = ORIGINAL_END_YEAR - 1;
+static const TimerGameCalendar::Year DEF_END_YEAR = ORIGINAL_END_YEAR - 1;
 
 /**
  * MAX_YEAR, nicely rounded value of the number of years that can
  * be encoded in a single 32 bits date, about 2^31 / 366 years.
  */
-static const Year MAX_YEAR  = 5000000;
+static const TimerGameCalendar::Year MAX_YEAR  = 5000000;
 
 /** The number of days till the last day */
 #define MAX_DAY (DAYS_TILL(MAX_YEAR + 1) - 1)
@@ -102,13 +100,13 @@ static const Year MAX_YEAR  = 5000000;
  * @see ConvertDateToYMD(), ConvertYMDToDate()
  */
 struct YearMonthDay {
-	Year  year;   ///< Year (0...)
-	Month month;  ///< Month (0..11)
-	Day   day;    ///< Day (1..31)
+	TimerGameCalendar::Year  year;   ///< Year (0...)
+	TimerGameCalendar::Month month;  ///< Month (0..11)
+	TimerGameCalendar::Day   day;    ///< Day (1..31)
 };
 
-static const Year  INVALID_YEAR  = -1; ///< Representation of an invalid year
-static const Date  INVALID_DATE  = -1; ///< Representation of an invalid date
+static const TimerGameCalendar::Year INVALID_YEAR = -1; ///< Representation of an invalid year
+static const TimerGameCalendar::Date INVALID_DATE = -1; ///< Representation of an invalid date
 static const Ticks INVALID_TICKS = -1; ///< Representation of an invalid number of ticks
 
 #endif /* DATE_TYPE_H */

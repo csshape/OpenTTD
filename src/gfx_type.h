@@ -251,7 +251,6 @@ enum Colours : byte {
 	COLOUR_END,
 	INVALID_COLOUR = 0xFF,
 };
-template <> struct EnumPropsT<Colours> : MakeEnumPropsT<Colours, byte, COLOUR_BEGIN, COLOUR_END, INVALID_COLOUR, 8> {};
 
 /** Colour of the strings, see _string_colourmap in table/string_colours.h or docs/ottd-colourtext-palette.png */
 enum TextColour {
@@ -305,16 +304,20 @@ enum PaletteType {
 };
 
 /** Types of sprites that might be loaded */
-enum SpriteType : byte {
-	ST_NORMAL   = 0,      ///< The most basic (normal) sprite
-	ST_MAPGEN   = 1,      ///< Special sprite for the map generator
-	ST_FONT     = 2,      ///< A sprite used for fonts
-	ST_RECOLOUR = 3,      ///< Recolour sprite
-	ST_INVALID  = 4,      ///< Pseudosprite or other unusable sprite, used only internally
+enum class SpriteType : byte {
+	Normal   = 0,      ///< The most basic (normal) sprite
+	MapGen   = 1,      ///< Special sprite for the map generator
+	Font     = 2,      ///< A sprite used for fonts
+	Recolour = 3,      ///< Recolour sprite
+	Invalid  = 4,      ///< Pseudosprite or other unusable sprite, used only internally
 };
 
-/** The number of milliseconds per game tick. */
-static const uint MILLISECONDS_PER_TICK = 30;
+/**
+ * The number of milliseconds per game tick.
+ * The value 27 together with a day length of 74 ticks makes one day 1998 milliseconds, almost exactly 2 seconds.
+ * With a 2 second day, one standard month is 1 minute, and one standard year is slightly over 12 minutes.
+ */
+static const uint MILLISECONDS_PER_TICK = 27;
 
 /** Information about the currently used palette. */
 struct Palette {

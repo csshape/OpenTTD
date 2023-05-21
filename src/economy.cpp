@@ -26,9 +26,9 @@
 #include "newgrf_industrytiles.h"
 #include "newgrf_station.h"
 #include "newgrf_airporttiles.h"
+#include "newgrf_roadstop.h"
 #include "object.h"
 #include "strings_func.h"
-#include "date_func.h"
 #include "vehicle_func.h"
 #include "sound_func.h"
 #include "autoreplace_func.h"
@@ -51,6 +51,8 @@
 #include "company_cmd.h"
 #include "economy_cmd.h"
 #include "vehicle_cmd.h"
+#include "timer/timer.h"
+#include "timer/timer_game_calendar.h"
 
 #include "table/strings.h"
 #include "table/pricebase.h"
@@ -690,7 +692,7 @@ static void CompaniesGenStatistics()
 	cur_company.Restore();
 
 	/* Only run the economic statics and update company stats every 3rd month (1st of quarter). */
-	if (!HasBit(1 << 0 | 1 << 3 | 1 << 6 | 1 << 9, _cur_month)) return;
+	if (!HasBit(1 << 0 | 1 << 3 | 1 << 6 | 1 << 9, TimerGameCalendar::month)) return;
 
 	for (Company *c : Company::Iterate()) {
 		/* Drop the oldest history off the end */
@@ -734,7 +736,7 @@ bool AddInflation(bool check_year)
 	 * inflation doesn't add anything after that either; it even makes playing
 	 * it impossible due to the diverging cost and income rates.
 	 */
-	if (check_year && (_cur_year < ORIGINAL_BASE_YEAR || _cur_year >= ORIGINAL_MAX_YEAR)) return true;
+	if (check_year && (TimerGameCalendar::year < ORIGINAL_BASE_YEAR || TimerGameCalendar::year >= ORIGINAL_MAX_YEAR)) return true;
 
 	if (_economy.inflation_prices == MAX_INFLATION || _economy.inflation_payment == MAX_INFLATION) return true;
 
@@ -757,8 +759,8 @@ bool AddInflation(bool check_year)
  */
 void RecomputePrices()
 {
-	/* Setup maximum loan */
-	_economy.max_loan = ((uint64)_settings_game.difficulty.max_loan * _economy.inflation_prices >> 16) / 50000 * 50000;
+	/* Setup maximum loan as a rounded down multiple of LOAN_INTERVAL. */
+	_economy.max_loan = ((uint64)_settings_game.difficulty.max_loan * _economy.inflation_prices >> 16) / LOAN_INTERVAL * LOAN_INTERVAL;
 
 	/* Setup price bases */
 	for (Price i = PR_BEGIN; i < PR_END; i++) {
@@ -843,8 +845,8 @@ static void CompaniesPayInterest()
 		if (c->money < 0) {
 			yearly_fee += -c->money *_economy.interest_rate / 100;
 		}
-		Money up_to_previous_month = yearly_fee * _cur_month / 12;
-		Money up_to_this_month = yearly_fee * (_cur_month + 1) / 12;
+		Money up_to_previous_month = yearly_fee * TimerGameCalendar::month / 12;
+		Money up_to_this_month = yearly_fee * (TimerGameCalendar::month + 1) / 12;
 
 		SubtractMoneyFromCompany(CommandCost(EXPENSES_LOAN_INTEREST, up_to_this_month - up_to_previous_month));
 
@@ -927,7 +929,7 @@ void StartupEconomy()
 
 	if (_settings_game.economy.inflation) {
 		/* Apply inflation that happened before our game start year. */
-		int months = (std::min(_cur_year, ORIGINAL_MAX_YEAR) - ORIGINAL_BASE_YEAR) * 12;
+		int months = (std::min(TimerGameCalendar::year, ORIGINAL_MAX_YEAR) - ORIGINAL_BASE_YEAR) * 12;
 		for (int i = 0; i < months; i++) {
 			AddInflation(false);
 		}
@@ -974,7 +976,7 @@ Money GetPrice(Price index, uint cost_factor, const GRFFile *grf_file, int shift
 	return cost;
 }
 
-Money GetTransportedGoodsIncome(uint num_pieces, uint dist, byte transit_days, CargoID cargo_type)
+Money GetTransportedGoodsIncome(uint num_pieces, uint dist, uint16 transit_days, CargoID cargo_type)
 {
 	const CargoSpec *cs = CargoSpec::Get(cargo_type);
 	if (!cs->IsValid()) {
@@ -984,7 +986,7 @@ Money GetTransportedGoodsIncome(uint num_pieces, uint dist, byte transit_days, C
 
 	/* Use callback to calculate cargo profit, if available */
 	if (HasBit(cs->callback_mask, CBM_CARGO_PROFIT_CALC)) {
-		uint32 var18 = std::min(dist, 0xFFFFu) | (std::min(num_pieces, 0xFFu) << 16) | (transit_days << 24);
+		uint32 var18 = std::min(dist, 0xFFFFu) | (std::min(num_pieces, 0xFFu) << 16) | (std::min<uint16>(transit_days, 0xFFu) << 24);
 		uint16 callback = GetCargoCallback(CBID_CARGO_PROFIT_CALC, 0, var18, cs);
 		if (callback != CALLBACK_FAILED) {
 			int result = GB(callback, 0, 14);
@@ -1001,25 +1003,35 @@ Money GetTransportedGoodsIncome(uint num_pieces, uint dist, byte transit_days, C
 
 	static const int MIN_TIME_FACTOR = 31;
 	static const int MAX_TIME_FACTOR = 255;
+	static const int TIME_FACTOR_FRAC_BITS = 4;
+	static const int TIME_FACTOR_FRAC = 1 << TIME_FACTOR_FRAC_BITS;
 
 	const int days1 = cs->transit_days[0];
 	const int days2 = cs->transit_days[1];
 	const int days_over_days1 = std::max(   transit_days - days1, 0);
 	const int days_over_days2 = std::max(days_over_days1 - days2, 0);
+	int days_over_max = MIN_TIME_FACTOR - MAX_TIME_FACTOR;
+	if (days2 > -days_over_max) days_over_max += transit_days - days1;
+	else days_over_max += 2 * (transit_days - days1) - days2;
 
 	/*
 	 * The time factor is calculated based on the time it took
 	 * (transit_days) compared two cargo-depending values. The
-	 * range is divided into three parts:
+	 * range is divided into four parts:
 	 *
 	 *  - constant for fast transits
 	 *  - linear decreasing with time with a slope of -1 for medium transports
 	 *  - linear decreasing with time with a slope of -2 for slow transports
+	 *  - after hitting MIN_TIME_FACTOR, the time factor will be asymptotically decreased to a limit of 1 with a scaled 1/(x+1) function.
 	 *
 	 */
-	const int time_factor = std::max(MAX_TIME_FACTOR - days_over_days1 - days_over_days2, MIN_TIME_FACTOR);
-
-	return BigMulS(dist * time_factor * num_pieces, cs->current_payment, 21);
+	if (days_over_max > 0) {
+		const int time_factor = std::max(2 * MIN_TIME_FACTOR * TIME_FACTOR_FRAC * TIME_FACTOR_FRAC / (days_over_max + 2 * TIME_FACTOR_FRAC), 1); // MIN_TIME_FACTOR / (x/(2 * TIME_FACTOR_FRAC) + 1) + 1, expressed as fixed point with TIME_FACTOR_FRAC_BITS.
+		return BigMulS(dist * time_factor * num_pieces, cs->current_payment, 21 + TIME_FACTOR_FRAC_BITS);
+	} else {
+		const int time_factor = std::max(MAX_TIME_FACTOR - days_over_days1 - days_over_days2, MIN_TIME_FACTOR);
+		return BigMulS(dist * time_factor * num_pieces, cs->current_payment, 21);
+	}
 }
 
 /** The industries we've currently brought cargo to. */
@@ -1069,12 +1081,12 @@ static uint DeliverGoodsToIndustry(const Station *st, CargoID cargo_type, uint n
 
 		uint amount = std::min(num_pieces, 0xFFFFu - ind->incoming_cargo_waiting[cargo_index]);
 		ind->incoming_cargo_waiting[cargo_index] += amount;
-		ind->last_cargo_accepted_at[cargo_index] = _date;
+		ind->last_cargo_accepted_at[cargo_index] = TimerGameCalendar::date;
 		num_pieces -= amount;
 		accepted += amount;
 
 		/* Update the cargo monitor. */
-		AddCargoDelivery(cargo_type, company, amount, ST_INDUSTRY, source, st, ind->index);
+		AddCargoDelivery(cargo_type, company, amount, SourceType::Industry, source, st, ind->index);
 	}
 
 	return accepted;
@@ -1093,14 +1105,14 @@ static uint DeliverGoodsToIndustry(const Station *st, CargoID cargo_type, uint n
  * @return Revenue for delivering cargo
  * @note The cargo is just added to the stockpile of the industry. It is due to the caller to trigger the industry's production machinery
  */
-static Money DeliverGoods(int num_pieces, CargoID cargo_type, StationID dest, TileIndex source_tile, byte days_in_transit, Company *company, SourceType src_type, SourceID src)
+static Money DeliverGoods(int num_pieces, CargoID cargo_type, StationID dest, TileIndex source_tile, uint16 days_in_transit, Company *company, SourceType src_type, SourceID src)
 {
 	assert(num_pieces > 0);
 
 	Station *st = Station::Get(dest);
 
 	/* Give the goods to the industry. */
-	uint accepted_ind = DeliverGoodsToIndustry(st, cargo_type, num_pieces, src_type == ST_INDUSTRY ? src : INVALID_INDUSTRY, company->index);
+	uint accepted_ind = DeliverGoodsToIndustry(st, cargo_type, num_pieces, src_type == SourceType::Industry ? src : INVALID_INDUSTRY, company->index);
 
 	/* If this cargo type is always accepted, accept all */
 	uint accepted_total = HasBit(st->always_accepted, cargo_type) ? num_pieces : accepted_ind;
@@ -1765,7 +1777,7 @@ static void LoadUnloadVehicle(Vehicle *front)
 
 		/* if last speed is 0, we treat that as if no vehicle has ever visited the station. */
 		ge->last_speed = std::min(t, 255);
-		ge->last_age = std::min(_cur_year - front->build_year, 255);
+		ge->last_age = std::min(TimerGameCalendar::year - front->build_year, 255);
 
 		assert(v->cargo_cap >= v->cargo.StoredCount());
 		/* Capacity available for loading more cargo. */
@@ -1813,6 +1825,8 @@ static void LoadUnloadVehicle(Vehicle *front)
 						TriggerStationRandomisation(st, st->xy, SRT_CARGO_TAKEN, v->cargo_type);
 						TriggerStationAnimation(st, st->xy, SAT_CARGO_TAKEN, v->cargo_type);
 						AirportAnimationTrigger(st, AAT_STATION_CARGO_TAKEN, v->cargo_type);
+						TriggerRoadStopRandomisation(st, st->xy, RSRT_CARGO_TAKEN, v->cargo_type);
+						TriggerRoadStopAnimation(st, st->xy, SAT_CARGO_TAKEN, v->cargo_type);
 					}
 
 					new_load_unload_ticks += loaded;
@@ -1833,6 +1847,9 @@ static void LoadUnloadVehicle(Vehicle *front)
 		if (front->type == VEH_TRAIN) {
 			TriggerStationRandomisation(st, front->tile, SRT_TRAIN_LOADS);
 			TriggerStationAnimation(st, front->tile, SAT_TRAIN_LOADS);
+		} else if (front->type == VEH_ROAD) {
+			TriggerRoadStopRandomisation(st, front->tile, RSRT_VEH_LOADS);
+			TriggerRoadStopAnimation(st, front->tile, SAT_TRAIN_LOADS);
 		}
 	}
 
@@ -1967,7 +1984,7 @@ void LoadUnloadStation(Station *st)
 /**
  * Monthly update of the economic data (of the companies as well as economic fluctuations).
  */
-void CompaniesMonthlyLoop()
+static IntervalTimer<TimerGameCalendar> _companies_monthly({TimerGameCalendar::MONTH, TimerGameCalendar::Priority::COMPANY}, [](auto)
 {
 	CompaniesGenStatistics();
 	if (_settings_game.economy.inflation) {
@@ -1976,7 +1993,7 @@ void CompaniesMonthlyLoop()
 	}
 	CompaniesPayInterest();
 	HandleEconomyFluctuations();
-}
+});
 
 static void DoAcquireCompany(Company *c)
 {
@@ -2030,7 +2047,7 @@ CommandCost CmdBuyShareInCompany(DoCommandFlag flags, CompanyID target_company)
 	if (c == nullptr || !_settings_game.economy.allow_shares || _current_company == target_company) return CMD_ERROR;
 
 	/* Protect new companies from hostile takeovers */
-	if (_cur_year - c->inaugurated_year < _settings_game.economy.min_years_for_shares) return_cmd_error(STR_ERROR_PROTECTED);
+	if (TimerGameCalendar::year - c->inaugurated_year < _settings_game.economy.min_years_for_shares) return_cmd_error(STR_ERROR_PROTECTED);
 
 	/* Those lines are here for network-protection (clients can be slow) */
 	if (GetAmountOwnedBy(c, INVALID_OWNER) == 0) return cost;

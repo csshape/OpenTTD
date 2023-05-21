@@ -17,6 +17,8 @@
 #include "../roadstop_base.h"
 #include "../vehicle_base.h"
 #include "../newgrf_station.h"
+#include "../newgrf_roadstop.h"
+#include "../timer/timer_game_calendar.h"
 
 #include "table/strings.h"
 
@@ -66,7 +68,7 @@ void MoveBuoysToWaypoints()
 		Town *town         = st->town;
 		StringID string_id = st->string_id;
 		std::string name   = st->name;
-		Date build_date    = st->build_date;
+		TimerGameCalendar::Date build_date = st->build_date;
 		/* TTDPatch could use "buoys with rail station" for rail waypoints */
 		bool train         = st->train_station.tile != INVALID_TILE;
 		TileArea train_st  = st->train_station;
@@ -90,9 +92,10 @@ void MoveBuoysToWaypoints()
 		if (train) {
 			/* When we make a rail waypoint of the station, convert the map as well. */
 			for (TileIndex t : train_st) {
-				if (!IsTileType(t, MP_STATION) || GetStationIndex(t) != index) continue;
+				Tile tile(t);
+				if (!IsTileType(tile, MP_STATION) || GetStationIndex(tile) != index) continue;
 
-				SB(_me[t].m6, 3, 3, STATION_WAYPOINT);
+				SB(tile.m6(), 3, 3, STATION_WAYPOINT);
 				wp->rect.BeforeAddTile(t, StationRect::ADD_FORCE);
 			}
 
@@ -114,6 +117,11 @@ void AfterLoadStations()
 
 			st->speclist[i].spec = StationClass::GetByGrf(st->speclist[i].grfid, st->speclist[i].localidx, nullptr);
 		}
+		for (uint i = 0; i < st->roadstop_speclist.size(); i++) {
+			if (st->roadstop_speclist[i].grfid == 0) continue;
+
+			st->roadstop_speclist[i].spec = RoadStopClass::GetByGrf(st->roadstop_speclist[i].grfid, st->roadstop_speclist[i].localidx, nullptr);
+		}
 
 		if (Station::IsExpected(st)) {
 			Station *sta = Station::From(st);
@@ -122,6 +130,7 @@ void AfterLoadStations()
 		}
 
 		StationUpdateCachedTriggers(st);
+		RoadStopUpdateCachedTriggers(st);
 	}
 }
 
@@ -223,6 +232,33 @@ public:
 };
 
 uint8 SlStationSpecList::last_num_specs;
+
+class SlRoadStopSpecList : public DefaultSaveLoadHandler<SlRoadStopSpecList, BaseStation> {
+public:
+	inline static const SaveLoad description[] = {
+		SLE_VAR(RoadStopSpecList, grfid,    SLE_UINT32),
+		SLE_VAR(RoadStopSpecList, localidx, SLE_UINT8),
+	};
+	inline const static SaveLoadCompatTable compat_description = _station_road_stop_spec_list_sl_compat;
+
+	void Save(BaseStation *bst) const override
+	{
+		SlSetStructListLength(bst->roadstop_speclist.size());
+		for (uint i = 0; i < bst->roadstop_speclist.size(); i++) {
+			SlObject(&bst->roadstop_speclist[i], this->GetDescription());
+		}
+	}
+
+	void Load(BaseStation *bst) const override
+	{
+		uint8 num_specs = (uint8)SlGetStructListLength(UINT8_MAX);
+
+		bst->roadstop_speclist.resize(num_specs);
+		for (uint i = 0; i < num_specs; i++) {
+			SlObject(&bst->roadstop_speclist[i], this->GetLoadDescription());
+		}
+	}
+};
 
 class SlStationCargo : public DefaultSaveLoadHandler<SlStationCargo, GoodsEntry> {
 public:
@@ -516,6 +552,35 @@ struct STNSChunkHandler : ChunkHandler {
 	}
 };
 
+class SlRoadStopTileData : public DefaultSaveLoadHandler<SlRoadStopTileData, BaseStation> {
+public:
+	inline static const SaveLoad description[] = {
+	    SLE_VAR(RoadStopTileData, tile,            SLE_UINT32),
+	    SLE_VAR(RoadStopTileData, random_bits,     SLE_UINT8),
+	    SLE_VAR(RoadStopTileData, animation_frame, SLE_UINT8),
+	};
+	inline const static SaveLoadCompatTable compat_description = {};
+
+	static uint8 last_num_specs; ///< Number of specs of the last loaded station.
+
+	void Save(BaseStation *bst) const override
+	{
+		SlSetStructListLength(bst->custom_roadstop_tile_data.size());
+		for (uint i = 0; i < bst->custom_roadstop_tile_data.size(); i++) {
+			SlObject(&bst->custom_roadstop_tile_data[i], this->GetDescription());
+		}
+	}
+
+	void Load(BaseStation *bst) const override
+	{
+		uint32 num_tiles = (uint32)SlGetStructListLength(UINT32_MAX);
+		bst->custom_roadstop_tile_data.resize(num_tiles);
+		for (uint i = 0; i < num_tiles; i++) {
+			SlObject(&bst->custom_roadstop_tile_data[i], this->GetLoadDescription());
+		}
+	}
+};
+
 /**
  * SaveLoad handler for the BaseStation, which all other stations / waypoints
  * make use of.
@@ -593,6 +658,7 @@ public:
 		SLE_REFLIST(Station, loading_vehicles,           REF_VEHICLE),
 		SLE_CONDVAR(Station, always_accepted,            SLE_FILE_U32 | SLE_VAR_U64, SLV_127, SLV_EXTEND_CARGOTYPES),
 		SLE_CONDVAR(Station, always_accepted,            SLE_UINT64,                 SLV_EXTEND_CARGOTYPES, SL_MAX_VERSION),
+		SLEG_CONDSTRUCTLIST("speclist", SlRoadStopTileData,                          SLV_NEWGRF_ROAD_STOPS, SL_MAX_VERSION),
 		SLEG_STRUCTLIST("goods", SlStationGoods),
 	};
 	inline const static SaveLoadCompatTable compat_description = _station_normal_sl_compat;
@@ -652,6 +718,7 @@ static const SaveLoad _station_desc[] = {
 	SLEG_STRUCT("normal", SlStationNormal),
 	SLEG_STRUCT("waypoint", SlStationWaypoint),
 	SLEG_CONDSTRUCTLIST("speclist", SlStationSpecList, SLV_27, SL_MAX_VERSION),
+	SLEG_CONDSTRUCTLIST("roadstopspeclist", SlRoadStopSpecList, SLV_NEWGRF_ROAD_STOPS, SL_MAX_VERSION),
 };
 
 struct STNNChunkHandler : ChunkHandler {

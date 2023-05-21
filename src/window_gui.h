@@ -449,7 +449,7 @@ public:
 	static void DeleteClosedWindows();
 
 	void SetDirty() const;
-	void ReInit(int rx = 0, int ry = 0);
+	void ReInit(int rx = 0, int ry = 0, bool reposition = false);
 
 	/** Is window shaded currently? */
 	inline bool IsShaded() const
@@ -620,13 +620,6 @@ public:
 	 * Called once per (game) tick.
 	 */
 	virtual void OnGameTick() {}
-
-	/**
-	 * Called once every 100 (game) ticks, or once every 3s, whichever comes last.
-	 * In normal game speed the frequency is 1 call every 100 ticks (can be more than 3s).
-	 * In fast-forward the frequency is 1 call every ~3s (can be more than 100 ticks).
-	 */
-	virtual void OnHundredthTick() {}
 
 	/**
 	 * Called periodically.

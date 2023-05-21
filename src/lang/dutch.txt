@@ -195,6 +195,7 @@ STR_UNITS_VELOCITY_IMPERIAL                                     :{COMMA}{NBSP}mp
 STR_UNITS_VELOCITY_METRIC                                       :{COMMA}{NBSP}km/u
 STR_UNITS_VELOCITY_SI                                           :{COMMA}{NBSP}m/s
 STR_UNITS_VELOCITY_GAMEUNITS                                    :{DECIMAL}{NBSP}tegels/dag
+STR_UNITS_VELOCITY_KNOTS                                        :{COMMA}{NBSP}knopen
 
 STR_UNITS_POWER_IMPERIAL                                        :{COMMA}{NBSP}pk
 STR_UNITS_POWER_METRIC                                          :{COMMA}{NBSP}pk
@@ -343,9 +344,9 @@ STR_GOTO_ORDER_VIEW_TOOLTIP                                     :{BLACK}Open het
 ###length 31
 STR_TOOLBAR_TOOLTIP_PAUSE_GAME                                  :{BLACK}Hiermee pauzeer je het spel
 STR_TOOLBAR_TOOLTIP_FORWARD                                     :{BLACK}Hiermee verhoog je de spelsnelheid
-STR_TOOLBAR_TOOLTIP_OPTIONS                                     :{BLACK}Opties
-STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Spel opslaan, spel stoppen, afsluiten
-STR_TOOLBAR_TOOLTIP_DISPLAY_MAP                                 :{BLACK}Kaart, extra kijkvenster of lijst met bordjes weergeven
+STR_TOOLBAR_TOOLTIP_OPTIONS                                     :{BLACK}Opties en instellingen
+STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Spel opslaan, laden of stoppen, afsluiten
+STR_TOOLBAR_TOOLTIP_DISPLAY_MAP                                 :{BLACK}Kaart, extra kijkvenster, vrachtstroom of lijst met bordjes weergeven
 STR_TOOLBAR_TOOLTIP_DISPLAY_TOWN_DIRECTORY                      :{BLACK}Stedenlijst weergeven
 STR_TOOLBAR_TOOLTIP_DISPLAY_SUBSIDIES                           :{BLACK}Subsidies weergeven
 STR_TOOLBAR_TOOLTIP_DISPLAY_LIST_OF_COMPANY_STATIONS            :{BLACK}Lijst met stations van het bedrijf weergeven
@@ -353,9 +354,9 @@ STR_TOOLBAR_TOOLTIP_DISPLAY_COMPANY_FINANCES                    :{BLACK}Financi�
 STR_TOOLBAR_TOOLTIP_DISPLAY_COMPANY_GENERAL                     :{BLACK}Algemene informatie over het bedrijf weergeven
 STR_TOOLBAR_TOOLTIP_DISPLAY_STORY_BOOK                          :{BLACK}Verhaal weergeven
 STR_TOOLBAR_TOOLTIP_DISPLAY_GOALS_LIST                          :{BLACK}Doellijst weergeven
-STR_TOOLBAR_TOOLTIP_DISPLAY_GRAPHS                              :{BLACK}Grafieken weergeven
+STR_TOOLBAR_TOOLTIP_DISPLAY_GRAPHS                              :{BLACK}Bedrijfsgrafieken en vrachtprijzen weergeven
 STR_TOOLBAR_TOOLTIP_DISPLAY_COMPANY_LEAGUE                      :{BLACK}Bedrijfsscoretabel weergeven
-STR_TOOLBAR_TOOLTIP_FUND_CONSTRUCTION_OF_NEW                    :{BLACK}Bouw van nieuwe industrie financieren of lijst van alle industrieën weergeven
+STR_TOOLBAR_TOOLTIP_FUND_CONSTRUCTION_OF_NEW                    :{BLACK}Industrieën onderzoeken of bouw van nieuwe industrie financieren
 STR_TOOLBAR_TOOLTIP_DISPLAY_LIST_OF_COMPANY_TRAINS              :{BLACK}Lijst met treinen van het bedrijf weergeven. Ctrl+klik schakelt tussen lijst van groepen/voertuigen.
 STR_TOOLBAR_TOOLTIP_DISPLAY_LIST_OF_COMPANY_ROAD_VEHICLES       :{BLACK}Lijst met wegvoertuigen van het bedrijf weergeven. Ctrl+klik schakelt tussen lijst van groepen/voertuigen.
 STR_TOOLBAR_TOOLTIP_DISPLAY_LIST_OF_COMPANY_SHIPS               :{BLACK}Lijst met schepen van het bedrijf weergeven. Ctrl+klik schakelt tussen lijst van groepen/voertuigen.
@@ -369,8 +370,8 @@ STR_TOOLBAR_TOOLTIP_BUILD_SHIP_DOCKS                            :{BLACK}Dokken e
 STR_TOOLBAR_TOOLTIP_BUILD_AIRPORTS                              :{BLACK}Vliegvelden bouwen
 STR_TOOLBAR_TOOLTIP_LANDSCAPING                                 :{BLACK}Hiermee open je de landschapsbalk om land te verhogen/verlagen, bomen te planten, enz.
 STR_TOOLBAR_TOOLTIP_SHOW_SOUND_MUSIC_WINDOW                     :{BLACK}Geluid-/muziekvenster weergeven
-STR_TOOLBAR_TOOLTIP_SHOW_LAST_MESSAGE_NEWS                      :{BLACK}Laatste (nieuws-)bericht weergeven, berichtinstellingen weergeven
-STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Landinformatie, console, foutopsporing in scripts, schermfoto's, over OpenTTD
+STR_TOOLBAR_TOOLTIP_SHOW_LAST_MESSAGE_NEWS                      :{BLACK}Laatste (nieuws-)bericht weergeven, berichtengeschiedenis of alle berichten verwijderen
+STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Landinformatie, schermfoto, over OpenTTD en ontwikkelaarshulpmiddelen
 STR_TOOLBAR_TOOLTIP_SWITCH_TOOLBAR                              :{BLACK}Knoppenbalken wisselen
 
 # Extra tooltips for the scenario editor toolbar
@@ -982,10 +983,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Tijdsduu
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Uit
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Iedere maand
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Iedere 3 maanden
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Iedere 6 maanden
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Iedere 12 maanden
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Taal
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Taal selecteren voor gebruikersscherm
@@ -1206,6 +1203,9 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Rechts
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Maximale beginlening: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Maximaal bedrag dat een bedrijf kan lenen (zonder rekening te houden met de inflatie)
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_VALUE                   :{CURRENCY_LONG}
+###setting-zero-is-special
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_DISABLED                :Geen lening {RED}Spelscript vereist voor aanvankelijk saldo
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Rente van lening: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Percentage rente op lening; bepaald ook het inflatiecijfer wanneer ingeschakeld
@@ -1805,6 +1805,9 @@ STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :Wanneer ingesch
 
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :Minimale leeftijd van bedrijf om aandelen te kunnen verhandelen: {STRING}
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_HELPTEXT                :Hiermee wordt de minimale leeftijd van een bedrijf ingesteld waarna anderen aandelen in dat bedrijf kunnen gaan kopen en verkopen.
+STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_VALUE                   :{COMMA} jaar
+###setting-zero-is-special
+STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_NO_MIN                  :Geen minimum
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Percentage van routeopbrengst in overdrachtssysteem: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Percentage van het inkomen besteed aan de intermediaire delen in feedersystemen waardoor er meer controle over de inkomsten is
@@ -1919,10 +1922,10 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :Geen
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Beginfactor voor stadsgroei: {STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :Gemiddelde grootte van steden in vergelijking tot normale steden bij het begin van het spel.
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :Werk distributiegrafiek elke {STRING}{NBSP}dag{P 0:2 "" en} bij
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL_HELPTEXT                  :Tijd tussen opeenvolgende herberekeningen van de koppelinggrafiek. Elke herberekening berekent de plannen voor een component van de grafiek. Dat betekent dat een waarde X voor deze instelling niet betekent dat de hele grafiek elke X dagen wordt bijgewerkt. Alleen een component wordt bijgewerkt. Hoe korter je dit instelt, hoe meer CPU-tijd nodig is om de berekening te maken. Hoe langer je dit instelt, hoe langer het duurt voordat de vrachtdistributie op nieuwe routes start.
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :{STRING}{NBSP}dag{P 0:2 "" en} gebruiken voor herberekening van de distributiegrafiek
-STR_CONFIG_SETTING_LINKGRAPH_TIME_HELPTEXT                      :Tijd die wordt gebruikt voor een herberekening van een component van een koppelinggrafiek . Wanneer een herberekening wordt gestart, wordt een draad voortgebracht die dit aantal dagen mag lopen. Hoe korter je dit instelt, hoe waarschijnlijker het is dat de draad niet is voltooid als dat zou moeten. Dan stopt het spel totdat het 'bij' is ('lag'). Hoe langer je dit instelt, hoe langer het duurt voordat de distributie wordt aangepast als een route wijzigt.
+STR_CONFIG_SETTING_LINKGRAPH_RECALC_INTERVAL                    :Distributiegrafiek elke {STRING}{NBSP}second{P 0:2 "" en} bijwerken
+STR_CONFIG_SETTING_LINKGRAPH_RECALC_INTERVAL_HELPTEXT           :De tijd tussen opeenvolgende herberekeningen van de koppeling-grafiek. Elke berekening berekent de plannen voor één component van de grafiek. Dat betekent dat een waarde X voor deze instelling niet betekent dat de hele grafiek elke X seconden wordt bijgewerkt. Dat geldt alleen voor één component. Hoe korter je deze waarde instelt, hoe meer CPU-tijd er nodig is voor de berekening. Hoe langer je deze waarde instelt, hoe langer het duurt voordat de vrachtdistributie start op nieuwe routes.
+STR_CONFIG_SETTING_LINKGRAPH_RECALC_TIME                        :Besteed {STRING}{NBSP}second{P 0:2 "" en} per herberekening van de distributiegrafiek
+STR_CONFIG_SETTING_LINKGRAPH_RECALC_TIME_HELPTEXT               :De benodigde tijd voor een herbereking van een koppeling-grafiekcomponent. Wanneer een herberekening wordt gestart, start een draad die dit aantal seconden mag lopen. Hoe korter je deze waarde maakt, hoe groter de kans dat de draad is niet op tijd is afgelopen. Het spel stopt dan totdat dit alsnog gebeurt (het 'hikt'). Hoe langer je deze waarde maakt, hoe langer het duurt voor de distributie wordt bijgewerkt wanneer een route wijzigt.
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :Distributiemodus voor passagiers: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :'Symmetrisch' betekent dat ongeveer hetzelfde aantal passagiers van station A naar station B gaat als van B naar A. 'Asymmetrisch' betekent dat willekeurige aantallen passagiers reizen in beide richtingen. 'Handmatig' betekent dat er geen automatische distributie plaatsvindt voor passagiers.
@@ -1948,13 +1951,15 @@ STR_CONFIG_SETTING_DEMAND_SIZE_HELPTEXT                         :Door dit op min
 STR_CONFIG_SETTING_SHORT_PATH_SATURATION                        :Verzadiging van korte routes voordat routes met hoge capaciteit worden gebruikt: {STRING}
 STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :Vaak zijn er meerdere routes mogelijk tussen twee stations. De vrachtdistributie verzadigt eerst de kortste route, gebruikt dan de op één na kortste route tot die verzadigd is enzovoort. Verzadiging wordt bepaald door een schatting van de capaciteit en het geplande gebruik. Wanneer alle routes verzadigd zijn, maar er is meer vraag, raken alle wegen overbelast, die met hoge capaciteit als eerste. In veel gevallen schat het algoritme helaas de capaciteit niet nauwkeurig in. Met deze instelling kun je aangeven tot welk percentage een korter pad moet worden verzadigd voordat de eerstvolgende, langere route wordt gekozen. Stel dit in op minder dan 100% om overvolle stations in geval van overschatte capaciteit te voorkomen.
 
-STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Snelheidseenheden: {STRING}
+STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Snelheidseenheden (land): {STRING}
+STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_NAUTICAL         :Snelheidseenheden (nautisch): {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Wanneer een snelheid wordt weergegeven in het gebruikersscherm, gebruik dan de geselecteerde eenheden
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :Imperiaal (mph)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :Metrisch (km/h)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (m/s)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_GAMEUNITS        :Speleenheden (tegels/dag)
+STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_KNOTS            :Knopen
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_POWER                     :Voertuigkrachteenheden: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_POWER_HELPTEXT            :Als het verbruik van een voertuig wordt weergegeven in het gebruikersscherm, gebruik dan de geselecteerde eenheden
@@ -2355,7 +2360,8 @@ STR_NETWORK_CLIENT_LIST_NEW_COMPANY                             :(Nieuw bedrijf)
 STR_NETWORK_CLIENT_LIST_NEW_COMPANY_TOOLTIP                     :{BLACK}Een nieuw bedrijf maken en meedoen
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_SELF_TOOLTIP                :{BLACK}Dit ben jij
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_HOST_TOOLTIP                :{BLACK}Dit is de host van het spel
-STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} speler{P "" s} / {NUM} bedrij{P f ven}
+STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} speler{P "" s} - {NUM}/{NUM} bedrij{P f ven}
+STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT_TOOLTIP            :{BLACK}Het aantal momenteel verbonden clients, het aantal bedrijven en het maximale aantal toegestane bedrijven door de serverbeheerder
 
 # Matches ConnectionType
 ###length 5
@@ -3349,8 +3355,8 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Waarschuwing: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Fout: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Fatale fout: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Een fatale NewGRF-fout is ontstaan:{}{STRING}
-STR_NEWGRF_ERROR_POPUP                                          :{WHITE}Er is een NewGRF-fout opgetreden:{}{STRING}
+STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}De NewGRF "{STRING}" heeft een fatale fout veroorzaakt:{}{STRING}
+STR_NEWGRF_ERROR_POPUP                                          :{WHITE}De NewGRF "{STRING}" heeft een fout veroorzaakt:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} werkt niet met de TTDPatch-versie die is opgegeven door OpenTTD
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} is voor versie {2:STRING} van TTD
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} is ontwikkeld voor {2:STRING}
@@ -4526,7 +4532,7 @@ STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Snelheid
 STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Verwijder de maximumsnelheid van de gekozen order. Met Ctrl+klik wis je de snelheid voor alle orders
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Vertragingsteller terugstellen
-STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Stel de vertragingsteller terug zodat het voertuig op tijd is
+STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Stel de vertragingsteller terug zodat het voertuig op tijd is. Ctrl+kllik stelt de hele groep terug zodat het laatste voertuig op tijd komt en alle andere te vroeg.
 
 STR_TIMETABLE_AUTOFILL                                          :{BLACK}Automatisch vullen
 STR_TIMETABLE_AUTOFILL_TOOLTIP                                  :{BLACK}Vul de dienstregeling automatisch in aan de hand van de volgende reis. Ctrl+klik om te proberen om wachttijden te bewaren
@@ -4580,7 +4586,9 @@ STR_AI_CONFIG_AILIST_TOOLTIP                                    :{BLACK}De AI's 
 STR_AI_CONFIG_HUMAN_PLAYER                                      :Menselijke speler
 STR_AI_CONFIG_RANDOM_AI                                         :Willekeurige AI
 STR_AI_CONFIG_NONE                                              :(geen)
+STR_AI_CONFIG_NAME_VERSION                                      :{STRING} {YELLOW}v{NUM}
 STR_AI_CONFIG_MAX_COMPETITORS                                   :{LTBLUE}Maximaal aantal tegenstanders: {ORANGE}{COMMA}
+STR_AI_CONFIG_COMPETITORS_INTERVAL                              :{LTBLUE}Tijdsduur tussen starts van concurrenten: {ORANGE}{COMMA} minu{P "ut" "ten"}
 
 STR_AI_CONFIG_MOVE_UP                                           :{BLACK}Omhoog verplaatsen
 STR_AI_CONFIG_MOVE_UP_TOOLTIP                                   :{BLACK}Geselecteerde AI omhoog verplaatsen in de lijst
@@ -4593,7 +4601,7 @@ STR_AI_CONFIG_AI                                                :{SILVER}AI's
 
 STR_AI_CONFIG_CHANGE_AI                                         :{BLACK}AI selecteren
 STR_AI_CONFIG_CHANGE_GAMESCRIPT                                 :{BLACK}Spelscript selecteren
-STR_AI_CONFIG_CHANGE_TOOLTIP                                    :{BLACK}Ander script laden
+STR_AI_CONFIG_CHANGE_TOOLTIP                                    :{BLACK}Ander script laden. Ctrl+klik geeft alle beschikbare versies
 STR_AI_CONFIG_CONFIGURE                                         :{BLACK}Configureren
 STR_AI_CONFIG_CONFIGURE_TOOLTIP                                 :{BLACK}De parameters van het script configureren
 
@@ -4620,12 +4628,13 @@ STR_SCREENSHOT_WORLD_SCREENSHOT                                 :{BLACK}Schermaf
 STR_SCREENSHOT_HEIGHTMAP_SCREENSHOT                             :{BLACK}Schermafbeelding van de hoogtekaart
 STR_SCREENSHOT_MINIMAP_SCREENSHOT                               :{BLACK}Schermafbeelding van de minikaart
 
-# AI Parameters
+# Script Parameters
+STR_AI_SETTINGS_CAPTION                                         :{WHITE}{STRING} Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :{WHITE}AI-parameters
+STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :Spelscript
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Sluiten
 STR_AI_SETTINGS_RESET                                           :{BLACK}Terugstellen
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Aantal dagen dat deze AI start na de vorige (ongeveer): {ORANGE}{STRING}
 
 
 # Textfile window
@@ -5079,6 +5088,20 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Kan orde
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... te ver van vorige bestemming
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... vliegtuig heeft niet genoeg bereik
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+STR_ERROR_NO_RAIL_STATION                                       :{WHITE}Er is geen station
+STR_ERROR_NO_BUS_STATION                                        :{WHITE}Er is geen bussstation
+STR_ERROR_NO_TRUCK_STATION                                      :{WHITE}Er is geen vrachtwagenlaadstation
+STR_ERROR_NO_DOCK                                               :{WHITE}Er is geen dok
+STR_ERROR_NO_AIRPORT                                            :{WHITE}Er is geen vliegveld/heliplatform
+STR_ERROR_NO_STOP_COMPATIBLE_ROAD_TYPE                          :{WHITE}Er zijn geen haltes met een compatibel wegtype
+STR_ERROR_NO_STOP_COMPATIBLE_TRAM_TYPE                          :{WHITE}Er zijn geen haltes met een compatibel type tram
+STR_ERROR_NO_STOP_ARTICULATED_VEHICLE                           :{WHITE}Er zijn geen haltes die geschikt zijn voor gelede wegvoertuigen.{}Gelede wegvoertuigen kunnen alleen stoppen aan de weg, niet bij een laadplatform.
+STR_ERROR_AIRPORT_NO_PLANES                                     :{WHITE}Dit vliegtuig kan niet landen op dit heliplatform
+STR_ERROR_AIRPORT_NO_HELICOPTERS                                :{WHITE}Deze helikopter kan niet landen op dit vliegveld
+STR_ERROR_NO_RAIL_WAYPOINT                                      :{WHITE}Er is geen routepunt
+STR_ERROR_NO_BUOY                                               :{WHITE}Er is geen boei
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Kan geen dienstregeling opzetten voor dit voertuig...
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Voertuigen kunnen alleen wachten op stations
@@ -5494,10 +5517,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Powernaut-helik
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Bedrijf {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Groep {COMMA}
@@ -5579,7 +5602,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

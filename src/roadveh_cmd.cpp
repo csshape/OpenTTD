@@ -10,6 +10,7 @@
 #include "stdafx.h"
 #include "roadveh.h"
 #include "command_func.h"
+#include "error_func.h"
 #include "news_func.h"
 #include "pathfinder/npf/npf_func.h"
 #include "station_base.h"
@@ -19,7 +20,7 @@
 #include "pathfinder/yapf/yapf.h"
 #include "strings_func.h"
 #include "tunnelbridge_map.h"
-#include "date_func.h"
+#include "timer/timer_game_calendar.h"
 #include "vehicle_func.h"
 #include "sound_func.h"
 #include "ai/ai.hpp"
@@ -277,7 +278,7 @@ CommandCost CmdBuildRoadVehicle(DoCommandFlag flags, TileIndex tile, const Engin
 		int y = TileY(tile) * TILE_SIZE + TILE_SIZE / 2;
 		v->x_pos = x;
 		v->y_pos = y;
-		v->z_pos = GetSlopePixelZ(x, y);
+		v->z_pos = GetSlopePixelZ(x, y, true);
 
 		v->state = RVSB_IN_DEPOT;
 		v->vehstatus = VS_HIDDEN | VS_STOPPED | VS_DEFPAL;
@@ -298,8 +299,8 @@ CommandCost CmdBuildRoadVehicle(DoCommandFlag flags, TileIndex tile, const Engin
 
 		v->SetServiceInterval(Company::Get(v->owner)->settings.vehicle.servint_roadveh);
 
-		v->date_of_last_service = _date;
-		v->build_year = _cur_year;
+		v->date_of_last_service = TimerGameCalendar::date;
+		v->build_year = TimerGameCalendar::year;
 
 		v->sprite_cache.sprite_seq.Set(SPR_IMG_QUERY);
 		v->random_bits = VehicleRandomBits();
@@ -1205,7 +1206,7 @@ bool IndividualRoadVehicleController(RoadVehicle *v, const RoadVehicle *prev)
 		}
 
 		if (dir == INVALID_TRACKDIR) {
-			if (!v->IsFrontEngine()) error("Disconnecting road vehicle.");
+			if (!v->IsFrontEngine()) FatalError("Disconnecting road vehicle.");
 			v->cur_speed = 0;
 			return false;
 		}
@@ -1473,7 +1474,7 @@ again:
 		 * A vehicle has to spend at least 9 frames on a tile, so the following articulated part can follow.
 		 * (The following part may only be one tile behind, and the front part is moved before the following ones.)
 		 * The short (inner) curve has 8 frames, this elongates it to 10. */
-		v->UpdateInclination(false, true);
+		v->UpdateViewport(true, true);
 		return true;
 	}
 

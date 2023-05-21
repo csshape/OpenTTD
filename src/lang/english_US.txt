@@ -37,7 +37,7 @@ STR_CARGO_PLURAL_IRON_ORE                                       :Iron Ore
 STR_CARGO_PLURAL_STEEL                                          :Steel
 STR_CARGO_PLURAL_VALUABLES                                      :Valuables
 STR_CARGO_PLURAL_COPPER_ORE                                     :Copper Ore
-STR_CARGO_PLURAL_MAIZE                                          :Maize
+STR_CARGO_PLURAL_MAIZE                                          :Corn
 STR_CARGO_PLURAL_FRUIT                                          :Fruit
 STR_CARGO_PLURAL_DIAMONDS                                       :Diamonds
 STR_CARGO_PLURAL_FOOD                                           :Food
@@ -71,7 +71,7 @@ STR_CARGO_SINGULAR_IRON_ORE                                     :Iron Ore
 STR_CARGO_SINGULAR_STEEL                                        :Steel
 STR_CARGO_SINGULAR_VALUABLES                                    :Valuables
 STR_CARGO_SINGULAR_COPPER_ORE                                   :Copper Ore
-STR_CARGO_SINGULAR_MAIZE                                        :Maize
+STR_CARGO_SINGULAR_MAIZE                                        :Corn
 STR_CARGO_SINGULAR_FRUIT                                        :Fruit
 STR_CARGO_SINGULAR_DIAMOND                                      :Diamond
 STR_CARGO_SINGULAR_FOOD                                         :Food
@@ -105,7 +105,7 @@ STR_QUANTITY_IRON_ORE                                           :{WEIGHT_LONG} o
 STR_QUANTITY_STEEL                                              :{WEIGHT_LONG} of steel
 STR_QUANTITY_VALUABLES                                          :{COMMA}{NBSP}bag{P "" s} of valuables
 STR_QUANTITY_COPPER_ORE                                         :{WEIGHT_LONG} of copper ore
-STR_QUANTITY_MAIZE                                              :{WEIGHT_LONG} of maize
+STR_QUANTITY_MAIZE                                              :{WEIGHT_LONG} of corn
 STR_QUANTITY_FRUIT                                              :{WEIGHT_LONG} of fruit
 STR_QUANTITY_DIAMONDS                                           :{COMMA}{NBSP}bag{P "" s} of diamonds
 STR_QUANTITY_FOOD                                               :{WEIGHT_LONG} of food
@@ -195,6 +195,7 @@ STR_UNITS_VELOCITY_IMPERIAL                                     :{COMMA}{NBSP}mp
 STR_UNITS_VELOCITY_METRIC                                       :{COMMA}{NBSP}km/h
 STR_UNITS_VELOCITY_SI                                           :{COMMA}{NBSP}m/s
 STR_UNITS_VELOCITY_GAMEUNITS                                    :{DECIMAL}{NBSP}tiles/day
+STR_UNITS_VELOCITY_KNOTS                                        :{COMMA}{NBSP}knots
 
 STR_UNITS_POWER_IMPERIAL                                        :{COMMA}{NBSP}hp
 STR_UNITS_POWER_METRIC                                          :{COMMA}{NBSP}hp
@@ -343,9 +344,9 @@ STR_GOTO_ORDER_VIEW_TOOLTIP                                     :{BLACK}Open the
 ###length 31
 STR_TOOLBAR_TOOLTIP_PAUSE_GAME                                  :{BLACK}Pause game
 STR_TOOLBAR_TOOLTIP_FORWARD                                     :{BLACK}Fast forward the game
-STR_TOOLBAR_TOOLTIP_OPTIONS                                     :{BLACK}Options
-STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Save game, abandon game, quit
-STR_TOOLBAR_TOOLTIP_DISPLAY_MAP                                 :{BLACK}Display map, extra viewport, or list of signs
+STR_TOOLBAR_TOOLTIP_OPTIONS                                     :{BLACK}Options and settings
+STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Save, load or abandon game, exit program
+STR_TOOLBAR_TOOLTIP_DISPLAY_MAP                                 :{BLACK}Display map, extra viewport, cargo flow or list of signs
 STR_TOOLBAR_TOOLTIP_DISPLAY_TOWN_DIRECTORY                      :{BLACK}Display town directory
 STR_TOOLBAR_TOOLTIP_DISPLAY_SUBSIDIES                           :{BLACK}Display subsidies
 STR_TOOLBAR_TOOLTIP_DISPLAY_LIST_OF_COMPANY_STATIONS            :{BLACK}Display list of company's stations
@@ -353,9 +354,9 @@ STR_TOOLBAR_TOOLTIP_DISPLAY_COMPANY_FINANCES                    :{BLACK}Display 
 STR_TOOLBAR_TOOLTIP_DISPLAY_COMPANY_GENERAL                     :{BLACK}Display general company information
 STR_TOOLBAR_TOOLTIP_DISPLAY_STORY_BOOK                          :{BLACK}Display story book
 STR_TOOLBAR_TOOLTIP_DISPLAY_GOALS_LIST                          :{BLACK}Display goal list
-STR_TOOLBAR_TOOLTIP_DISPLAY_GRAPHS                              :{BLACK}Display graphs
+STR_TOOLBAR_TOOLTIP_DISPLAY_GRAPHS                              :{BLACK}Display company graphs and cargo payment rates
 STR_TOOLBAR_TOOLTIP_DISPLAY_COMPANY_LEAGUE                      :{BLACK}Display company league table
-STR_TOOLBAR_TOOLTIP_FUND_CONSTRUCTION_OF_NEW                    :{BLACK}Fund construction of new industry or list all industries
+STR_TOOLBAR_TOOLTIP_FUND_CONSTRUCTION_OF_NEW                    :{BLACK}Examine industries or fund construction of a new industry
 STR_TOOLBAR_TOOLTIP_DISPLAY_LIST_OF_COMPANY_TRAINS              :{BLACK}Display list of company's trains. Ctrl+Click toggles opening the group/vehicle list
 STR_TOOLBAR_TOOLTIP_DISPLAY_LIST_OF_COMPANY_ROAD_VEHICLES       :{BLACK}Display list of company's road vehicles. Ctrl+Click toggles opening the group/vehicle list
 STR_TOOLBAR_TOOLTIP_DISPLAY_LIST_OF_COMPANY_SHIPS               :{BLACK}Display list of company's ships. Ctrl+Click toggles opening the group/vehicle list
@@ -369,8 +370,8 @@ STR_TOOLBAR_TOOLTIP_BUILD_SHIP_DOCKS                            :{BLACK}Build sh
 STR_TOOLBAR_TOOLTIP_BUILD_AIRPORTS                              :{BLACK}Build airports
 STR_TOOLBAR_TOOLTIP_LANDSCAPING                                 :{BLACK}Open the landscaping toolbar to raise/lower land, plant trees, etc.
 STR_TOOLBAR_TOOLTIP_SHOW_SOUND_MUSIC_WINDOW                     :{BLACK}Show sound/music window
-STR_TOOLBAR_TOOLTIP_SHOW_LAST_MESSAGE_NEWS                      :{BLACK}Show last message/news report, show message options
-STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Land area information, console, script debug, screenshots, about OpenTTD
+STR_TOOLBAR_TOOLTIP_SHOW_LAST_MESSAGE_NEWS                      :{BLACK}Show last message/news report, messages history or delete all messages
+STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Land area information, screenshot, about OpenTTD and developer tools
 STR_TOOLBAR_TOOLTIP_SWITCH_TOOLBAR                              :{BLACK}Switch toolbars
 
 # Extra tooltips for the scenario editor toolbar
@@ -982,10 +983,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Select i
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Off
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Every month
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Every 3 months
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Every 6 months
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Every 12 months
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Language
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Select the interface language to use
@@ -1206,6 +1203,9 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Right
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Maximum initial loan: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Maximum amount a company can loan (without taking inflation into account)
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_VALUE                   :{CURRENCY_LONG}
+###setting-zero-is-special
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_DISABLED                :No loan {RED}Requires Game Script to provide initial funds
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Interest rate: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Loan interest rate; also controls inflation, if enabled
@@ -1708,7 +1708,7 @@ STR_CONFIG_SETTING_SCRIPT_MAX_MEMORY_HELPTEXT                   :How much memory
 STR_CONFIG_SETTING_SCRIPT_MAX_MEMORY_VALUE                      :{COMMA} MiB
 
 STR_CONFIG_SETTING_SERVINT_ISPERCENT                            :Maintenance intervals are in percents: {STRING}
-STR_CONFIG_SETTING_SERVINT_ISPERCENT_HELPTEXT                   :Choose whether maintenance of vehicles is triggered by the time passed since last maintenance or by reliability dropping by a certain percentage of the maximum reliability
+STR_CONFIG_SETTING_SERVINT_ISPERCENT_HELPTEXT                   :When enabled, vehicles try to service when their reliability drops by a given percentage of the maximum reliability.{}{}For example, if a vehicle's maximum reliability is 90% and the service interval is 20%, the vehicle will try to service when it reaches 72% reliability.
 
 STR_CONFIG_SETTING_SERVINT_TRAINS                               :Default maintenance interval for trains: {STRING}
 STR_CONFIG_SETTING_SERVINT_TRAINS_HELPTEXT                      :Set the default maintenance interval for new rail vehicles, if no explicit maintenance interval is set for the vehicle
@@ -1805,6 +1805,9 @@ STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :When enabled, a
 
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :Minimum company age to trade shares: {STRING}
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_HELPTEXT                :Set the minimum age of a company for others to be able to buy and sell shares from them.
+STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_VALUE                   :{COMMA} year{P "" s}
+###setting-zero-is-special
+STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_NO_MIN                  :No minimum
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Percentage of leg profit to pay in feeder systems: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Percentage of income given to the intermediate legs in feeder systems, giving more control over the income
@@ -1919,10 +1922,10 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :None
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Initial city size multiplier: {STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :Average size of cities relative to normal towns at start of the game
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :Update distribution graph every {STRING}{NBSP}day{P 0:2 "" s}
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL_HELPTEXT                  :Time between subsequent recalculations of the link graph. Each recalculation calculates the plans for one component of the graph. That means that a value X for this setting does not mean the whole graph will be updated every X days. Only some component will. The shorter you set it the more CPU time will be necessary to calculate it. The longer you set it the longer it will take until the cargo distribution starts on new routes.
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :Take {STRING}{NBSP}day{P 0:2 "" s} for recalculation of distribution graph
-STR_CONFIG_SETTING_LINKGRAPH_TIME_HELPTEXT                      :Time taken for each recalculation of a link graph component. When a recalculation is started, a thread is spawned which is allowed to run for this number of days. The shorter you set this the more likely it is that the thread is not finished when it's supposed to. Then the game stops until it is ("lag"). The longer you set it the longer it takes for the distribution to be updated when routes change.
+STR_CONFIG_SETTING_LINKGRAPH_RECALC_INTERVAL                    :Update distribution graph every {STRING}{NBSP}second{P 0:2 "" s}
+STR_CONFIG_SETTING_LINKGRAPH_RECALC_INTERVAL_HELPTEXT           :Time between subsequent recalculations of the link graph. Each recalculation calculates the plans for one component of the graph. That means that a value X for this setting does not mean the whole graph will be updated every X seconds. Only some component will. The shorter you set it the more CPU time will be necessary to calculate it. The longer you set it the longer it will take until the cargo distribution starts on new routes.
+STR_CONFIG_SETTING_LINKGRAPH_RECALC_TIME                        :Take {STRING}{NBSP}second{P 0:2 "" s} for recalculation of distribution graph
+STR_CONFIG_SETTING_LINKGRAPH_RECALC_TIME_HELPTEXT               :Time taken for each recalculation of a link graph component. When a recalculation is started, a thread is spawned which is allowed to run for this number of seconds. The shorter you set this the more likely it is that the thread is not finished when it's supposed to. Then the game stops until it is ("lag"). The longer you set it the longer it takes for the distribution to be updated when routes change.
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :Distribution mode for passengers: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :"Symmetric" means that roughly the same number of passengers will go from a station A to a station B as from B to A. "Asymmetric" means that arbitrary numbers of passengers can go in either direction. "Manual" means that no automatic distribution will take place for passengers.
@@ -1948,13 +1951,15 @@ STR_CONFIG_SETTING_DEMAND_SIZE_HELPTEXT                         :Setting this to
 STR_CONFIG_SETTING_SHORT_PATH_SATURATION                        :Saturation of short paths before using high-capacity paths: {STRING}
 STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :Frequently there are multiple paths between two given stations. Cargodist will saturate the shortest path first, then use the second shortest path until that is saturated and so on. Saturation is determined by an estimation of capacity and planned usage. Once it has saturated all paths, if there is still demand left, it will overload all paths, preferring the ones with high capacity. Most of the time the algorithm will not estimate the capacity accurately, though. This setting allows you to specify up to which percentage a shorter path must be saturated in the first pass before choosing the next longer one. Set it to less than 100% to avoid overcrowded stations in case of overestimated capacity.
 
-STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Speed units: {STRING}
+STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Speed units (land): {STRING}
+STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_NAUTICAL         :Speed units (nautical): {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Whenever a speed is shown in the user interface, show it in the selected units
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :Imperial (mph)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :Metric (km/h)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (m/s)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_GAMEUNITS        :Game units (tiles/day)
+STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_KNOTS            :Knots
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_POWER                     :Vehicle power units: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_POWER_HELPTEXT            :Whenever a vehicle's power is shown in the user interface, show it in the selected units
@@ -2355,7 +2360,8 @@ STR_NETWORK_CLIENT_LIST_NEW_COMPANY                             :(New company)
 STR_NETWORK_CLIENT_LIST_NEW_COMPANY_TOOLTIP                     :{BLACK}Create a new company and join it
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_SELF_TOOLTIP                :{BLACK}This is you
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_HOST_TOOLTIP                :{BLACK}This is the host of the game
-STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} client{P "" s} / {NUM} compan{P y ies}
+STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} client{P "" s} - {NUM}/{NUM} compan{P y ies}
+STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT_TOOLTIP            :{BLACK}The number of currently connected clients, number of companies and maximum number of companies allowed by the server administrator
 
 # Matches ConnectionType
 ###length 5
@@ -3349,8 +3355,8 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Warning: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Error: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Fatal: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}A fatal NewGRF error has occurred:{}{STRING}
-STR_NEWGRF_ERROR_POPUP                                          :{WHITE}A NewGRF error has occurred:{}{STRING}
+STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}The NewGRF "{STRING}" has returned a fatal error:{}{STRING}
+STR_NEWGRF_ERROR_POPUP                                          :{WHITE}The NewGRF "{STRING}" has returned an error:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} will not work with the TTDPatch version reported by OpenTTD
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} is for the {2:STRING} version of TTD
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} is designed to be used with {2:STRING}
@@ -4359,7 +4365,7 @@ STR_ORDER_DROP_REFIT_AUTO_ANY                                   :Available cargo
 
 STR_ORDER_SERVICE                                               :{BLACK}Maintenance
 STR_ORDER_DROP_GO_ALWAYS_DEPOT                                  :Always go
-STR_ORDER_DROP_SERVICE_DEPOT                                    :Maintain if needed
+STR_ORDER_DROP_SERVICE_DEPOT                                    :Repair if needed
 STR_ORDER_DROP_HALT_DEPOT                                       :Stop
 STR_ORDER_SERVICE_TOOLTIP                                       :{BLACK}Skip this order unless maintenance is needed
 
@@ -4526,7 +4532,7 @@ STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Clear Sp
 STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Clear the maximum travel speed of the highlighted order. Ctrl+Click clears the speed for all orders
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Reset Late Counter
-STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Reset the lateness counter, so the vehicle will be on time
+STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Reset the lateness counter, so the vehicle will be on time. Ctrl+Click will reset the entire group so the latest vehicle will be on time and all others will be early
 
 STR_TIMETABLE_AUTOFILL                                          :{BLACK}Autofill
 STR_TIMETABLE_AUTOFILL_TOOLTIP                                  :{BLACK}Fill the timetable automatically with the values from the next journey. Ctrl+Click to try to keep waiting times
@@ -4580,7 +4586,9 @@ STR_AI_CONFIG_AILIST_TOOLTIP                                    :{BLACK}The AIs 
 STR_AI_CONFIG_HUMAN_PLAYER                                      :Human player
 STR_AI_CONFIG_RANDOM_AI                                         :Random AI
 STR_AI_CONFIG_NONE                                              :(none)
+STR_AI_CONFIG_NAME_VERSION                                      :{STRING} {YELLOW}v{NUM}
 STR_AI_CONFIG_MAX_COMPETITORS                                   :{LTBLUE}Maximum no. competitors: {ORANGE}{COMMA}
+STR_AI_CONFIG_COMPETITORS_INTERVAL                              :{LTBLUE}Interval between starting of competitors: {ORANGE}{COMMA} minute{P "" s}
 
 STR_AI_CONFIG_MOVE_UP                                           :{BLACK}Move Up
 STR_AI_CONFIG_MOVE_UP_TOOLTIP                                   :{BLACK}Move selected AI up in the list
@@ -4593,7 +4601,7 @@ STR_AI_CONFIG_AI                                                :{SILVER}AIs
 
 STR_AI_CONFIG_CHANGE_AI                                         :{BLACK}Select AI
 STR_AI_CONFIG_CHANGE_GAMESCRIPT                                 :{BLACK}Select Game Script
-STR_AI_CONFIG_CHANGE_TOOLTIP                                    :{BLACK}Load another script
+STR_AI_CONFIG_CHANGE_TOOLTIP                                    :{BLACK}Load another script. Ctrl+Click to show all available versions
 STR_AI_CONFIG_CONFIGURE                                         :{BLACK}Configure
 STR_AI_CONFIG_CONFIGURE_TOOLTIP                                 :{BLACK}Configure the parameters of the Script
 
@@ -4620,12 +4628,13 @@ STR_SCREENSHOT_WORLD_SCREENSHOT                                 :{BLACK}Whole ma
 STR_SCREENSHOT_HEIGHTMAP_SCREENSHOT                             :{BLACK}Heightmap screenshot
 STR_SCREENSHOT_MINIMAP_SCREENSHOT                               :{BLACK}Minimap screenshot
 
-# AI Parameters
-STR_AI_SETTINGS_CAPTION_AI                                      :{WHITE}AI Parameters
+# Script Parameters
+STR_AI_SETTINGS_CAPTION                                         :{WHITE}{STRING} Parameters
+STR_AI_SETTINGS_CAPTION_AI                                      :AI
+STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :Game Script
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Close
 STR_AI_SETTINGS_RESET                                           :{BLACK}Reset
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Number of days to start this AI after the previous one (give or take): {ORANGE}{STRING}
 
 
 # Textfile window
@@ -5079,10 +5088,25 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Can't co
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... too far from previous destination
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... aircraft has not enough range
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+STR_ERROR_NO_RAIL_STATION                                       :{WHITE}There is no railroad station
+STR_ERROR_NO_BUS_STATION                                        :{WHITE}There is no bus station
+STR_ERROR_NO_TRUCK_STATION                                      :{WHITE}There is no truck station
+STR_ERROR_NO_DOCK                                               :{WHITE}There is no dock
+STR_ERROR_NO_AIRPORT                                            :{WHITE}There is no airport/heliport
+STR_ERROR_NO_STOP_COMPATIBLE_ROAD_TYPE                          :{WHITE}There are no stops with a compatible road type
+STR_ERROR_NO_STOP_COMPATIBLE_TRAM_TYPE                          :{WHITE}There are no stops with a compatible tram type
+STR_ERROR_NO_STOP_ARTICULATED_VEHICLE                           :{WHITE}There are no stops which are suitable for articulated road vehicles.{}Articulated road vehicles require a drive-through stop, not a bay stop
+STR_ERROR_AIRPORT_NO_PLANES                                     :{WHITE}This plane cannot land at this heliport
+STR_ERROR_AIRPORT_NO_HELICOPTERS                                :{WHITE}This helicopter cannot land at this airport
+STR_ERROR_NO_RAIL_WAYPOINT                                      :{WHITE}There is no railroad waypoint
+STR_ERROR_NO_BUOY                                               :{WHITE}There is no buoy
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Can't timetable vehicle...
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Vehicles can only wait at stations
 STR_ERROR_TIMETABLE_NOT_STOPPING_HERE                           :{WHITE}This vehicle is not stopping at this station
+STR_ERROR_TIMETABLE_INCOMPLETE                                  :{WHITE}... timetable is incomplete
 
 # Sign related errors
 STR_ERROR_TOO_MANY_SIGNS                                        :{WHITE}... too many signs
@@ -5494,10 +5518,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Powernaut Helic
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{1:STRING}/{0:STRING}/{2:NUM}
+STR_FORMAT_DATE_TINY                                            :{1:ZEROFILL_NUM}/{0:ZEROFILL_NUM}/{2:NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{1:STRING} {0:STRING}, {2:NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Company {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Group {COMMA}
@@ -5579,7 +5603,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

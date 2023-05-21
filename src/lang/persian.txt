@@ -922,10 +922,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK} انت�
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :خاموش
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :هر ماه
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :هر ۳ ماه
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :هر ۶ ماه
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :هر ۱۲ ماه
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}زبان
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}زبان واسط کاربری را برای استفاده انتخاب کنید
@@ -1105,6 +1101,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_CENTER                        :مرکز
 STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :راست
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :حداکثر اعتبار اولیه: {STRING}
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :نرخ سود: {STRING}
 
@@ -1477,6 +1474,7 @@ STR_CONFIG_SETTING_STARTING_YEAR                                :سال شروع
 
 STR_CONFIG_SETTING_ALLOW_SHARES                                 :قابلیت خرید سهام بقیه شرکت‌ها: {STRING}
 
+###setting-zero-is-special
 
 
 
@@ -1550,7 +1548,7 @@ STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :مضرب ابت
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :واحدهای سرعت: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :هر زمان که سرعت در محیط بازی نمایش داده شود، آن را با واحد انتخاب شده نمایش بده
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :امپریال (mph)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :متریک (km/h)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (m/s)
@@ -2697,7 +2695,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}هشدار: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}خطا: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}خطای وخیم: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}یک خطای وخیم در NewGRF اتفاق افتاده:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} با TTDPatch که ویرایش آن توسط OpenTTD گزارش شده کار نمی کند
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} برای ویرایش {STRING}TTD می باشد
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} طراحی شده برای استفاده با {STRING}
@@ -3475,11 +3472,10 @@ STR_AI_LIST_CANCEL                                              :{BLACK}لغو
 STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}کد را تغییر نده
 
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :هوش مصنوعی(AI)
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}بستن
 STR_AI_SETTINGS_RESET                                           :{BLACK}بازنشاندن
-STR_AI_SETTINGS_START_DELAY                                     :تعداد روزهایی که این بازیگر هوش مصنوعی پس از بازیگر هوش مصنوعی قبلی قبل از اتصال صبر می کند(کم و بیش): {ORANGE}{STRING}
 
 
 # Textfile window
@@ -3790,6 +3786,8 @@ STR_ERROR_CAN_T_STOP_SHARING_ORDER_LIST                         :{WHITE}نمی �
 STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}نمی توان برنامه حرکت را کپی کرد...
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}از هدف قبلی بسیار دور است...
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... هواپیما برد کافی ندارد
+
+# Extra messages which go on the third line of errors, explaining why orders failed
 
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}نمی شود مدیریت زمانی وسیله را تغییر داد...
@@ -4204,10 +4202,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :هلیکوپت�
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(شرکت {COMMA})
 STR_FORMAT_GROUP_NAME                                           :گروه {COMMA}
@@ -4288,7 +4286,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

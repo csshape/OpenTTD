@@ -930,10 +930,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Инте
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :изключено
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :всеки месец
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :всеки 3 месеца
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :всеки 6 месеца
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :всеки 12 месеца
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Език
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Избор на език
@@ -1128,6 +1124,7 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :дясно
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Максимален начален заем: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Максимално количество заем за компания (без отчитане на инфлацията)
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Лихвен процент: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Лихвен процент на заемите; също така контролира инфлацията ако е разрешена
@@ -1655,6 +1652,7 @@ STR_CONFIG_SETTING_STARTING_YEAR                                :Начална 
 STR_CONFIG_SETTING_ALLOW_SHARES                                 :Разреши купуване на акции от други компании: {STRING}
 STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :Ако тази опция бъде активирана, ще можете да купувате и продавате дялове на компании. Това ще бъде възможно единствено когато дадената компания достигне определена възраст
 
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Процент от leg profit to pay in feeder systems: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Процент от приходите, който се плаща на intermediate legs in feeder systems, давайки ви повече контрол върху приходите
@@ -1752,7 +1750,6 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :Без
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Множител за големината на града: {STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :Относителен размер на мегаполисите в сравнение с градовете в началото на играта
 
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :Вземи {STRING}{NBSP}дни{P 0:2 "" s} за преизчисляване на графа за резпределение
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :"симетрично" означава, че приблизително един и същ брой пътници ще пътуват от спирка А до спирка Б и обратно. "асиметрично" означава, че произволен брой пътници могат да пътуват във всяка от посоките. "ръчно" означава, че няма да има автоматично разпределение за пътниците.
 STR_CONFIG_SETTING_DISTRIBUTION_DEFAULT                         :Режим на разпределение на други класове товари: {STRING}
@@ -1766,7 +1763,7 @@ STR_CONFIG_SETTING_DEMAND_SIZE                                  :Количес�
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Единици за скорост: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Всеки път при показване на скорости, да бъдат изписвани в избраните мерни единици
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :Imperial (mph)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :Metric (km/h)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (m/s)
@@ -2948,7 +2945,6 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Внимание: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Грешка: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Критично: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Настъпи фатална грешка в NewGRF:{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} няма да работи с версията на TTDPatch указана от OpenTTD.
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} е за {STRING} версията на TTD.
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} е проектиран да работи с {STRING}
@@ -4109,12 +4105,11 @@ STR_AI_LIST_CANCEL                                              :{BLACK}Отме
 STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}Не променяй AI
 
 
-# AI Parameters
+# Script Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :AI
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Затвори
 STR_AI_SETTINGS_RESET                                           :{BLACK}Рестартиране
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Броят дни докато този ИИ бъде стартиран след предишния (give or take): {ORANGE}{STRING}
 
 
 # Textfile window
@@ -4551,6 +4546,8 @@ STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Не м�
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... прекалено далече от предходната цел
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... самолета няма достатъчен обхват
 
+# Extra messages which go on the third line of errors, explaining why orders failed
+
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Не може да добави разписание на превозно средство...
 STR_ERROR_TIMETABLE_ONLY_WAIT_AT_STATIONS                       :{WHITE}Превозни средства могат да чакат само на гари.
@@ -4965,10 +4962,10 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Пауерна�
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(Компания {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Група {COMMA}
@@ -5049,7 +5046,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

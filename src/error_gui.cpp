@@ -21,6 +21,8 @@
 #include "window_func.h"
 #include "console_func.h"
 #include "window_gui.h"
+#include "timer/timer.h"
+#include "timer/timer_window.h"
 
 #include "widgets/error_widget.h"
 
@@ -71,8 +73,8 @@ static WindowDesc _errmsg_face_desc(
  * @param data The data to copy.
  */
 ErrorMessageData::ErrorMessageData(const ErrorMessageData &data) :
-	display_timer(data.display_timer), textref_stack_grffile(data.textref_stack_grffile), textref_stack_size(data.textref_stack_size),
-	summary_msg(data.summary_msg), detailed_msg(data.detailed_msg), position(data.position), face(data.face)
+	is_critical(data.is_critical), textref_stack_grffile(data.textref_stack_grffile), textref_stack_size(data.textref_stack_size),
+	summary_msg(data.summary_msg), detailed_msg(data.detailed_msg), extra_msg(data.extra_msg), position(data.position), face(data.face)
 {
 	memcpy(this->textref_stack, data.textref_stack, sizeof(this->textref_stack));
 	memcpy(this->decode_params, data.decode_params, sizeof(this->decode_params));
@@ -95,18 +97,21 @@ ErrorMessageData::~ErrorMessageData()
  * Display an error message in a window.
  * @param summary_msg  General error message showed in first line. Must be valid.
  * @param detailed_msg Detailed error message showed in second line. Can be INVALID_STRING_ID.
- * @param duration     The amount of time to show this error message.
+ * @param is_critical  Whether the error is critical. Critical messages never go away on their own.
  * @param x            World X position (TileVirtX) of the error location. Set both x and y to 0 to just center the message when there is no related error tile.
  * @param y            World Y position (TileVirtY) of the error location. Set both x and y to 0 to just center the message when there is no related error tile.
  * @param textref_stack_grffile NewGRF that provides the #TextRefStack for the error message.
  * @param textref_stack_size Number of uint32 values to put on the #TextRefStack for the error message; 0 if the #TextRefStack shall not be used.
  * @param textref_stack Values to put on the #TextRefStack.
+ * @param extra_msg    Extra error message showed in third line. Can be INVALID_STRING_ID.
  */
-ErrorMessageData::ErrorMessageData(StringID summary_msg, StringID detailed_msg, uint duration, int x, int y, const GRFFile *textref_stack_grffile, uint textref_stack_size, const uint32 *textref_stack) :
+ErrorMessageData::ErrorMessageData(StringID summary_msg, StringID detailed_msg, bool is_critical, int x, int y, const GRFFile *textref_stack_grffile, uint textref_stack_size, const uint32 *textref_stack, StringID extra_msg) :
+	is_critical(is_critical),
 	textref_stack_grffile(textref_stack_grffile),
 	textref_stack_size(textref_stack_size),
 	summary_msg(summary_msg),
 	detailed_msg(detailed_msg),
+	extra_msg(extra_msg),
 	face(INVALID_COMPANY)
 {
 	this->position.x = x;
@@ -118,8 +123,6 @@ ErrorMessageData::ErrorMessageData(StringID summary_msg, StringID detailed_msg, 
 	if (textref_stack_size > 0) MemCpyT(this->textref_stack, textref_stack, textref_stack_size);
 
 	assert(summary_msg != INVALID_STRING_ID);
-
-	this->display_timer.SetInterval(duration * 3000);
 }
 
 /**
@@ -184,11 +187,23 @@ struct ErrmsgWindow : public Window, ErrorMessageData {
 private:
 	uint height_summary;            ///< Height of the #summary_msg string in pixels in the #WID_EM_MESSAGE widget.
 	uint height_detailed;           ///< Height of the #detailed_msg string in pixels in the #WID_EM_MESSAGE widget.
+	uint height_extra;              ///< Height of the #extra_msg string in pixels in the #WID_EM_MESSAGE widget.
+	TimeoutTimer<TimerWindow> display_timeout;
 
 public:
-	ErrmsgWindow(const ErrorMessageData &data) : Window(data.HasFace() ? &_errmsg_face_desc : &_errmsg_desc), ErrorMessageData(data)
+	ErrmsgWindow(const ErrorMessageData &data) :
+		Window(data.HasFace() ? &_errmsg_face_desc : &_errmsg_desc),
+		ErrorMessageData(data),
+		display_timeout(std::chrono::seconds(3 * _settings_client.gui.errmsg_duration), [this]() {
+			this->Close();
+		})
 	{
 		this->InitNested();
+
+		/* Only start the timeout if the message is not critical. */
+		if (!this->is_critical) {
+			this->display_timeout.Reset();
+		}
 	}
 
 	void UpdateWidgetSize(int widget, Dimension *size, const Dimension &padding, Dimension *fill, Dimension *resize) override
@@ -200,17 +215,19 @@ public:
 
 				this->height_summary = GetStringHeight(this->summary_msg, size->width);
 				this->height_detailed = (this->detailed_msg == INVALID_STRING_ID) ? 0 : GetStringHeight(this->detailed_msg, size->width);
+				this->height_extra = (this->extra_msg == INVALID_STRING_ID) ? 0 : GetStringHeight(this->extra_msg, size->width);
 
 				if (this->textref_stack_size > 0) StopTextRefStackUsage();
 
 				uint panel_height = this->height_summary;
 				if (this->detailed_msg != INVALID_STRING_ID) panel_height += this->height_detailed + WidgetDimensions::scaled.vsep_wide;
+				if (this->extra_msg != INVALID_STRING_ID) panel_height += this->height_extra + WidgetDimensions::scaled.vsep_wide;
 
 				size->height = std::max(size->height, panel_height);
 				break;
 			}
 			case WID_EM_FACE: {
-				Dimension face_size = GetSpriteSize(SPR_GRADIENT);
+				Dimension face_size = GetScaledSpriteSize(SPR_GRADIENT);
 				size->width = std::max(size->width, face_size.width);
 				size->height = std::max(size->height, face_size.height);
 				break;
@@ -270,7 +287,7 @@ public:
 		switch (widget) {
 			case WID_EM_FACE: {
 				const Company *c = Company::Get(this->face);
-				DrawCompanyManagerFace(c->face, c->colour, r.left, r.top);
+				DrawCompanyManagerFace(c->face, c->colour, r);
 				break;
 			}
 
@@ -280,13 +297,24 @@ public:
 
 				if (this->detailed_msg == INVALID_STRING_ID) {
 					DrawStringMultiLine(r, this->summary_msg, TC_FROMSTRING, SA_CENTER);
-				} else {
+				} else if (this->extra_msg == INVALID_STRING_ID) {
 					/* Extra space when message is shorter than company face window */
 					int extra = (r.Height() - this->height_summary - this->height_detailed - WidgetDimensions::scaled.vsep_wide) / 2;
 
 					/* Note: NewGRF supplied error message often do not start with a colour code, so default to white. */
 					DrawStringMultiLine(r.WithHeight(this->height_summary + extra, false), this->summary_msg, TC_WHITE, SA_CENTER);
 					DrawStringMultiLine(r.WithHeight(this->height_detailed + extra, true), this->detailed_msg, TC_WHITE, SA_CENTER);
+				} else {
+					/* Extra space when message is shorter than company face window */
+					int extra = (r.Height() - this->height_summary - this->height_detailed - this->height_extra - (WidgetDimensions::scaled.vsep_wide * 2)) / 3;
+
+					/* Note: NewGRF supplied error message often do not start with a colour code, so default to white. */
+					Rect top_section = r.WithHeight(this->height_summary + extra, false);
+					Rect bottom_section = r.WithHeight(this->height_extra + extra, true);
+					Rect middle_section = { top_section.left, top_section.bottom, top_section.right, bottom_section.top };
+					DrawStringMultiLine(top_section, this->summary_msg, TC_WHITE, SA_CENTER);
+					DrawStringMultiLine(middle_section, this->detailed_msg, TC_WHITE, SA_CENTER);
+					DrawStringMultiLine(bottom_section, this->extra_msg, TC_WHITE, SA_CENTER);
 				}
 
 				if (this->textref_stack_size > 0) StopTextRefStackUsage();
@@ -300,14 +328,7 @@ public:
 	void OnMouseLoop() override
 	{
 		/* Disallow closing the window too easily, if timeout is disabled */
-		if (_right_button_down && !this->display_timer.HasElapsed()) this->Close();
-	}
-
-	void OnRealtimeTick(uint delta_ms) override
-	{
-		if (this->display_timer.CountElapsed(delta_ms) == 0) return;
-
-		this->Close();
+		if (_right_button_down && !this->is_critical) this->Close();
 	}
 
 	void Close() override
@@ -323,7 +344,7 @@ public:
 	 */
 	bool IsCritical()
 	{
-		return this->display_timer.HasElapsed();
+		return this->is_critical;
 	}
 };
 
@@ -363,6 +384,19 @@ void UnshowCriticalError()
 
 /**
  * Display an error message in a window.
+ * Note: CommandCost errors are always severity level WL_INFO.
+ * @param summary_msg  General error message showed in first line. Must be valid.
+ * @param x            World X position (TileVirtX) of the error location. Set both x and y to 0 to just center the message when there is no related error tile.
+ * @param y            World Y position (TileVirtY) of the error location. Set both x and y to 0 to just center the message when there is no related error tile.
+ * @param cc           CommandCost containing the optional detailed and extra error messages shown in the second and third lines (can be INVALID_STRING_ID) and TextRefStack info.
+ */
+void ShowErrorMessage(StringID summary_msg, int x, int y, CommandCost cc)
+{
+	ShowErrorMessage(summary_msg, cc.GetErrorMessage(), WL_INFO, x, y, cc.GetTextRefStackGRF(), cc.GetTextRefStackSize(), cc.GetTextRefStack(), cc.GetExtraErrorMessage());
+}
+
+/**
+ * Display an error message in a window.
  * @param summary_msg  General error message showed in first line. Must be valid.
  * @param detailed_msg Detailed error message showed in second line. Can be INVALID_STRING_ID.
  * @param wl           Message severity.
@@ -371,8 +405,9 @@ void UnshowCriticalError()
  * @param textref_stack_grffile NewGRF providing the #TextRefStack for the error message.
  * @param textref_stack_size Number of uint32 values to put on the #TextRefStack for the error message; 0 if the #TextRefStack shall not be used.
  * @param textref_stack Values to put on the #TextRefStack.
+ * @param extra_msg    Extra error message shown in third line. Can be INVALID_STRING_ID.
  */
-void ShowErrorMessage(StringID summary_msg, StringID detailed_msg, WarningLevel wl, int x, int y, const GRFFile *textref_stack_grffile, uint textref_stack_size, const uint32 *textref_stack)
+void ShowErrorMessage(StringID summary_msg, StringID detailed_msg, WarningLevel wl, int x, int y, const GRFFile *textref_stack_grffile, uint textref_stack_size, const uint32 *textref_stack, StringID extra_msg)
 {
 	assert(textref_stack_size == 0 || (textref_stack_grffile != nullptr && textref_stack != nullptr));
 	if (summary_msg == STR_NULL) summary_msg = STR_EMPTY;
@@ -388,18 +423,22 @@ void ShowErrorMessage(StringID summary_msg, StringID detailed_msg, WarningLevel 
 			b += seprintf(b, lastof(buf), " ");
 			GetString(b, detailed_msg, lastof(buf));
 		}
+		if (extra_msg != INVALID_STRING_ID) {
+			b += seprintf(b, lastof(buf), " ");
+			GetString(b, extra_msg, lastof(buf));
+		}
 
 		if (textref_stack_size > 0) StopTextRefStackUsage();
 
 		IConsolePrint(wl == WL_WARNING ? CC_WARNING : CC_ERROR, buf);
 	}
 
-	bool no_timeout = wl == WL_CRITICAL;
+	bool is_critical = wl == WL_CRITICAL;
 
 	if (_game_mode == GM_BOOTSTRAP) return;
-	if (_settings_client.gui.errmsg_duration == 0 && !no_timeout) return;
+	if (_settings_client.gui.errmsg_duration == 0 && !is_critical) return;
 
-	ErrorMessageData data(summary_msg, detailed_msg, no_timeout ? 0 : _settings_client.gui.errmsg_duration, x, y, textref_stack_grffile, textref_stack_size, textref_stack);
+	ErrorMessageData data(summary_msg, detailed_msg, is_critical, x, y, textref_stack_grffile, textref_stack_size, textref_stack, extra_msg);
 	data.CopyOutDParams();
 
 	ErrmsgWindow *w = (ErrmsgWindow*)FindWindowById(WC_ERRMSG, 0);

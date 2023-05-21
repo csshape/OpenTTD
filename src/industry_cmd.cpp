@@ -44,6 +44,9 @@
 #include "industry_cmd.h"
 #include "landscape_cmd.h"
 #include "terraform_cmd.h"
+#include "timer/timer.h"
+#include "timer/timer_game_calendar.h"
+#include "timer/timer_game_tick.h"
 
 #include "table/strings.h"
 #include "table/industry_land.h"
@@ -74,21 +77,16 @@ IndustryBuildData _industry_builder; ///< In-game manager of industries.
  */
 void ResetIndustries()
 {
-	for (IndustryType i = 0; i < NUM_INDUSTRYTYPES; i++) {
-		/* Reset the spec to default */
-		if (i < lengthof(_origin_industry_specs)) {
-			_industry_specs[i] = _origin_industry_specs[i];
-		} else {
-			_industry_specs[i] = IndustrySpec{};
-		}
+	auto industry_insert = std::copy(std::begin(_origin_industry_specs), std::end(_origin_industry_specs), std::begin(_industry_specs));
+	std::fill(industry_insert, std::end(_industry_specs), IndustrySpec{});
 
+	for (IndustryType i = 0; i < lengthof(_origin_industry_specs); i++) {
 		/* Enable only the current climate industries */
-		_industry_specs[i].enabled = i < NEW_INDUSTRYOFFSET &&
-				HasBit(_origin_industry_specs[i].climate_availability, _settings_game.game_creation.landscape);
+		_industry_specs[i].enabled = HasBit(_industry_specs[i].climate_availability, _settings_game.game_creation.landscape);
 	}
 
-	memset(&_industry_tile_specs, 0, sizeof(_industry_tile_specs));
-	memcpy(&_industry_tile_specs, &_origin_industry_tile_specs, sizeof(_origin_industry_tile_specs));
+	auto industry_tile_insert = std::copy(std::begin(_origin_industry_tile_specs), std::end(_origin_industry_tile_specs), std::begin(_industry_tile_specs));
+	std::fill(industry_tile_insert, std::end(_industry_tile_specs), IndustryTileSpec{});
 
 	/* Reset any overrides that have been set. */
 	_industile_mngr.ResetOverride();
@@ -103,7 +101,7 @@ void ResetIndustries()
  * @pre IsTileType(tile, MP_INDUSTRY)
  * @return general type for this industry, as defined in industry.h
  */
-IndustryType GetIndustryType(TileIndex tile)
+IndustryType GetIndustryType(Tile tile)
 {
 	assert(IsTileType(tile, MP_INDUSTRY));
 
@@ -195,8 +193,8 @@ Industry::~Industry()
 	CloseWindowById(WC_INDUSTRY_VIEW, this->index);
 	DeleteNewGRFInspectWindow(GSF_INDUSTRIES, this->index);
 
-	DeleteSubsidyWith(ST_INDUSTRY, this->index);
-	CargoPacket::InvalidateAllFrom(ST_INDUSTRY, this->index);
+	DeleteSubsidyWith(SourceType::Industry, this->index);
+	CargoPacket::InvalidateAllFrom(SourceType::Industry, this->index);
 
 	for (Station *st : this->stations_near) {
 		st->RemoveIndustryToDeliver(this);
@@ -385,7 +383,7 @@ static void DrawTile_Industry(TileInfo *ti)
 	}
 }
 
-static int GetSlopePixelZ_Industry(TileIndex tile, uint x, uint y)
+static int GetSlopePixelZ_Industry(TileIndex tile, uint x, uint y, bool ground_vehicle)
 {
 	return GetTileMaxPixelZ(tile);
 }
@@ -544,7 +542,7 @@ static bool TransportIndustryGoods(TileIndex tile)
 
 			i->this_month_production[j] += cw;
 
-			uint am = MoveGoodsToStation(i->produced_cargo[j], cw, ST_INDUSTRY, i->index, &i->stations_near, i->exclusive_consumer);
+			uint am = MoveGoodsToStation(i->produced_cargo[j], cw, SourceType::Industry, i->index, &i->stations_near, i->exclusive_consumer);
 			i->this_month_transported[j] += am;
 
 			moved_cargo |= (am != 0);
@@ -554,6 +552,145 @@ static bool TransportIndustryGoods(TileIndex tile)
 	return moved_cargo;
 }
 
+static void AnimateSugarSieve(TileIndex tile)
+{
+	byte m = GetAnimationFrame(tile) + 1;
+
+	if (_settings_client.sound.ambient) {
+		switch (m & 7) {
+			case 2: SndPlayTileFx(SND_2D_SUGAR_MINE_1, tile); break;
+			case 6: SndPlayTileFx(SND_29_SUGAR_MINE_2, tile); break;
+		}
+	}
+
+	if (m >= 96) {
+		m = 0;
+		DeleteAnimatedTile(tile);
+	}
+	SetAnimationFrame(tile, m);
+
+	MarkTileDirtyByTile(tile);
+}
+
+static void AnimateToffeeQuarry(TileIndex tile)
+{
+	byte m = GetAnimationFrame(tile);
+
+	if (_industry_anim_offs_toffee[m] == 0xFF && _settings_client.sound.ambient) {
+		SndPlayTileFx(SND_30_TOFFEE_QUARRY, tile);
+	}
+
+	if (++m >= 70) {
+		m = 0;
+		DeleteAnimatedTile(tile);
+	}
+	SetAnimationFrame(tile, m);
+
+	MarkTileDirtyByTile(tile);
+}
+
+static void AnimateBubbleCatcher(TileIndex tile)
+{
+	byte m = GetAnimationFrame(tile);
+
+	if (++m >= 40) {
+		m = 0;
+		DeleteAnimatedTile(tile);
+	}
+	SetAnimationFrame(tile, m);
+
+	MarkTileDirtyByTile(tile);
+}
+
+static void AnimatePowerPlantSparks(TileIndex tile)
+{
+	byte m = GetAnimationFrame(tile);
+	if (m == 6) {
+		SetAnimationFrame(tile, 0);
+		DeleteAnimatedTile(tile);
+	} else {
+		SetAnimationFrame(tile, m + 1);
+		MarkTileDirtyByTile(tile);
+	}
+}
+
+static void AnimateToyFactory(TileIndex tile)
+{
+	byte m = GetAnimationFrame(tile) + 1;
+
+	switch (m) {
+		case  1: if (_settings_client.sound.ambient) SndPlayTileFx(SND_2C_TOY_FACTORY_1, tile); break;
+		case 23: if (_settings_client.sound.ambient) SndPlayTileFx(SND_2B_TOY_FACTORY_2, tile); break;
+		case 28: if (_settings_client.sound.ambient) SndPlayTileFx(SND_2A_TOY_FACTORY_3, tile); break;
+		default:
+			if (m >= 50) {
+				int n = GetIndustryAnimationLoop(tile) + 1;
+				m = 0;
+				if (n >= 8) {
+					n = 0;
+					DeleteAnimatedTile(tile);
+				}
+				SetIndustryAnimationLoop(tile, n);
+			}
+	}
+
+	SetAnimationFrame(tile, m);
+	MarkTileDirtyByTile(tile);
+}
+
+static void AnimatePlasticFountain(TileIndex tile, IndustryGfx gfx)
+{
+	gfx = (gfx < GFX_PLASTIC_FOUNTAIN_ANIMATED_8) ? gfx + 1 : GFX_PLASTIC_FOUNTAIN_ANIMATED_1;
+	SetIndustryGfx(tile, gfx);
+	MarkTileDirtyByTile(tile);
+}
+
+static void AnimateOilWell(TileIndex tile, IndustryGfx gfx)
+{
+	bool b = Chance16(1, 7);
+	byte m = GetAnimationFrame(tile) + 1;
+	if (m == 4 && (m = 0, ++gfx) == GFX_OILWELL_ANIMATED_3 + 1 && (gfx = GFX_OILWELL_ANIMATED_1, b)) {
+		SetIndustryGfx(tile, GFX_OILWELL_NOT_ANIMATED);
+		SetIndustryConstructionStage(tile, 3);
+		DeleteAnimatedTile(tile);
+	} else {
+		SetAnimationFrame(tile, m);
+		SetIndustryGfx(tile, gfx);
+		MarkTileDirtyByTile(tile);
+	}
+}
+
+static void AnimateMineTower(TileIndex tile)
+{
+	int state = TimerGameTick::counter & 0x7FF;
+
+	if ((state -= 0x400) < 0) return;
+
+	if (state < 0x1A0) {
+		if (state < 0x20 || state >= 0x180) {
+			byte m = GetAnimationFrame(tile);
+			if (!(m & 0x40)) {
+				SetAnimationFrame(tile, m | 0x40);
+				if (_settings_client.sound.ambient) SndPlayTileFx(SND_0B_MINE, tile);
+			}
+			if (state & 7) return;
+		} else {
+			if (state & 3) return;
+		}
+		byte m = (GetAnimationFrame(tile) + 1) | 0x40;
+		if (m > 0xC2) m = 0xC0;
+		SetAnimationFrame(tile, m);
+		MarkTileDirtyByTile(tile);
+	} else if (state >= 0x200 && state < 0x3A0) {
+		int i = (state < 0x220 || state >= 0x380) ? 7 : 3;
+		if (state & i) return;
+
+		byte m = (GetAnimationFrame(tile) & 0xBF) - 1;
+		if (m < 0x80) m = 0x82;
+		SetAnimationFrame(tile, m);
+		MarkTileDirtyByTile(tile);
+	}
+}
 
 static void AnimateTile_Industry(TileIndex tile)
 {
@@ -566,159 +703,43 @@ static void AnimateTile_Industry(TileIndex tile)
 
 	switch (gfx) {
 	case GFX_SUGAR_MINE_SIEVE:
-		if ((_tick_counter & 1) == 0) {
-			byte m = GetAnimationFrame(tile) + 1;
-
-			if (_settings_client.sound.ambient) {
-				switch (m & 7) {
-					case 2: SndPlayTileFx(SND_2D_SUGAR_MINE_1, tile); break;
-					case 6: SndPlayTileFx(SND_29_SUGAR_MINE_2, tile); break;
-				}
-			}
-
-			if (m >= 96) {
-				m = 0;
-				DeleteAnimatedTile(tile);
-			}
-			SetAnimationFrame(tile, m);
-
-			MarkTileDirtyByTile(tile);
-		}
+		if ((TimerGameTick::counter & 1) == 0) AnimateSugarSieve(tile);
 		break;
 
 	case GFX_TOFFEE_QUARY:
-		if ((_tick_counter & 3) == 0) {
-			byte m = GetAnimationFrame(tile);
-
-			if (_industry_anim_offs_toffee[m] == 0xFF && _settings_client.sound.ambient) {
-				SndPlayTileFx(SND_30_TOFFEE_QUARRY, tile);
-			}
-
-			if (++m >= 70) {
-				m = 0;
-				DeleteAnimatedTile(tile);
-			}
-			SetAnimationFrame(tile, m);
-
-			MarkTileDirtyByTile(tile);
-		}
+		if ((TimerGameTick::counter & 3) == 0) AnimateToffeeQuarry(tile);
 		break;
 
 	case GFX_BUBBLE_CATCHER:
-		if ((_tick_counter & 1) == 0) {
-			byte m = GetAnimationFrame(tile);
-
-			if (++m >= 40) {
-				m = 0;
-				DeleteAnimatedTile(tile);
-			}
-			SetAnimationFrame(tile, m);
-
-			MarkTileDirtyByTile(tile);
-		}
+		if ((TimerGameTick::counter & 1) == 0) AnimateBubbleCatcher(tile);
 		break;
 
-	/* Sparks on a coal plant */
 	case GFX_POWERPLANT_SPARKS:
-		if ((_tick_counter & 3) == 0) {
-			byte m = GetAnimationFrame(tile);
-			if (m == 6) {
-				SetAnimationFrame(tile, 0);
-				DeleteAnimatedTile(tile);
-			} else {
-				SetAnimationFrame(tile, m + 1);
-				MarkTileDirtyByTile(tile);
-			}
-		}
+		if ((TimerGameTick::counter & 3) == 0) AnimatePowerPlantSparks(tile);
 		break;
 
 	case GFX_TOY_FACTORY:
-		if ((_tick_counter & 1) == 0) {
-			byte m = GetAnimationFrame(tile) + 1;
-
-			switch (m) {
-				case  1: if (_settings_client.sound.ambient) SndPlayTileFx(SND_2C_TOY_FACTORY_1, tile); break;
-				case 23: if (_settings_client.sound.ambient) SndPlayTileFx(SND_2B_TOY_FACTORY_2, tile); break;
-				case 28: if (_settings_client.sound.ambient) SndPlayTileFx(SND_2A_TOY_FACTORY_3, tile); break;
-				default:
-					if (m >= 50) {
-						int n = GetIndustryAnimationLoop(tile) + 1;
-						m = 0;
-						if (n >= 8) {
-							n = 0;
-							DeleteAnimatedTile(tile);
-						}
-						SetIndustryAnimationLoop(tile, n);
-					}
-			}
-
-			SetAnimationFrame(tile, m);
-			MarkTileDirtyByTile(tile);
-		}
+		if ((TimerGameTick::counter & 1) == 0) AnimateToyFactory(tile);
 		break;
 
 	case GFX_PLASTIC_FOUNTAIN_ANIMATED_1: case GFX_PLASTIC_FOUNTAIN_ANIMATED_2:
 	case GFX_PLASTIC_FOUNTAIN_ANIMATED_3: case GFX_PLASTIC_FOUNTAIN_ANIMATED_4:
 	case GFX_PLASTIC_FOUNTAIN_ANIMATED_5: case GFX_PLASTIC_FOUNTAIN_ANIMATED_6:
 	case GFX_PLASTIC_FOUNTAIN_ANIMATED_7: case GFX_PLASTIC_FOUNTAIN_ANIMATED_8:
-		if ((_tick_counter & 3) == 0) {
-			gfx = (gfx < 155) ? gfx + 1 : 148;
-			SetIndustryGfx(tile, gfx);
-			MarkTileDirtyByTile(tile);
-		}
+		if ((TimerGameTick::counter & 3) == 0) AnimatePlasticFountain(tile, gfx);
 		break;
 
 	case GFX_OILWELL_ANIMATED_1:
 	case GFX_OILWELL_ANIMATED_2:
 	case GFX_OILWELL_ANIMATED_3:
-		if ((_tick_counter & 7) == 0) {
-			bool b = Chance16(1, 7);
-			byte m = GetAnimationFrame(tile) + 1;
-			if (m == 4 && (m = 0, ++gfx) == GFX_OILWELL_ANIMATED_3 + 1 && (gfx = GFX_OILWELL_ANIMATED_1, b)) {
-				SetIndustryGfx(tile, GFX_OILWELL_NOT_ANIMATED);
-				SetIndustryConstructionStage(tile, 3);
-				DeleteAnimatedTile(tile);
-			} else {
-				SetAnimationFrame(tile, m);
-				SetIndustryGfx(tile, gfx);
-				MarkTileDirtyByTile(tile);
-			}
-		}
+		if ((TimerGameTick::counter & 7) == 0) AnimateOilWell(tile, gfx);
 		break;
 
 	case GFX_COAL_MINE_TOWER_ANIMATED:
 	case GFX_COPPER_MINE_TOWER_ANIMATED:
-	case GFX_GOLD_MINE_TOWER_ANIMATED: {
-			int state = _tick_counter & 0x7FF;
-
-			if ((state -= 0x400) < 0) return;
-
-			if (state < 0x1A0) {
-				if (state < 0x20 || state >= 0x180) {
-					byte m = GetAnimationFrame(tile);
-					if (!(m & 0x40)) {
-						SetAnimationFrame(tile, m | 0x40);
-						if (_settings_client.sound.ambient) SndPlayTileFx(SND_0B_MINE, tile);
-					}
-					if (state & 7) return;
-				} else {
-					if (state & 3) return;
-				}
-				byte m = (GetAnimationFrame(tile) + 1) | 0x40;
-				if (m > 0xC2) m = 0xC0;
-				SetAnimationFrame(tile, m);
-				MarkTileDirtyByTile(tile);
-			} else if (state >= 0x200 && state < 0x3A0) {
-				int i = (state < 0x220 || state >= 0x380) ? 7 : 3;
-				if (state & i) return;
-
-				byte m = (GetAnimationFrame(tile) & 0xBF) - 1;
-				if (m < 0x80) m = 0x82;
-				SetAnimationFrame(tile, m);
-				MarkTileDirtyByTile(tile);
-			}
-			break;
-		}
+	case GFX_GOLD_MINE_TOWER_ANIMATED:
+		AnimateMineTower(tile);
+		break;
 	}
 }
 
@@ -859,7 +880,7 @@ static void TileLoop_Industry(TileIndex tile)
 	case GFX_COAL_MINE_TOWER_NOT_ANIMATED:
 	case GFX_COPPER_MINE_TOWER_NOT_ANIMATED:
 	case GFX_GOLD_MINE_TOWER_NOT_ANIMATED:
-		if (!(_tick_counter & 0x400) && Chance16(1, 2)) {
+		if (!(TimerGameTick::counter & 0x400) && Chance16(1, 2)) {
 			switch (gfx) {
 				case GFX_COAL_MINE_TOWER_NOT_ANIMATED:   gfx = GFX_COAL_MINE_TOWER_ANIMATED;   break;
 				case GFX_COPPER_MINE_TOWER_NOT_ANIMATED: gfx = GFX_COPPER_MINE_TOWER_ANIMATED; break;
@@ -882,7 +903,7 @@ static void TileLoop_Industry(TileIndex tile)
 	case GFX_COAL_MINE_TOWER_ANIMATED:
 	case GFX_COPPER_MINE_TOWER_ANIMATED:
 	case GFX_GOLD_MINE_TOWER_ANIMATED:
-		if (!(_tick_counter & 0x400)) {
+		if (!(TimerGameTick::counter & 0x400)) {
 			switch (gfx) {
 				case GFX_COAL_MINE_TOWER_ANIMATED:   gfx = GFX_COAL_MINE_TOWER_NOT_ANIMATED;   break;
 				case GFX_COPPER_MINE_TOWER_ANIMATED: gfx = GFX_COPPER_MINE_TOWER_NOT_ANIMATED; break;
@@ -1776,11 +1797,11 @@ static void DoCreateNewIndustry(Industry *i, TileIndex tile, IndustryType type, 
 	i->counter = GB(r, 4, 12);
 	i->random = initial_random_bits;
 	i->was_cargo_delivered = false;
-	i->last_prod_year = _cur_year;
+	i->last_prod_year = TimerGameCalendar::year;
 	i->founder = founder;
 	i->ctlflags = INDCTL_NONE;
 
-	i->construction_date = _date;
+	i->construction_date = TimerGameCalendar::date;
 	i->construction_type = (_game_mode == GM_EDITOR) ? ICT_SCENARIO_EDITOR :
 			(_generating_world ? ICT_MAP_GENERATION : ICT_NORMAL_GAMEPLAY);
 
@@ -2092,56 +2113,73 @@ CommandCost CmdBuildIndustry(DoCommandFlag flags, TileIndex tile, IndustryType i
 }
 
 /**
- * Change industry properties
+ * Set industry control flags.
  * @param flags Type of operation.
  * @param ind_id IndustryID
- * @param action IndustryAction to perform
- * @param ctlflags IndustryControlFlags (only used with set control flags)
- * @param company_id CompanyID to set or INVALID_OWNER (available to everyone) or
- *                   OWNER_NONE (neutral stations only) or OWNER_DEITY (no one)
- *                   (only used with set exclusive supplier / consumer)
- * @param text - Additional industry text (only used with set text action)
+ * @param ctlflags IndustryControlFlags
  * @return Empty cost or an error.
  */
-CommandCost CmdIndustryCtrl(DoCommandFlag flags, IndustryID ind_id, IndustryAction action, IndustryControlFlags ctlflags, Owner company_id, const std::string &text)
+CommandCost CmdIndustrySetFlags(DoCommandFlag flags, IndustryID ind_id, IndustryControlFlags ctlflags)
 {
 	if (_current_company != OWNER_DEITY) return CMD_ERROR;
 
 	Industry *ind = Industry::GetIfValid(ind_id);
 	if (ind == nullptr) return CMD_ERROR;
 
-	switch (action) {
-		case IndustryAction::SetControlFlags: {
-			if (flags & DC_EXEC) ind->ctlflags = ctlflags & INDCTL_MASK;
+	if (flags & DC_EXEC) ind->ctlflags = ctlflags & INDCTL_MASK;
 
-			break;
+	return CommandCost();
+}
+
+/**
+ * Change exclusive consumer or supplier for the industry.
+ * @param flags Type of operation.
+ * @param ind_id IndustryID
+ * @param company_id CompanyID to set or INVALID_OWNER (available to everyone) or
+ *                   OWNER_NONE (neutral stations only) or OWNER_DEITY (no one)
+ * @param consumer Set exclusive consumer if true, supplier if false.
+ * @return Empty cost or an error.
+ */
+CommandCost CmdIndustrySetExclusivity(DoCommandFlag flags, IndustryID ind_id, Owner company_id, bool consumer)
+{
+	if (_current_company != OWNER_DEITY) return CMD_ERROR;
+
+	Industry *ind = Industry::GetIfValid(ind_id);
+	if (ind == nullptr) return CMD_ERROR;
+
+	if (company_id != OWNER_NONE && company_id != INVALID_OWNER && company_id != OWNER_DEITY
+		&& !Company::IsValidID(company_id)) return CMD_ERROR;
+
+	if (flags & DC_EXEC) {
+		if (consumer) {
+			ind->exclusive_consumer = company_id;
+		} else {
+			ind->exclusive_supplier = company_id;
 		}
+	}
 
-		case IndustryAction::SetExclusiveSupplier:
-		case IndustryAction::SetExclusiveConsumer: {
-			if (company_id != OWNER_NONE && company_id != INVALID_OWNER && company_id != OWNER_DEITY
-				&& !Company::IsValidID(company_id)) return CMD_ERROR;
 
-			if (flags & DC_EXEC) {
-				if (action == IndustryAction::SetExclusiveSupplier) {
-					ind->exclusive_supplier = company_id;
-				} else {
-					ind->exclusive_consumer = company_id;
-				}
-			}
+	return CommandCost();
+}
 
-			break;
-		}
+/**
+ * Change additional industry text.
+ * @param flags Type of operation.
+ * @param ind_id IndustryID
+ * @param text - Additional industry text.
+ * @return Empty cost or an error.
+ */
+CommandCost CmdIndustrySetText(DoCommandFlag flags, IndustryID ind_id, const std::string &text)
+{
+	if (_current_company != OWNER_DEITY) return CMD_ERROR;
 
-		case IndustryAction::SetText: {
-			ind->text.clear();
-			if (!text.empty()) ind->text = text;
-			InvalidateWindowData(WC_INDUSTRY_VIEW, ind->index);
-			break;
-		}
+	Industry *ind = Industry::GetIfValid(ind_id);
+	if (ind == nullptr) return CMD_ERROR;
 
-		default:
-			return CMD_ERROR;
+	if (flags & DC_EXEC) {
+		ind->text.clear();
+		if (!text.empty()) ind->text = text;
+		InvalidateWindowData(WC_INDUSTRY_VIEW, ind->index);
 	}
 
 	return CommandCost();
@@ -2209,8 +2247,8 @@ static uint16 GetIndustryGamePlayProbability(IndustryType it, byte *min_number)
 	const IndustrySpec *ind_spc = GetIndustrySpec(it);
 	byte chance = ind_spc->appear_ingame[_settings_game.game_creation.landscape];
 	if (!ind_spc->enabled || ind_spc->layouts.empty() ||
-			((ind_spc->behaviour & INDUSTRYBEH_BEFORE_1950) && _cur_year > 1950) ||
-			((ind_spc->behaviour & INDUSTRYBEH_AFTER_1960) && _cur_year < 1960) ||
+			((ind_spc->behaviour & INDUSTRYBEH_BEFORE_1950) && TimerGameCalendar::year > 1950) ||
+			((ind_spc->behaviour & INDUSTRYBEH_AFTER_1960) && TimerGameCalendar::year < 1960) ||
 			(chance = GetIndustryProbabilityCallback(it, IACT_RANDOMCREATION, chance)) == 0) {
 		*min_number = 0;
 		return 0;
@@ -2384,7 +2422,7 @@ static void UpdateIndustryStatistics(Industry *i)
 		if (i->produced_cargo[j] != CT_INVALID) {
 			byte pct = 0;
 			if (i->this_month_production[j] != 0) {
-				i->last_prod_year = _cur_year;
+				i->last_prod_year = TimerGameCalendar::year;
 				pct = std::min(i->this_month_transported[j] * 256 / i->this_month_production[j], 255);
 			}
 			i->last_month_pct_transported[j] = pct;
@@ -2819,7 +2857,7 @@ static void ChangeIndustryProduction(Industry *i, bool monthly)
 	if ((i->ctlflags & INDCTL_NO_PRODUCTION_INCREASE) && (mul > 0 || increment > 0)) return;
 
 	if (!callback_enabled && (indspec->life_type & INDUSTRYLIFE_PROCESSING)) {
-		if ( (byte)(_cur_year - i->last_prod_year) >= 5 && Chance16(1, original_economy ? 2 : 180)) {
+		if (TimerGameCalendar::year - i->last_prod_year >= PROCESSING_INDUSTRY_ABANDONMENT_YEARS && Chance16(1, original_economy ? 2 : 180)) {
 			closeit = true;
 		}
 	}
@@ -2907,7 +2945,7 @@ static void ChangeIndustryProduction(Industry *i, bool monthly)
  * For small maps, it implies that less than one change per month is required, while on bigger maps,
  * it would be way more. The daily loop handles those changes.
  */
-void IndustryDailyLoop()
+static IntervalTimer<TimerGameCalendar> _industries_daily({TimerGameCalendar::DAY, TimerGameCalendar::Priority::INDUSTRY}, [](auto)
 {
 	_economy.industry_daily_change_counter += _economy.industry_daily_increment;
 
@@ -2947,9 +2985,9 @@ void IndustryDailyLoop()
 
 	/* production-change */
 	InvalidateWindowData(WC_INDUSTRY_DIRECTORY, 0, IDIWD_PRODUCTION_CHANGE);
-}
+});
 
-void IndustryMonthlyLoop()
+static IntervalTimer<TimerGameCalendar> _industries_monthly({TimerGameCalendar::MONTH, TimerGameCalendar::Priority::INDUSTRY}, [](auto)
 {
 	Backup<CompanyID> cur_company(_current_company, OWNER_NONE, FILE_LINE);
 
@@ -2969,7 +3007,7 @@ void IndustryMonthlyLoop()
 
 	/* production-change */
 	InvalidateWindowData(WC_INDUSTRY_DIRECTORY, 0, IDIWD_PRODUCTION_CHANGE);
-}
+});
 
 
 void InitializeIndustries()

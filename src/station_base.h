@@ -501,7 +501,7 @@ public:
 
 	uint GetPlatformLength(TileIndex tile, DiagDirection dir) const override;
 	uint GetPlatformLength(TileIndex tile) const override;
-	void RecomputeCatchment();
+	void RecomputeCatchment(bool no_clear_nearby_lists = false);
 	static void RecomputeCatchmentForAll();
 
 	uint GetCatchmentRadius() const;
@@ -519,6 +519,11 @@ public:
 	inline bool TileBelongsToRailStation(TileIndex tile) const override
 	{
 		return IsRailStationTile(tile) && GetStationIndex(tile) == this->index;
+	}
+
+	inline bool TileBelongsToRoadStop(TileIndex tile) const
+	{
+		return IsRoadStopTile(tile) && GetStationIndex(tile) == this->index;
 	}
 
 	inline bool TileBelongsToAirport(TileIndex tile) const

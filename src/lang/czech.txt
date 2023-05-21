@@ -1069,10 +1069,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_TOOLTIP                      :{BLACK}Volba in
 # Autosave dropdown
 ###length 5
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Vypnuto
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Každý měsíc
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_3_MONTHS               :Každé 3 měsíce
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_6_MONTHS               :Každých 6 měsíců
-STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Každých 12 měsíců
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Jazyk
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Zvolit jazyk uživatelského rozhraní
@@ -1293,6 +1289,9 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :vpravo
 
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Maximální půjčka: {STRING}
 STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Jak moc si může společnost půjčit (bez ohledu na inflaci)
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_VALUE                   :{CURRENCY_LONG}
+###setting-zero-is-special
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_DISABLED                :Žádná půjčka {RED}Vyžaduje herní skript pro získání základního kapitálu.
 
 STR_CONFIG_SETTING_INTEREST_RATE                                :Výše úroků: {STRING}
 STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Výše úroků z půjček; rovněž ovlivňuje inflaci, pokud je zapnuta
@@ -1892,6 +1891,7 @@ STR_CONFIG_SETTING_ALLOW_SHARES_HELPTEXT                        :Pokud je zapnut
 
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES                         :Minimální stáří společnosti pro obchod s akciemi: {STRING}
 STR_CONFIG_SETTING_MIN_YEARS_FOR_SHARES_HELPTEXT                :Určuje stáří společnosti, od kterého mohou ostatní společnosti kupovat a prodávat její akcie.
+###setting-zero-is-special
 
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :Podíl ze zisku při překládce: {STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE_HELPTEXT                :Procentuální podíl příjmu, který je předán mezistanicím v překládacích systémech, předá větší kontrolu nad příjmem
@@ -2006,10 +2006,6 @@ STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :Žádné
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Činitel základní velikosti města: {STRING}
 STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER_HELPTEXT                :Průměrná velikost větších měst v porovnání s ostatními městy na začátku hry
 
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL                           :Aktualizovat distribuční graf po {STRING}{P 0:2 dni dnech dnech}
-STR_CONFIG_SETTING_LINKGRAPH_INTERVAL_HELPTEXT                  :Čas mezi přepočítáváním částí grafu spojení. Každý přepočet přepočítává plány jedné části grafu. To znamená, že hodnota X u toho nastavení nezpůsobí, že se každých X dní přepočítá celý graf, ale pouze určité části. Čím kratší interval nastavíš, tím více času CPU bude potřeba ke spočítání. Čím delší nastavíš, tím déle bude trvat dokud si distribuce nákladu najde nové trasy.
-STR_CONFIG_SETTING_LINKGRAPH_TIME                               :Zaber si {STRING}{NBSP}{P 0:2 "den" "dny" "dní"} na přepočet grafu spojení
-STR_CONFIG_SETTING_LINKGRAPH_TIME_HELPTEXT                      :Čas vyhrazený pro každý přepočet části grafu spojení. Pokud přepočet začne, je vytvořeno nové vlákno, které má dovoleno běžet po zvolený počet dnů. Čím nižší hodnotu nastavíš tím je pravděpodobnější, že vlákno nebude dokončeno kdy má. Pokud se tak stane, hra se zastaví ("lagne") dokud dokončeno nebude. Čím vyšší hodnotu nastavíš, tím déle bude trvat aktualizace grafu pokud se trasy změní.
 
 STR_CONFIG_SETTING_DISTRIBUTION_PAX                             :Mód distribuce pro cestující: {STRING}
 STR_CONFIG_SETTING_DISTRIBUTION_PAX_HELPTEXT                    :"Rovnoměrný" znamená, že téměř stejné množství cestujících chce cestovat ze stanice A do stanice B, jako ze stanice B do A. "Nerovnoměrný" znamená, že libovolné množství cestujících může cestovat v jakémkoliv směru. "Manuální" znamená, že zde nebude žádná automatická distribuce pro cestující.
@@ -2037,7 +2033,7 @@ STR_CONFIG_SETTING_SHORT_PATH_SATURATION_HELPTEXT               :Vzhledem k tomu
 
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY                  :Jednotky rychlosti: {STRING}
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_HELPTEXT         :Kdykoliv se rychlost zobrazí v uživatelském rozhraní, bude ve zvolených jednotkách
-###length 4
+###length 5
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_IMPERIAL         :Imperiální (mph)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_METRIC           :Metrické (km/h)
 STR_CONFIG_SETTING_LOCALISATION_UNITS_VELOCITY_SI               :SI (m/s)
@@ -2442,7 +2438,8 @@ STR_NETWORK_CLIENT_LIST_NEW_COMPANY                             :(Nová společn
 STR_NETWORK_CLIENT_LIST_NEW_COMPANY_TOOLTIP                     :{BLACK}Vytvořit novou společnost a připojit se do ní
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_SELF_TOOLTIP                :{BLACK}Tohle jsi ty
 STR_NETWORK_CLIENT_LIST_PLAYER_ICON_HOST_TOOLTIP                :{BLACK}Toto je hostitel hry
-STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} klient{P "" i i} / {NUM} společnost{P “” i i}
+STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT                    :{BLACK}{NUM} klient{P "" i i} - {NUM}/{NUM} společnost{P “” i i}
+STR_NETWORK_CLIENT_LIST_CLIENT_COMPANY_COUNT_TOOLTIP            :{BLACK}Počet momentálně připojených hráčů, počet společností a maximální počet společností povolený administrátorem serveru
 
 # Matches ConnectionType
 ###length 5
@@ -3442,8 +3439,8 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Varování: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Chyba: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Závažná chyba: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Vyskytla se kritická chyba v NewGRF:{}{STRING}
-STR_NEWGRF_ERROR_POPUP                                          :{WHITE}Došlo k chybě v NewGRF:{}{STRING}
+STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}V NewGRF "{STRING}" se vyskytla kritická chyba:{}{STRING}
+STR_NEWGRF_ERROR_POPUP                                          :{WHITE}V NewGRF "{STRING}" došlo k chybě{}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} nebude fungovat s verzí TTDPatche, kterou OpenTTD hlásí
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} je pro TTD verzi {2:STRING}
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} je navržen pro práci s {STRING}
@@ -4622,7 +4619,7 @@ STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Odstrani
 STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Odstranit maximální cestovní rychlost u vybraného příkazu. Ctrl+klik odstraní maximální rychlosti u všech příkazů
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Zapomenout zpoždění
-STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Smazat zpoždění, takže vozidlo pojede na čas
+STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Smazat zpoždění, takže vozidlo pojede na čas. Ctrl+Click smaže zpoždění celé skupině, takže poslední vozidlo pojede na čas a ostatní brzy.
 
 STR_TIMETABLE_AUTOFILL                                          :{BLACK}Automaticky
 STR_TIMETABLE_AUTOFILL_TOOLTIP                                  :{BLACK}Automaticky vyplň rozvrh hodnotami z následující cesty. Ctrl+klik pro zachování vyčkávací doby.
@@ -4716,12 +4713,13 @@ STR_SCREENSHOT_WORLD_SCREENSHOT                                 :{BLACK}Snímek 
 STR_SCREENSHOT_HEIGHTMAP_SCREENSHOT                             :{BLACK}Snímek výškové mapy
 STR_SCREENSHOT_MINIMAP_SCREENSHOT                               :{BLACK}Snímek (náhledové) mapy světa
 
-# AI Parameters
+# Script Parameters
+STR_AI_SETTINGS_CAPTION                                         :{WHITE}{STRING} Parametry
 STR_AI_SETTINGS_CAPTION_AI                                      :{WHITE}Parametry AI
+STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :Herní skript
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Zavřít
 STR_AI_SETTINGS_RESET                                           :{BLACK}Obnovit nastavení
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
-STR_AI_SETTINGS_START_DELAY                                     :Počet dní kdy se spustí tato AI po předchozí (plus/mínus): {ORANGE}{STRING}
 
 
 # Textfile window
@@ -5181,6 +5179,20 @@ STR_ERROR_CAN_T_STOP_SHARING_ORDER_LIST                         :{WHITE}Nelze za
 STR_ERROR_CAN_T_COPY_ORDER_LIST                                 :{WHITE}Nelze kopírovat seznam příkazů...
 STR_ERROR_TOO_FAR_FROM_PREVIOUS_DESTINATION                     :{WHITE}... příliš daleko od předcházejícího cíle
 STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE                             :{WHITE}... letadlo nemá dostatečný dolet
+
+# Extra messages which go on the third line of errors, explaining why orders failed
+STR_ERROR_NO_RAIL_STATION                                       :{WHITE}Není zde žádná železniční stanice
+STR_ERROR_NO_BUS_STATION                                        :Není zde žádná autobusová stanice
+STR_ERROR_NO_TRUCK_STATION                                      :Není zde žádná nákladní rampa
+STR_ERROR_NO_DOCK                                               :{WHITE}Není zde žádný přístav
+STR_ERROR_NO_AIRPORT                                            :{WHITE}Zde není žádné letiště
+STR_ERROR_NO_STOP_COMPATIBLE_ROAD_TYPE                          :{WHITE}Nejsou zde žádné zastávky kompatibilní s tímto druhem silnice
+STR_ERROR_NO_STOP_COMPATIBLE_TRAM_TYPE                          :{WHITE}Zde není žádná zastávka kompatibilní s tímto typem tramvaje
+STR_ERROR_NO_STOP_ARTICULATED_VEHICLE                           :{WHITE}Nejsou zde žádné stanice vhodné pro kloubové silniční vozidla.{}Kloubové silniční vozidla vyžadují průjezdnou stanici.
+STR_ERROR_AIRPORT_NO_PLANES                                     :{WHITE}Toto letadlo nemůže přistát na tomto letišti
+STR_ERROR_AIRPORT_NO_HELICOPTERS                                :{WHITE}Tato helikoptéra nemůže přistát na tomto letišti
+STR_ERROR_NO_RAIL_WAYPOINT                                      :{WHITE}Zde není žádný kolejový směrovač
+STR_ERROR_NO_BUOY                                               :{WHITE}Zde není žádná bójka
 
 # Timetable related errors
 STR_ERROR_CAN_T_TIMETABLE_VEHICLE                               :{WHITE}Tomuto vozidlu nejde nastavit jízdní řád...
@@ -5708,11 +5720,11 @@ STR_VEHICLE_NAME_AIRCRAFT_POWERNAUT_HELICOPTER                  :Vrtulník Power
 
 ##id 0x8800
 # Formatting of some strings
-STR_FORMAT_DATE_TINY                                            :{STRING}-{STRING}-{NUM}
+STR_FORMAT_DATE_TINY                                            :{ZEROFILL_NUM}-{ZEROFILL_NUM}-{NUM}
 STR_FORMAT_DATE_SHORT                                           :{STRING} {NUM}
 STR_FORMAT_DATE_SHORT.gen                                       :{STRING.gen} {NUM}
 STR_FORMAT_DATE_LONG                                            :{STRING} {STRING} {NUM}
-STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:STRING}-{0:STRING}
+STR_FORMAT_DATE_ISO                                             :{2:NUM}-{1:ZEROFILL_NUM}-{0:ZEROFILL_NUM}
 
 STR_FORMAT_COMPANY_NUM                                          :(společnost {COMMA})
 STR_FORMAT_GROUP_NAME                                           :Skupina {COMMA}
@@ -5799,7 +5811,7 @@ STR_JUST_BIG_RAW_STRING                                         :{BIG_FONT}{STRI
 
 # Slightly 'raw' stringcodes with colour or size
 STR_BLACK_COMMA                                                 :{BLACK}{COMMA}
-STR_TINY_BLACK_COMA                                             :{TINY_FONT}{BLACK}{COMMA}
+STR_TINY_BLACK_COMMA                                            :{TINY_FONT}{BLACK}{COMMA}
 STR_TINY_COMMA                                                  :{TINY_FONT}{COMMA}
 STR_BLUE_COMMA                                                  :{BLUE}{COMMA}
 STR_RED_COMMA                                                   :{RED}{COMMA}

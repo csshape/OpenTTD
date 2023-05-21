@@ -9,7 +9,7 @@
 
 #include "stdafx.h"
 #include "debug.h"
-#include "date_func.h"
+#include "timer/timer_game_calendar.h"
 #include "newgrf_spritegroup.h"
 #include "newgrf_text.h"
 #include "station_base.h"
@@ -124,9 +124,9 @@ AirportSpec AirportSpec::specs[NUM_AIRPORTS]; ///< Airport specifications.
 bool AirportSpec::IsAvailable() const
 {
 	if (!this->enabled) return false;
-	if (_cur_year < this->min_year) return false;
+	if (TimerGameCalendar::year < this->min_year) return false;
 	if (_settings_game.station.never_expire_airports) return true;
-	return _cur_year <= this->max_year;
+	return TimerGameCalendar::year <= this->max_year;
 }
 
 /**
@@ -152,9 +152,10 @@ bool AirportSpec::IsWithinMapBounds(byte table, TileIndex tile) const
  */
 void AirportSpec::ResetAirports()
 {
-	extern const AirportSpec _origin_airport_specs[];
-	memset(&AirportSpec::specs, 0, sizeof(AirportSpec::specs));
-	memcpy(&AirportSpec::specs, &_origin_airport_specs, sizeof(AirportSpec) * NEW_AIRPORT_OFFSET);
+	extern const AirportSpec _origin_airport_specs[NEW_AIRPORT_OFFSET];
+
+	auto insert = std::copy(std::begin(_origin_airport_specs), std::end(_origin_airport_specs), std::begin(AirportSpec::specs));
+	std::fill(insert, std::end(AirportSpec::specs), AirportSpec{});
 
 	_airport_mngr.ResetOverride();
 }
@@ -176,11 +177,11 @@ void AirportOverrideManager::SetEntitySpec(AirportSpec *as)
 	byte airport_id = this->AddEntityID(as->grf_prop.local_id, as->grf_prop.grffile->grfid, as->grf_prop.subst_id);
 
 	if (airport_id == this->invalid_id) {
-		grfmsg(1, "Airport.SetEntitySpec: Too many airports allocated. Ignoring.");
+		GrfMsg(1, "Airport.SetEntitySpec: Too many airports allocated. Ignoring.");
 		return;
 	}
 
-	memcpy(AirportSpec::GetWithoutOverride(airport_id), as, sizeof(*as));
+	*AirportSpec::GetWithoutOverride(airport_id) = *as;
 
 	/* Now add the overrides. */
 	for (int i = 0; i < this->max_offset; i++) {

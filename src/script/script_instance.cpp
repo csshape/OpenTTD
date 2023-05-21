@@ -44,10 +44,10 @@ ScriptStorage::~ScriptStorage()
  * @param error_msg Is this an error message?
  * @param message The actual message text.
  */
-static void PrintFunc(bool error_msg, const SQChar *message)
+static void PrintFunc(bool error_msg, const std::string &message)
 {
 	/* Convert to OpenTTD internal capable string */
-	ScriptController::Print(error_msg, message);
+	ScriptController::Print(error_msg, message.c_str());
 }
 
 ScriptInstance::ScriptInstance(const char *APIName) :
@@ -744,11 +744,11 @@ SQInteger ScriptInstance::GetOpsTillSuspend()
 	return this->engine->GetOpsTillSuspend();
 }
 
-bool ScriptInstance::DoCommandCallback(const CommandCost &result, TileIndex tile, const CommandDataBuffer &data, CommandDataBuffer result_data, Commands cmd)
+bool ScriptInstance::DoCommandCallback(const CommandCost &result, const CommandDataBuffer &data, CommandDataBuffer result_data, Commands cmd)
 {
 	ScriptObject::ActiveInstance active(this);
 
-	if (!ScriptObject::CheckLastCommand(tile, data, cmd)) {
+	if (!ScriptObject::CheckLastCommand(data, cmd)) {
 		Debug(script, 1, "DoCommandCallback terminating a script, last command does not match expected command");
 		return false;
 	}
@@ -763,7 +763,7 @@ bool ScriptInstance::DoCommandCallback(const CommandCost &result, TileIndex tile
 		ScriptObject::SetLastCost(result.GetCost());
 	}
 
-	ScriptObject::SetLastCommand(INVALID_TILE, {}, CMD_END);
+	ScriptObject::SetLastCommand({}, CMD_END);
 
 	return true;
 }

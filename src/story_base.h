@@ -12,7 +12,7 @@
 
 #include "company_type.h"
 #include "story_type.h"
-#include "date_type.h"
+#include "timer/timer_game_calendar.h"
 #include "gfx_type.h"
 #include "vehicle_type.h"
 #include "core/pool_type.hpp"
@@ -37,9 +37,6 @@ enum StoryPageElementType : byte {
 	SPET_END,
 	INVALID_SPET = 0xFF,
 };
-
-/** Define basic enum properties */
-template <> struct EnumPropsT<StoryPageElementType> : MakeEnumPropsT<StoryPageElementType, byte, SPET_TEXT, SPET_END, INVALID_SPET, 8> {};
 
 /** Flags available for buttons */
 enum StoryPageButtonFlags : byte {
@@ -110,9 +107,6 @@ enum StoryPageButtonCursor : byte {
 	INVALID_SPBC = 0xFF
 };
 
-/** Define basic enum properties */
-template <> struct EnumPropsT<StoryPageButtonCursor> : MakeEnumPropsT<StoryPageButtonCursor, byte, SPBC_MOUSE, SPBC_END, INVALID_SPBC, 8> {};
-
 /**
  * Checks if a StoryPageButtonCursor value is valid.
  *
@@ -169,7 +163,7 @@ struct StoryPageElement : StoryPageElementPool::PoolItem<&_story_page_element_po
 /** Struct about stories, current and completed */
 struct StoryPage : StoryPagePool::PoolItem<&_story_page_pool> {
 	uint32 sort_value;   ///< A number that increases for every created story page. Used for sorting. The id of a story page is the pool index.
-	Date date;           ///< Date when the page was created.
+	TimerGameCalendar::Date date; ///< Date when the page was created.
 	CompanyID company;   ///< StoryPage is for a specific company; INVALID_COMPANY if it is global
 
 	char *title;         ///< Title of story page

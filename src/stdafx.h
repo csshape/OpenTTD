@@ -39,7 +39,6 @@
 #	include <unistd.h>
 #	define _DEFAULT_SOURCE
 #	define _GNU_SOURCE
-#	define TROUBLED_INTS
 #endif
 
 #if defined(__HAIKU__) || defined(__CYGWIN__)
@@ -61,46 +60,9 @@
 #	endif
 #endif
 
-/* The conditions for these constants to be available are way too messy; so check them one by one */
-#if !defined(UINT64_MAX)
-#	define UINT64_MAX (18446744073709551615ULL)
-#endif
-#if !defined(INT64_MAX)
-#	define INT64_MAX  (9223372036854775807LL)
-#endif
-#if !defined(INT64_MIN)
-#	define INT64_MIN  (-INT64_MAX - 1)
-#endif
-#if !defined(UINT32_MAX)
-#	define UINT32_MAX (4294967295U)
-#endif
-#if !defined(INT32_MAX)
-#	define INT32_MAX  (2147483647)
-#endif
-#if !defined(INT32_MIN)
-#	define INT32_MIN  (-INT32_MAX - 1)
-#endif
-#if !defined(UINT16_MAX)
-#	define UINT16_MAX (65535U)
-#endif
-#if !defined(INT16_MAX)
-#	define INT16_MAX  (32767)
-#endif
-#if !defined(INT16_MIN)
-#	define INT16_MIN  (-INT16_MAX - 1)
-#endif
-#if !defined(UINT8_MAX)
-#	define UINT8_MAX  (255)
-#endif
-#if !defined(INT8_MAX)
-#	define INT8_MAX   (127)
-#endif
-#if !defined(INT8_MIN)
-#	define INT8_MIN   (-INT8_MAX - 1)
-#endif
-
 #include <algorithm>
 #include <cstdio>
+#include <cstdint>
 #include <cstddef>
 #include <cstring>
 #include <cstdlib>
@@ -109,10 +71,6 @@
 #include <memory>
 #include <string>
 
-#ifndef SIZE_MAX
-#	define SIZE_MAX ((size_t)-1)
-#endif
-
 #if defined(UNIX) || defined(__MINGW32__)
 #	include <sys/types.h>
 #endif
@@ -120,10 +78,6 @@
 #if defined(__OS2__)
 #	include <types.h>
 #	define strcasecmp stricmp
-#endif
-
-#if defined(SUNOS) || defined(HPUX) || defined(__CYGWIN__)
-#	include <alloca.h>
 #endif
 
 /* Stuff for GCC */
@@ -159,6 +113,13 @@
 #      define NOACCESS(args)
 #endif
 
+/* [[nodiscard]] on constructors doesn't work in GCC older than 10.1. */
+#if __GNUC__ < 10 || (__GNUC__ == 10 && __GNUC_MINOR__ < 1)
+#      define NODISCARD
+#else
+#      define NODISCARD [[nodiscard]]
+#endif
+
 #if defined(__WATCOMC__)
 #	define NORETURN
 #	define CDECL
@@ -168,10 +129,6 @@
 #	define FALLTHROUGH
 #	include <malloc.h>
 #endif /* __WATCOMC__ */
-
-#if defined(__MINGW32__)
-#	include <malloc.h> // alloca()
-#endif
 
 #if defined(_WIN32)
 #	define WIN32_LEAN_AND_MEAN     // Exclude rarely-used stuff from Windows headers
@@ -196,7 +153,6 @@
 #	pragma warning(disable: 6011)   // code analyzer: Dereferencing NULL pointer 'pfGetAddrInfo': Lines: 995, 996, 998, 999, 1001
 #	pragma warning(disable: 6326)   // code analyzer: potential comparison of a constant with another constant
 #	pragma warning(disable: 6031)   // code analyzer: Return value ignored: 'ReadFile'
-#	pragma warning(disable: 6255)   // code analyzer: _alloca indicates failure by raising a stack overflow exception. Consider using _malloca instead
 #	pragma warning(disable: 6246)   // code analyzer: Local declaration of 'statspec' hides declaration of the same name in outer scope. For additional information, see previous declaration at ...
 
 #	if (_MSC_VER == 1500)           // Addresses item #13 on http://blogs.msdn.com/b/vcblog/archive/2008/08/11/tr1-fixes-in-vc9-sp1.aspx, for Visual Studio 2008
@@ -204,7 +160,6 @@
 #		include <intrin.h>
 #	endif
 
-#	include <malloc.h> // alloca()
 #	define NORETURN __declspec(noreturn)
 #	if (_MSC_VER < 1900)
 #		define inline __forceinline
@@ -258,7 +213,6 @@
 
 #	define strcasecmp stricmp
 #	define strncasecmp strnicmp
-#	define strtoull _strtoui64
 
 	/* MSVC doesn't have these :( */
 #	define S_ISDIR(mode) (mode & S_IFDIR)
@@ -306,27 +260,6 @@
 #endif
 #define PACK(type_dec) PACK_N(type_dec, 1)
 
-/* MSVCRT of course has to have a different syntax for long long *sigh* */
-#if defined(_MSC_VER)
-#   define OTTD_PRINTF64 "%I64d"
-#   define OTTD_PRINTF64U "%I64u"
-#   define OTTD_PRINTFHEX64 "%I64x"
-#   define PRINTF_SIZE "%Iu"
-#   define PRINTF_SIZEX "%IX"
-#elif defined(__MINGW32__)
-#   define OTTD_PRINTF64 "%I64d"
-#   define OTTD_PRINTF64U "%I64llu"
-#   define OTTD_PRINTFHEX64 "%I64x"
-#   define PRINTF_SIZE "%Iu"
-#   define PRINTF_SIZEX "%IX"
-#else
-#   define OTTD_PRINTF64 "%lld"
-#   define OTTD_PRINTF64U "%llu"
-#   define OTTD_PRINTFHEX64 "%llx"
-#   define PRINTF_SIZE "%zu"
-#   define PRINTF_SIZEX "%zX"
-#endif
-
 /*
  * When making a (pure) debug build, the compiler will by default disable
  * inlining of functions. This has a detremental effect on the performance of
@@ -372,36 +305,21 @@
 #define debug_inline inline
 #endif
 
-typedef unsigned char byte;
+typedef uint8_t byte;
 
 /* This is already defined in unix, but not in QNX Neutrino (6.x) or Cygwin. */
 #if (!defined(UNIX) && !defined(__HAIKU__)) || defined(__QNXNTO__) || defined(__CYGWIN__)
 	typedef unsigned int uint;
 #endif
 
-#if defined(TROUBLED_INTS)
-	/* Haiku's types for uint32/int32/uint64/int64 are different than what
-	 * they are on other platforms; not in length, but how to print them.
-	 * So make them more like the other platforms, to make printf() etc a
-	 * little bit easier. */
-#	define uint32 uint32_ugly_hack
-#	define int32 int32_ugly_hack
-#	define uint64 uint64_ugly_hack
-#	define int64 int64_ugly_hack
-	typedef unsigned int uint32_ugly_hack;
-	typedef signed int int32_ugly_hack;
-	typedef unsigned __int64 uint64_ugly_hack;
-	typedef signed __int64 int64_ugly_hack;
-#else
-	typedef unsigned char    uint8;
-	typedef   signed char     int8;
-	typedef unsigned short   uint16;
-	typedef   signed short    int16;
-	typedef unsigned int     uint32;
-	typedef   signed int      int32;
-	typedef unsigned __int64 uint64;
-	typedef   signed __int64  int64;
-#endif /* !TROUBLED_INTS */
+typedef uint8_t  uint8;
+typedef  int8_t   int8;
+typedef uint16_t uint16;
+typedef  int16_t  int16;
+typedef uint32_t uint32;
+typedef  int32_t  int32;
+typedef uint64_t uint64;
+typedef  int64_t  int64;
 
 #if !defined(WITH_PERSONAL_DIR)
 #	define PERSONAL_DIR ""
@@ -487,14 +405,14 @@ static_assert(SIZE_MAX >= UINT32_MAX);
 /* For the FMT library we only want to use the headers, not link to some library. */
 #define FMT_HEADER_ONLY
 
-void NORETURN CDECL usererror(const char *str, ...) WARN_FORMAT(1, 2);
-void NORETURN CDECL error(const char *str, ...) WARN_FORMAT(1, 2);
-#define NOT_REACHED() error("NOT_REACHED triggered at line %i of %s", __LINE__, __FILE__)
+void NORETURN NotReachedError(int line, const char *file);
+void NORETURN AssertFailedError(int line, const char *file, const char *expression);
+#define NOT_REACHED() NotReachedError(__LINE__, __FILE__)
 
 /* For non-debug builds with assertions enabled use the special assertion handler. */
 #if defined(NDEBUG) && defined(WITH_ASSERT)
 #	undef assert
-#	define assert(expression) if (unlikely(!(expression))) error("Assertion failed at line %i of %s: %s", __LINE__, __FILE__, #expression);
+#	define assert(expression) if (unlikely(!(expression))) AssertFailedError(__LINE__, __FILE__, #expression);
 #endif
 
 #if defined(OPENBSD)

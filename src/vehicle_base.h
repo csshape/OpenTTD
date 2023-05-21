@@ -23,6 +23,7 @@
 #include "base_consist.h"
 #include "network/network.h"
 #include "saveload/saveload.h"
+#include "timer/timer_game_calendar.h"
 #include <list>
 #include <map>
 
@@ -286,10 +287,10 @@ public:
 	SpriteID colourmap;                 ///< NOSAVE: cached colour mapping
 
 	/* Related to age and service time */
-	Year build_year;                    ///< Year the vehicle has been built.
-	Date age;                           ///< Age in days
-	Date max_age;                       ///< Maximum age
-	Date date_of_last_service;          ///< Last date the vehicle had a service at a depot.
+	TimerGameCalendar::Year build_year;           ///< Year the vehicle has been built.
+	TimerGameCalendar::Date age;                  ///< Age in days
+	TimerGameCalendar::Date max_age;              ///< Maximum age
+	TimerGameCalendar::Date date_of_last_service; ///< Last date the vehicle had a service at a depot.
 	uint16 reliability;                 ///< Reliability.
 	uint16 reliability_spd_dec;         ///< Reliability decrease speed.
 	byte breakdown_ctr;                 ///< Counter for managing breakdown events. @see Vehicle::HandleBreakdown
@@ -332,7 +333,7 @@ public:
 
 	StationID last_station_visited;     ///< The last station we stopped at.
 	StationID last_loading_station;     ///< Last station the vehicle has stopped at and could possibly leave from with any cargo loaded.
-	uint64_t last_loading_tick;         ///< Last time (relative to _tick_counter) the vehicle has stopped at a station and could possibly leave with any cargo loaded.
+	uint64_t last_loading_tick;         ///< Last time (based on TimerGameTick counter) the vehicle has stopped at a station and could possibly leave with any cargo loaded.
 
 	CargoID cargo_type;                 ///< type of cargo this vehicle is carrying
 	byte cargo_subtype;                 ///< Used for livery refits (NewGRF variations)

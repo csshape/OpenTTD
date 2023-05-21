@@ -26,13 +26,14 @@
 #include "effectvehicle_base.h"
 #include "elrail_func.h"
 #include "roadveh.h"
+#include "train.h"
 #include "town.h"
 #include "company_base.h"
 #include "core/random_func.hpp"
 #include "newgrf_debug.h"
 #include "newgrf_railtype.h"
 #include "newgrf_roadtype.h"
-#include "date_func.h"
+#include "timer/timer_game_calendar.h"
 #include "genworld.h"
 #include "company_gui.h"
 #include "road_func.h"
@@ -1170,7 +1171,7 @@ CommandCost CmdBuildRoadDepot(DoCommandFlag flags, TileIndex tile, RoadType rt, 
 
 	if (flags & DC_EXEC) {
 		Depot *dep = new Depot(tile);
-		dep->build_date = _date;
+		dep->build_date = TimerGameCalendar::date;
 
 		/* A road depot has two road bits. */
 		UpdateCompanyRoadInfrastructure(rt, _current_company, ROAD_DEPOT_TRACKBIT_FACTOR);
@@ -1885,7 +1886,7 @@ void UpdateNearestTownForRoadTiles(bool invalidate)
 	}
 }
 
-static int GetSlopePixelZ_Road(TileIndex tile, uint x, uint y)
+static int GetSlopePixelZ_Road(TileIndex tile, uint x, uint y, bool ground_vehicle)
 {
 
 	if (IsNormalRoad(tile)) {
@@ -2086,6 +2087,8 @@ static TrackStatus GetTileTrackStatus_Road(TileIndex tile, TransportType mode, u
 					trackdirbits = TrackBitsToTrackdirBits(AxisToTrackBits(axis));
 					if (IsCrossingBarred(tile)) {
 						red_signals = trackdirbits;
+						if (TrainOnCrossing(tile)) break;
+
 						auto mask_red_signal_bits_if_crossing_barred = [&](TileIndex t, TrackdirBits mask) {
 							if (IsLevelCrossingTile(t) && IsCrossingBarred(t)) red_signals &= mask;
 						};

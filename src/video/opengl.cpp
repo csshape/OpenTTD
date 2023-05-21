@@ -955,14 +955,10 @@ bool OpenGLBackend::Resize(int w, int h, bool force)
 
 	_glActiveTexture(GL_TEXTURE0);
 	_glBindTexture(GL_TEXTURE_2D, this->vid_texture);
-	switch (bpp) {
-		case 8:
-			_glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, w, h, 0, GL_RED, GL_UNSIGNED_BYTE, nullptr);
-			break;
-
-		default:
-			_glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, nullptr);
-			break;
+	if (bpp == 8) {
+		_glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, w, h, 0, GL_RED, GL_UNSIGNED_BYTE, nullptr);
+	} else {
+		_glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, nullptr);
 	}
 	_glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
@@ -1118,7 +1114,7 @@ void OpenGLBackend::PopulateCursorCache()
 		SpriteID sprite = _cursor.sprite_seq[i].sprite;
 
 		if (!this->cursor_cache.Contains(sprite)) {
-			Sprite *old = this->cursor_cache.Insert(sprite, (Sprite *)GetRawSprite(sprite, ST_NORMAL, &SimpleSpriteAlloc, this));
+			Sprite *old = this->cursor_cache.Insert(sprite, (Sprite *)GetRawSprite(sprite, SpriteType::Normal, &SimpleSpriteAlloc, this));
 			if (old != nullptr) {
 				OpenGLSprite *gl_sprite = (OpenGLSprite *)old->data;
 				gl_sprite->~OpenGLSprite();
@@ -1224,14 +1220,10 @@ void OpenGLBackend::ReleaseVideoBuffer(const Rect &update_rect)
 		_glActiveTexture(GL_TEXTURE0);
 		_glBindTexture(GL_TEXTURE_2D, this->vid_texture);
 		_glPixelStorei(GL_UNPACK_ROW_LENGTH, _screen.pitch);
-		switch (BlitterFactory::GetCurrentBlitter()->GetScreenDepth()) {
-			case 8:
-				_glTexSubImage2D(GL_TEXTURE_2D, 0, update_rect.left, update_rect.top, update_rect.right - update_rect.left, update_rect.bottom - update_rect.top, GL_RED, GL_UNSIGNED_BYTE, (GLvoid *)(size_t)(update_rect.top * _screen.pitch + update_rect.left));
-				break;
-
-			default:
-				_glTexSubImage2D(GL_TEXTURE_2D, 0, update_rect.left, update_rect.top, update_rect.right - update_rect.left, update_rect.bottom - update_rect.top, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, (GLvoid *)(size_t)(update_rect.top * _screen.pitch * 4 + update_rect.left * 4));
-				break;
+		if (BlitterFactory::GetCurrentBlitter()->GetScreenDepth() == 8) {
+			_glTexSubImage2D(GL_TEXTURE_2D, 0, update_rect.left, update_rect.top, update_rect.right - update_rect.left, update_rect.bottom - update_rect.top, GL_RED, GL_UNSIGNED_BYTE, (GLvoid*)(size_t)(update_rect.top * _screen.pitch + update_rect.left));
+		} else {
+			_glTexSubImage2D(GL_TEXTURE_2D, 0, update_rect.left, update_rect.top, update_rect.right - update_rect.left, update_rect.bottom - update_rect.top, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, (GLvoid*)(size_t)(update_rect.top * _screen.pitch * 4 + update_rect.left * 4));
 		}
 
 #ifndef NO_GL_BUFFER_SYNC
@@ -1280,10 +1272,10 @@ void OpenGLBackend::ReleaseAnimBuffer(const Rect &update_rect)
 	Sprite *dest_sprite = (Sprite *)allocator(sizeof(*dest_sprite) + sizeof(OpenGLSprite));
 
 	OpenGLSprite *gl_sprite = (OpenGLSprite *)dest_sprite->data;
-	new (gl_sprite) OpenGLSprite(sprite->width, sprite->height, sprite->type == ST_FONT ? 1 : ZOOM_LVL_COUNT, sprite->colours);
+	new (gl_sprite) OpenGLSprite(sprite->width, sprite->height, sprite->type == SpriteType::Font ? 1 : ZOOM_LVL_COUNT, sprite->colours);
 
 	/* Upload texture data. */
-	for (int i = 0; i < (sprite->type == ST_FONT ? 1 : ZOOM_LVL_COUNT); i++) {
+	for (int i = 0; i < (sprite->type == SpriteType::Font ? 1 : ZOOM_LVL_COUNT); i++) {
 		gl_sprite->Update(sprite[i].width, sprite[i].height, i, sprite[i].data);
 	}
 
@@ -1318,7 +1310,7 @@ void OpenGLBackend::RenderOglSprite(OpenGLSprite *gl_sprite, PaletteID pal, int 
 			_glBindBuffer(GL_PIXEL_UNPACK_BUFFER, OpenGLSprite::pal_pbo);
 			_glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 
-			_glBufferSubData(GL_PIXEL_UNPACK_BUFFER, 0, 256, GetNonSprite(GB(pal, 0, PALETTE_WIDTH), ST_RECOLOUR) + 1);
+			_glBufferSubData(GL_PIXEL_UNPACK_BUFFER, 0, 256, GetNonSprite(GB(pal, 0, PALETTE_WIDTH), SpriteType::Recolour) + 1);
 			_glTexSubImage1D(GL_TEXTURE_1D, 0, 0, 256, GL_RED, GL_UNSIGNED_BYTE, nullptr);
 
 			_glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);

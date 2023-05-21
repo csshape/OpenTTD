@@ -40,6 +40,7 @@
 
 /* static */ bool ScriptCompany::IsMine(ScriptCompany::CompanyID company)
 {
+	EnforceCompanyModeValid(false);
 	return ResolveCompanyID(company) == ResolveCompanyID(COMPANY_SELF);
 }
 
@@ -47,8 +48,9 @@
 {
 	CCountedPtr<Text> counter(name);
 
+	EnforceCompanyModeValid(false);
 	EnforcePrecondition(false, name != nullptr);
-	const char *text = name->GetDecodedText();
+	const std::string &text = name->GetDecodedText();
 	EnforcePreconditionEncodedText(false, text);
 	EnforcePreconditionCustomError(false, ::Utf8StringLength(text) < MAX_LENGTH_COMPANY_NAME_CHARS, ScriptError::ERR_PRECONDITION_STRING_TOO_LONG);
 
@@ -68,8 +70,9 @@
 {
 	CCountedPtr<Text> counter(name);
 
+	EnforceCompanyModeValid(false);
 	EnforcePrecondition(false, name != nullptr);
-	const char *text = name->GetDecodedText();
+	const std::string &text = name->GetDecodedText();
 	EnforcePreconditionEncodedText(false, text);
 	EnforcePreconditionCustomError(false, ::Utf8StringLength(text) < MAX_LENGTH_PRESIDENT_NAME_CHARS, ScriptError::ERR_PRECONDITION_STRING_TOO_LONG);
 
@@ -94,6 +97,7 @@
 
 /* static */ bool ScriptCompany::SetPresidentGender(Gender gender)
 {
+	EnforceCompanyModeValid(false);
 	EnforcePrecondition(false, gender == GENDER_MALE || gender == GENDER_FEMALE);
 	EnforcePrecondition(false, GetPresidentGender(ScriptCompany::COMPANY_SELF) != gender);
 
@@ -114,11 +118,12 @@
 	return HasBit(ge, ::GENDER_FEMALE) ? GENDER_FEMALE : GENDER_MALE;
 }
 
-/* static */ Money ScriptCompany::GetQuarterlyIncome(ScriptCompany::CompanyID company, uint32 quarter)
+/* static */ Money ScriptCompany::GetQuarterlyIncome(ScriptCompany::CompanyID company, SQInteger quarter)
 {
 	company = ResolveCompanyID(company);
 	if (company == COMPANY_INVALID) return -1;
 	if (quarter > EARLIEST_QUARTER) return -1;
+	if (quarter < CURRENT_QUARTER) return -1;
 
 	if (quarter == CURRENT_QUARTER) {
 		return ::Company::Get(company)->cur_economy.income;
@@ -126,11 +131,12 @@
 	return ::Company::Get(company)->old_economy[quarter - 1].income;
 }
 
-/* static */ Money ScriptCompany::GetQuarterlyExpenses(ScriptCompany::CompanyID company, uint32 quarter)
+/* static */ Money ScriptCompany::GetQuarterlyExpenses(ScriptCompany::CompanyID company, SQInteger quarter)
 {
 	company = ResolveCompanyID(company);
 	if (company == COMPANY_INVALID) return -1;
 	if (quarter > EARLIEST_QUARTER) return -1;
+	if (quarter < CURRENT_QUARTER) return -1;
 
 	if (quarter == CURRENT_QUARTER) {
 		return ::Company::Get(company)->cur_economy.expenses;
@@ -138,11 +144,12 @@
 	return ::Company::Get(company)->old_economy[quarter - 1].expenses;
 }
 
-/* static */ int32 ScriptCompany::GetQuarterlyCargoDelivered(ScriptCompany::CompanyID company, uint32 quarter)
+/* static */ SQInteger ScriptCompany::GetQuarterlyCargoDelivered(ScriptCompany::CompanyID company, SQInteger quarter)
 {
 	company = ResolveCompanyID(company);
 	if (company == COMPANY_INVALID) return -1;
 	if (quarter > EARLIEST_QUARTER) return -1;
+	if (quarter < CURRENT_QUARTER) return -1;
 
 	if (quarter == CURRENT_QUARTER) {
 		return ::Company::Get(company)->cur_economy.delivered_cargo.GetSum<OverflowSafeInt32>();
@@ -150,21 +157,22 @@
 	return ::Company::Get(company)->old_economy[quarter - 1].delivered_cargo.GetSum<OverflowSafeInt32>();
 }
 
-/* static */ int32 ScriptCompany::GetQuarterlyPerformanceRating(ScriptCompany::CompanyID company, uint32 quarter)
+/* static */ SQInteger ScriptCompany::GetQuarterlyPerformanceRating(ScriptCompany::CompanyID company, SQInteger quarter)
 {
 	company = ResolveCompanyID(company);
 	if (company == COMPANY_INVALID) return -1;
 	if (quarter > EARLIEST_QUARTER) return -1;
-	if (quarter == CURRENT_QUARTER) return -1;
+	if (quarter <= CURRENT_QUARTER) return -1;
 
 	return ::Company::Get(company)->old_economy[quarter - 1].performance_history;
 }
 
-/* static */ Money ScriptCompany::GetQuarterlyCompanyValue(ScriptCompany::CompanyID company, uint32 quarter)
+/* static */ Money ScriptCompany::GetQuarterlyCompanyValue(ScriptCompany::CompanyID company, SQInteger quarter)
 {
 	company = ResolveCompanyID(company);
 	if (company == COMPANY_INVALID) return -1;
 	if (quarter > EARLIEST_QUARTER) return -1;
+	if (quarter < CURRENT_QUARTER) return -1;
 
 	if (quarter == CURRENT_QUARTER) {
 		return ::CalculateCompanyValue(::Company::Get(company));
@@ -201,7 +209,7 @@
 
 /* static */ bool ScriptCompany::SetLoanAmount(Money loan)
 {
-	EnforcePrecondition(false, ScriptObject::GetCompany() != OWNER_DEITY);
+	EnforceCompanyModeValid(false);
 	EnforcePrecondition(false, loan >= 0);
 	EnforcePrecondition(false, ((int64)loan % GetLoanInterval()) == 0);
 	EnforcePrecondition(false, loan <= GetMaxLoanAmount());
@@ -220,7 +228,7 @@
 
 /* static */ bool ScriptCompany::SetMinimumLoanAmount(Money loan)
 {
-	EnforcePrecondition(false, ScriptObject::GetCompany() != OWNER_DEITY);
+	EnforceCompanyModeValid(false);
 	EnforcePrecondition(false, loan >= 0);
 
 	Money over_interval = (int64)loan % GetLoanInterval();
@@ -235,10 +243,8 @@
 
 /* static */ bool ScriptCompany::ChangeBankBalance(CompanyID company, Money delta, ExpensesType expenses_type, TileIndex tile)
 {
-	EnforcePrecondition(false, ScriptObject::GetCompany() == OWNER_DEITY);
+	EnforceDeityMode(false);
 	EnforcePrecondition(false, expenses_type < (ExpensesType)::EXPENSES_END);
-	EnforcePrecondition(false, (int64)delta >= INT32_MIN);
-	EnforcePrecondition(false, (int64)delta <= INT32_MAX);
 	EnforcePrecondition(false, tile == INVALID_TILE || ::IsValidTile(tile));
 
 	company = ResolveCompanyID(company);
@@ -250,7 +256,7 @@
 
 /* static */ bool ScriptCompany::BuildCompanyHQ(TileIndex tile)
 {
-	EnforcePrecondition(false, ScriptObject::GetCompany() != OWNER_DEITY);
+	EnforceCompanyModeValid(false);
 	EnforcePrecondition(false, ::IsValidTile(tile));
 
 	return ScriptObject::Command<CMD_BUILD_OBJECT>::Do(tile, OBJECT_HQ, 0);
@@ -267,6 +273,7 @@
 
 /* static */ bool ScriptCompany::SetAutoRenewStatus(bool autorenew)
 {
+	EnforceCompanyModeValid(false);
 	return ScriptObject::Command<CMD_CHANGE_COMPANY_SETTING>::Do("company.engine_renew", autorenew ? 1 : 0);
 }
 
@@ -278,12 +285,15 @@
 	return ::Company::Get(company)->settings.engine_renew;
 }
 
-/* static */ bool ScriptCompany::SetAutoRenewMonths(int16 months)
+/* static */ bool ScriptCompany::SetAutoRenewMonths(SQInteger months)
 {
+	EnforceCompanyModeValid(false);
+	months = Clamp<SQInteger>(months, INT16_MIN, INT16_MAX);
+
 	return ScriptObject::Command<CMD_CHANGE_COMPANY_SETTING>::Do("company.engine_renew_months", months);
 }
 
-/* static */ int16 ScriptCompany::GetAutoRenewMonths(CompanyID company)
+/* static */ SQInteger ScriptCompany::GetAutoRenewMonths(CompanyID company)
 {
 	company = ResolveCompanyID(company);
 	if (company == COMPANY_INVALID) return 0;
@@ -293,6 +303,7 @@
 
 /* static */ bool ScriptCompany::SetAutoRenewMoney(Money money)
 {
+	EnforceCompanyModeValid(false);
 	EnforcePrecondition(false, money >= 0);
 	EnforcePrecondition(false, (int64)money <= UINT32_MAX);
 	return ScriptObject::Command<CMD_CHANGE_COMPANY_SETTING>::Do("company.engine_renew_money", money);
@@ -308,11 +319,13 @@
 
 /* static */ bool ScriptCompany::SetPrimaryLiveryColour(LiveryScheme scheme, Colours colour)
 {
+	EnforceCompanyModeValid(false);
 	return ScriptObject::Command<CMD_SET_COMPANY_COLOUR>::Do((::LiveryScheme)scheme, true, (::Colours)colour);
 }
 
 /* static */ bool ScriptCompany::SetSecondaryLiveryColour(LiveryScheme scheme, Colours colour)
 {
+	EnforceCompanyModeValid(false);
 	return ScriptObject::Command<CMD_SET_COMPANY_COLOUR>::Do((::LiveryScheme)scheme, false, (::Colours)colour);
 }
 

@@ -88,10 +88,10 @@ void LinkGraphOverlay::RebuildCache()
 			if (!LinkGraph::IsValidID(sta->goods[c].link_graph)) continue;
 			const LinkGraph &lg = *LinkGraph::Get(sta->goods[c].link_graph);
 
-			ConstNode from_node = lg[sta->goods[c].node];
-			supply += lg.Monthly(from_node.Supply());
-			for (ConstEdgeIterator i = from_node.Begin(); i != from_node.End(); ++i) {
-				StationID to = lg[i->first].Station();
+			ConstNode &from_node = lg[sta->goods[c].node];
+			supply += lg.Monthly(from_node.supply);
+			for (const Edge &edge : from_node.edges) {
+				StationID to = lg[edge.dest_node].station;
 				assert(from != to);
 				if (!Station::IsValidID(to) || seen_links.find(to) != seen_links.end()) {
 					continue;
@@ -217,9 +217,9 @@ void LinkGraphOverlay::AddLinks(const Station *from, const Station *to)
 			continue;
 		}
 		const LinkGraph &lg = *LinkGraph::Get(ge.link_graph);
-		ConstEdge edge = lg[ge.node][to->goods[c].node];
-		if (edge.Capacity() > 0) {
-			this->AddStats(c, lg.Monthly(edge.Capacity()), lg.Monthly(edge.Usage()),
+		if (lg[ge.node].HasEdgeTo(to->goods[c].node)) {
+			ConstEdge &edge = lg[ge.node][to->goods[c].node];
+			this->AddStats(c, lg.Monthly(edge.capacity), lg.Monthly(edge.usage),
 					ge.flows.GetFlowVia(to->index),
 					edge.TravelTime() / DAY_TICKS,
 					from->owner == OWNER_NONE || to->owner == OWNER_NONE,
@@ -373,8 +373,10 @@ bool LinkGraphOverlay::ShowTooltip(Point pt, TooltipCloseCondition close_cond)
 				std::sqrt((ptb.x - pta.x) * (ptb.x - pta.x) + (ptb.y - pta.y) * (ptb.y - pta.y));
 			const auto &link = j->second;
 			if (dist <= 4 && link.Usage() > 0 &&
-					pt.x >= std::min(pta.x, ptb.x) &&
-					pt.x <= std::max(pta.x, ptb.x)) {
+					pt.x + 2 >= std::min(pta.x, ptb.x) &&
+					pt.x - 2 <= std::max(pta.x, ptb.x) &&
+					pt.y + 2 >= std::min(pta.y, ptb.y) &&
+					pt.y - 2 <= std::max(pta.y, ptb.y)) {
 				static char buf[1024];
 				char *buf_end = buf;
 				buf[0] = 0;
@@ -442,7 +444,7 @@ void LinkGraphOverlay::SetCargoMask(CargoTypes cargo_mask)
  * Set a new company mask and rebuild the cache.
  * @param company_mask New company mask.
  */
-void LinkGraphOverlay::SetCompanyMask(uint32 company_mask)
+void LinkGraphOverlay::SetCompanyMask(CompanyMask company_mask)
 {
 	this->company_mask = company_mask;
 	this->RebuildCache();
@@ -560,9 +562,9 @@ LinkGraphLegendWindow::LinkGraphLegendWindow(WindowDesc *desc, int window_number
  * Set the overlay belonging to this menu and import its company/cargo settings.
  * @param overlay New overlay for this menu.
  */
-void LinkGraphLegendWindow::SetOverlay(LinkGraphOverlay *overlay) {
+void LinkGraphLegendWindow::SetOverlay(std::shared_ptr<LinkGraphOverlay> overlay) {
 	this->overlay = overlay;
-	uint32 companies = this->overlay->GetCompanyMask();
+	CompanyMask companies = this->overlay->GetCompanyMask();
 	for (uint c = 0; c < MAX_COMPANIES; c++) {
 		if (!this->IsWidgetDisabled(WID_LGL_COMPANY_FIRST + c)) {
 			this->SetWidgetLoweredState(WID_LGL_COMPANY_FIRST + c, HasBit(companies, c));

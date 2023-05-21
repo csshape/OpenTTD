@@ -21,6 +21,8 @@
 #include "../script_suspend.hpp"
 #include "../squirrel.hpp"
 
+#include <utility>
+
 /**
  * The callback function for Mode-classes.
  */
@@ -118,12 +120,12 @@ protected:
 	/**
 	 * Store the latest command executed by the script.
 	 */
-	static void SetLastCommand(TileIndex tile, const CommandDataBuffer &data, Commands cmd);
+	static void SetLastCommand(const CommandDataBuffer &data, Commands cmd);
 
 	/**
 	 * Check if it's the latest command executed by the script.
 	 */
-	static bool CheckLastCommand(TileIndex tile, const CommandDataBuffer &data, Commands cmd);
+	static bool CheckLastCommand(const CommandDataBuffer &data, Commands cmd);
 
 	/**
 	 * Sets the DoCommand costs counter to a value.
@@ -354,7 +356,7 @@ bool ScriptObject::ScriptDoCommandHelper<Tcmd, Tret(*)(DoCommandFlag, Targs...)>
 	if constexpr ((::GetCommandFlags<Tcmd>() & CMD_CLIENT_ID) != 0) ScriptObjectInternal::SetClientIds(args, std::index_sequence_for<Targs...>{});
 
 	/* Store the command for command callback validation. */
-	if (!estimate_only && networking) ScriptObject::SetLastCommand(tile, EndianBufferWriter<CommandDataBuffer>::FromValue(args), Tcmd);
+	if (!estimate_only && networking) ScriptObject::SetLastCommand(EndianBufferWriter<CommandDataBuffer>::FromValue(args), Tcmd);
 
 	/* Try to perform the command. */
 	Tret res = ::Command<Tcmd>::Unsafe((StringID)0, networking ? ScriptObject::GetDoCommandCallback() : nullptr, false, estimate_only, tile, args);
@@ -366,5 +368,69 @@ bool ScriptObject::ScriptDoCommandHelper<Tcmd, Tret(*)(DoCommandFlag, Targs...)>
 		return ScriptObject::DoCommandProcessResult(std::get<0>(res), callback, estimate_only);
 	}
 }
+
+/**
+ * Internally used class to automate the ScriptObject reference counting.
+ * @api -all
+ */
+template <typename T>
+class ScriptObjectRef {
+private:
+	T *data; ///< The reference counted object.
+public:
+	/**
+	 * Create the reference counter for the given ScriptObject instance.
+	 * @param data The underlying object.
+	 */
+	ScriptObjectRef(T *data) : data(data)
+	{
+		this->data->AddRef();
+	}
+
+	/* No copy constructor. */
+	ScriptObjectRef(const ScriptObjectRef<T> &ref) = delete;
+
+	/* Move constructor. */
+	ScriptObjectRef(ScriptObjectRef<T> &&ref) noexcept : data(std::exchange(ref.data, nullptr))
+	{
+	}
+
+	/* No copy assignment. */
+	ScriptObjectRef& operator=(const ScriptObjectRef<T> &other) = delete;
+
+	/* Move assignment. */
+	ScriptObjectRef& operator=(ScriptObjectRef<T> &&other) noexcept
+	{
+		std::swap(this->data, other.data);
+		return *this;
+	}
+
+	/**
+	 * Release the reference counted object.
+	 */
+	~ScriptObjectRef()
+	{
+		if (this->data != nullptr) this->data->Release();
+	}
+
+	/**
+	 * Dereferencing this reference returns a reference to the reference
+	 * counted object
+	 * @return Reference to the underlying object.
+	 */
+	T &operator*()
+	{
+		return *this->data;
+	}
+
+	/**
+	 * The arrow operator on this reference returns the reference counted object.
+	 * @return Pointer to the underlying object.
+	 */
+	T *operator->()
+	{
+		return this->data;
+	}
+};
 
 #endif /* SCRIPT_OBJECT_HPP */

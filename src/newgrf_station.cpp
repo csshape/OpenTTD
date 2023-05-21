@@ -23,6 +23,7 @@
 #include "tunnelbridge_map.h"
 #include "newgrf_animation_base.h"
 #include "newgrf_class_func.h"
+#include "timer/timer_game_calendar.h"
 
 #include "safeguards.h"
 
@@ -293,7 +294,7 @@ TownScopeResolver *StationResolverObject::GetTown()
 				}
 				break;
 
-			case 0xFA: return Clamp(_date - DAYS_TILL_ORIGINAL_BASE_YEAR, 0, 65535); // Build date, clamped to a 16 bit value
+			case 0xFA: return Clamp(TimerGameCalendar::date - DAYS_TILL_ORIGINAL_BASE_YEAR, 0, 65535); // Build date, clamped to a 16 bit value
 		}
 
 		*available = false;
@@ -894,7 +895,7 @@ uint16 GetAnimStationCallback(CallbackID callback, uint32 param1, uint32 param2,
 }
 
 /** Helper class for animation control. */
-struct StationAnimationBase : public AnimationBase<StationAnimationBase, StationSpec, BaseStation, int, GetAnimStationCallback> {
+struct StationAnimationBase : public AnimationBase<StationAnimationBase, StationSpec, BaseStation, int, GetAnimStationCallback, TileAnimationFrameAnimationHelper<BaseStation> > {
 	static const CallbackID cb_animation_speed      = CBID_STATION_ANIMATION_SPEED;
 	static const CallbackID cb_animation_next_frame = CBID_STATION_ANIM_NEXT_FRAME;
 

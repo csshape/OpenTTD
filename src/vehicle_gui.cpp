@@ -407,7 +407,7 @@ void DepotSortList(VehicleList *list)
 }
 
 /** draw the vehicle profit button in the vehicle list window. */
-static void DrawVehicleProfitButton(Date age, Money display_profit_last_year, uint num_vehicles, int x, int y)
+static void DrawVehicleProfitButton(TimerGameCalendar::Date age, Money display_profit_last_year, uint num_vehicles, int x, int y)
 {
 	SpriteID spr;
 
@@ -2413,12 +2413,14 @@ struct VehicleDetailsWindow : Window {
 				break;
 
 			case WID_VD_SERVICE_INTERVAL_DROPDOWN: {
+				Dimension d{0, 0};
 				StringID *strs = _service_interval_dropdown;
 				while (*strs != INVALID_STRING_ID) {
-					*size = maxdim(*size, GetStringBoundingBox(*strs++));
+					d = maxdim(d, GetStringBoundingBox(*strs++));
 				}
-				size->width += padding.width;
-				size->height = FONT_HEIGHT_NORMAL + padding.height;
+				d.width += padding.width;
+				d.height += padding.height;
+				*size = maxdim(*size, d);
 				break;
 			}
 
@@ -2493,7 +2495,7 @@ struct VehicleDetailsWindow : Window {
 				if (v->type == VEH_TRAIN ||
 						(v->type == VEH_ROAD && _settings_game.vehicle.roadveh_acceleration_model != AM_ORIGINAL)) {
 					const GroundVehicleCache *gcache = v->GetGroundVehicleCache();
-					SetDParam(2, v->GetDisplayMaxSpeed());
+					SetDParam(2, PackVelocity(v->GetDisplayMaxSpeed(), v->type));
 					SetDParam(1, gcache->cached_power);
 					SetDParam(0, gcache->cached_weight);
 					SetDParam(3, gcache->cached_max_te / 1000);
@@ -2504,7 +2506,7 @@ struct VehicleDetailsWindow : Window {
 						string = STR_VEHICLE_INFO_WEIGHT_POWER_MAX_SPEED_MAX_TE;
 					}
 				} else {
-					SetDParam(0, v->GetDisplayMaxSpeed());
+					SetDParam(0, PackVelocity(v->GetDisplayMaxSpeed(), v->type));
 					if (v->type == VEH_AIRCRAFT) {
 						SetDParam(1, v->GetEngine()->GetAircraftTypeText());
 						if (Aircraft::From(v)->GetRange() > 0) {
@@ -2999,7 +3001,7 @@ public:
 						str = STR_VEHICLE_STATUS_STOPPED;
 					}
 				} else {
-					SetDParam(0, v->GetDisplaySpeed());
+					SetDParam(0, PackVelocity(v->GetDisplaySpeed(), v->type));
 					str = STR_VEHICLE_STATUS_TRAIN_STOPPING_VEL;
 				}
 			} else { // no train
@@ -3020,7 +3022,7 @@ public:
 			switch (v->current_order.GetType()) {
 				case OT_GOTO_STATION: {
 					SetDParam(0, v->current_order.GetDestination());
-					SetDParam(1, v->GetDisplaySpeed());
+					SetDParam(1, PackVelocity(v->GetDisplaySpeed(), v->type));
 					str = HasBit(v->vehicle_flags, VF_PATHFINDER_LOST) ? STR_VEHICLE_STATUS_CANNOT_REACH_STATION_VEL : STR_VEHICLE_STATUS_HEADING_FOR_STATION_VEL;
 					break;
 				}
@@ -3028,7 +3030,7 @@ public:
 				case OT_GOTO_DEPOT: {
 					SetDParam(0, v->type);
 					SetDParam(1, v->current_order.GetDestination());
-					SetDParam(2, v->GetDisplaySpeed());
+					SetDParam(2, PackVelocity(v->GetDisplaySpeed(), v->type));
 					if (v->current_order.GetDestination() == INVALID_DEPOT) {
 						/* This case *only* happens when multiple nearest depot orders
 						 * follow each other (including an order list only one order: a
@@ -3053,7 +3055,7 @@ public:
 					assert(v->type == VEH_TRAIN || v->type == VEH_SHIP);
 					SetDParam(0, v->current_order.GetDestination());
 					str = HasBit(v->vehicle_flags, VF_PATHFINDER_LOST) ? STR_VEHICLE_STATUS_CANNOT_REACH_WAYPOINT_VEL : STR_VEHICLE_STATUS_HEADING_FOR_WAYPOINT_VEL;
-					SetDParam(1, v->GetDisplaySpeed());
+					SetDParam(1, PackVelocity(v->GetDisplaySpeed(), v->type));
 					break;
 				}
 
@@ -3066,7 +3068,7 @@ public:
 				default:
 					if (v->GetNumManualOrders() == 0) {
 						str = STR_VEHICLE_STATUS_NO_ORDERS_VEL;
-						SetDParam(0, v->GetDisplaySpeed());
+						SetDParam(0, PackVelocity(v->GetDisplaySpeed(), v->type));
 					} else {
 						str = STR_EMPTY;
 					}
