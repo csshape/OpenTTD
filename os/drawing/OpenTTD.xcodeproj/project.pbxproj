@@ -7,10 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		330B25312A1B9D960093DD5C /* gs_instruments.dls in Resources */ = {isa = PBXBuildFile; fileRef = 330B25302A1B9D960093DD5C /* gs_instruments.dls */; };
-		330B25352A1B9DBF0093DD5C /* Fragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 330B25322A1B9DBE0093DD5C /* Fragment.glsl */; };
-		330B25372A1B9DBF0093DD5C /* Vertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 330B25342A1B9DBF0093DD5C /* Vertex.glsl */; };
-		330B25392A1B9DD70093DD5C /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 330B25332A1B9DBF0093DD5C /* Shaders.metal */; };
+		330B25462A1BA1AE0093DD5C /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 330B25452A1BA1AE0093DD5C /* Shaders.metal */; };
+		330B254D2A1BA2540093DD5C /* game in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B96284A250F0057061C /* game */; };
+		330B254F2A1BA2580093DD5C /* game in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B96284A250F0057061C /* game */; };
 		33523889282BAEEE006B68EE /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33523888282BAEEE006B68EE /* main.mm */; };
 		335244F5282BBEC8006B68EE /* spritecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FAA282BBEC7006B68EE /* spritecache.cpp */; };
 		335244F6282BBEC8006B68EE /* cargomonitor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FAB282BBEC7006B68EE /* cargomonitor.cpp */; };
@@ -1446,10 +1445,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		330B25302A1B9D960093DD5C /* gs_instruments.dls */ = {isa = PBXFileReference; lastKnownFileType = file; path = gs_instruments.dls; sourceTree = "<group>"; };
-		330B25322A1B9DBE0093DD5C /* Fragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Fragment.glsl; sourceTree = "<group>"; };
-		330B25332A1B9DBF0093DD5C /* Shaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
-		330B25342A1B9DBF0093DD5C /* Vertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Vertex.glsl; sourceTree = "<group>"; };
+		330B253E2A1BA1AD0093DD5C /* gs_instruments.dls */ = {isa = PBXFileReference; lastKnownFileType = file; path = gs_instruments.dls; sourceTree = "<group>"; };
+		330B25432A1BA1AD0093DD5C /* Vertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Vertex.glsl; sourceTree = "<group>"; };
+		330B25442A1BA1AD0093DD5C /* Fragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Fragment.glsl; sourceTree = "<group>"; };
+		330B25452A1BA1AE0093DD5C /* Shaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
 		33523885282BAEEE006B68EE /* OpenTTD_Mac_Test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OpenTTD_Mac_Test; sourceTree = BUILT_PRODUCTS_DIR; };
 		33523888282BAEEE006B68EE /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
 		33523891282BB08F006B68EE /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
@@ -2687,10 +2686,10 @@
 		336E69A4284A09370057061C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		336E69A9284A09370057061C /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
 		336E69AB284A09370057061C /* OpenTTD_Mac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OpenTTD_Mac.entitlements; sourceTree = "<group>"; };
-		336E6B96284A250F0057061C /* game */ = {isa = PBXFileReference; lastKnownFileType = text; name = game; path = ../../../../Downloads/openttd/OpenTTD/build/game; sourceTree = "<group>"; };
-		336E6B97284A25310057061C /* lang */ = {isa = PBXFileReference; lastKnownFileType = text; name = lang; path = ../../../../Downloads/openttd/OpenTTD/build/lang; sourceTree = "<group>"; };
-		336E6B99284A25660057061C /* ai */ = {isa = PBXFileReference; lastKnownFileType = text; name = ai; path = ../../../../Downloads/openttd/OpenTTD/build/ai; sourceTree = "<group>"; };
-		336E6B9A284A25660057061C /* baseset */ = {isa = PBXFileReference; lastKnownFileType = text; name = baseset; path = ../../../../Downloads/openttd/OpenTTD/build/baseset; sourceTree = "<group>"; };
+		336E6B96284A250F0057061C /* game */ = {isa = PBXFileReference; lastKnownFileType = folder; name = game; path = ../../../../../../Downloads/openttd/OpenTTD/build/game; sourceTree = "<group>"; };
+		336E6B97284A25310057061C /* lang */ = {isa = PBXFileReference; lastKnownFileType = folder; name = lang; path = ../../../../../../Downloads/openttd/OpenTTD/build/lang; sourceTree = "<group>"; };
+		336E6B99284A25660057061C /* ai */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ai; path = ../../../../../../Downloads/openttd/OpenTTD/build/ai; sourceTree = "<group>"; };
+		336E6B9A284A25660057061C /* baseset */ = {isa = PBXFileReference; lastKnownFileType = folder; name = baseset; path = ../../../../../../Downloads/openttd/OpenTTD/build/baseset; sourceTree = "<group>"; };
 		336E6B9D284A25750057061C /* scripts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = scripts; path = ../../../../../../Downloads/openttd/OpenTTD/bin/scripts; sourceTree = "<group>"; };
 		336E6BD8284A5FFD0057061C /* cocoa_ogl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cocoa_ogl.h; sourceTree = "<group>"; };
 		336E6BD9284A5FFD0057061C /* cocoa_keys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cocoa_keys.h; sourceTree = "<group>"; };
@@ -4469,10 +4468,10 @@
 		336E6B8F284A24AB0057061C /* bin */ = {
 			isa = PBXGroup;
 			children = (
-				330B25322A1B9DBE0093DD5C /* Fragment.glsl */,
-				330B25332A1B9DBF0093DD5C /* Shaders.metal */,
-				330B25342A1B9DBF0093DD5C /* Vertex.glsl */,
-				330B25302A1B9D960093DD5C /* gs_instruments.dls */,
+				330B25452A1BA1AE0093DD5C /* Shaders.metal */,
+				330B25442A1BA1AD0093DD5C /* Fragment.glsl */,
+				330B253E2A1BA1AD0093DD5C /* gs_instruments.dls */,
+				330B25432A1BA1AD0093DD5C /* Vertex.glsl */,
 				336E6B9D284A25750057061C /* scripts */,
 				336E6B99284A25660057061C /* ai */,
 				336E6B9A284A25660057061C /* baseset */,
@@ -4675,6 +4674,7 @@
 				336E6B98284A25310057061C /* lang in Resources */,
 				336E69A5284A09370057061C /* Assets.xcassets in Resources */,
 				336E6B9E284A25750057061C /* scripts in Resources */,
+				330B254D2A1BA2540093DD5C /* game in Resources */,
 				336E6B9C284A25670057061C /* baseset in Resources */,
 				336E6BFB284A62CA0057061C /* MainMenu.xib in Resources */,
 			);
@@ -4686,15 +4686,13 @@
 			files = (
 				33A02CBE285F359900075442 /* lang in Resources */,
 				33A02CBF285F359D00075442 /* baseset in Resources */,
+				330B254F2A1BA2580093DD5C /* game in Resources */,
 				33A02CC1285F35A400075442 /* scripts in Resources */,
-				330B25312A1B9D960093DD5C /* gs_instruments.dls in Resources */,
 				33A02CD8286EE9C400075442 /* DevConfig.xcconfig in Resources */,
-				330B25352A1B9DBF0093DD5C /* Fragment.glsl in Resources */,
 				33A02CD0286C9B6800075442 /* InhouseConfig.xcconfig in Resources */,
 				336E6C16284A787A0057061C /* LaunchScreen.storyboard in Resources */,
 				33A02CC0285F35A000075442 /* ai in Resources */,
 				336E6C13284A787A0057061C /* Assets.xcassets in Resources */,
-				330B25372A1B9DBF0093DD5C /* Vertex.glsl in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4921,6 +4919,7 @@
 				335245C9282BBEC8006B68EE /* fileio.cpp in Sources */,
 				3352468F282BBEC9006B68EE /* texteff.cpp in Sources */,
 				335245BE282BBEC8006B68EE /* 40bpp_anim.cpp in Sources */,
+				330B25462A1BA1AE0093DD5C /* Shaders.metal in Sources */,
 				33524528282BBEC8006B68EE /* newgrf_cargo.cpp in Sources */,
 				33524600282BBEC8006B68EE /* script_tilelist.cpp in Sources */,
 				33524641282BBEC9006B68EE /* road.cpp in Sources */,
@@ -5899,7 +5898,6 @@
 				336E6D85284A7AF50057061C /* station_cmd.cpp in Sources */,
 				336E6D5F284A7AF50057061C /* settings_gui.cpp in Sources */,
 				336E6D38284A7A980057061C /* subsidy_sl.cpp in Sources */,
-				330B25392A1B9DD70093DD5C /* Shaders.metal in Sources */,
 				336E6DA1284A7AF50057061C /* script_group.cpp in Sources */,
 				336E6D0A284A7A5C0057061C /* newgrf_roadtype.cpp in Sources */,
 				336E6DAB284A7AF50057061C /* script_engine.cpp in Sources */,
