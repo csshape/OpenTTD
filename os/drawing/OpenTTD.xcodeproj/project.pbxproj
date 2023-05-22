@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		330B25312A1B9D960093DD5C /* gs_instruments.dls in Resources */ = {isa = PBXBuildFile; fileRef = 330B25302A1B9D960093DD5C /* gs_instruments.dls */; };
+		330B25352A1B9DBF0093DD5C /* Fragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 330B25322A1B9DBE0093DD5C /* Fragment.glsl */; };
+		330B25372A1B9DBF0093DD5C /* Vertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 330B25342A1B9DBF0093DD5C /* Vertex.glsl */; };
+		330B25392A1B9DD70093DD5C /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 330B25332A1B9DBF0093DD5C /* Shaders.metal */; };
 		33523889282BAEEE006B68EE /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33523888282BAEEE006B68EE /* main.mm */; };
 		335244F5282BBEC8006B68EE /* spritecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FAA282BBEC7006B68EE /* spritecache.cpp */; };
 		335244F6282BBEC8006B68EE /* cargomonitor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FAB282BBEC7006B68EE /* cargomonitor.cpp */; };
@@ -436,12 +440,8 @@
 		335246CA282BD828006B68EE /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 33523891282BB08F006B68EE /* libz.tbd */; };
 		33560DA1284CC43600B6B8C4 /* font_osx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243E3282BBEC8006B68EE /* font_osx.cpp */; settings = {COMPILER_FLAGS = " -w"; }; };
 		33560DA2284CC6CF00B6B8C4 /* string_osx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335243DE282BBEC8006B68EE /* string_osx.cpp */; settings = {COMPILER_FLAGS = " -w"; }; };
-		33560DA3284CC87800B6B8C4 /* gs_instruments.dls in Resources */ = {isa = PBXBuildFile; fileRef = 336E6BA0284A25CC0057061C /* gs_instruments.dls */; };
 		33560DA4284CC8AA00B6B8C4 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6C07284A78790057061C /* AppDelegate.mm */; };
 		33560DA6284CC8F000B6B8C4 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6C0D284A78790057061C /* ViewController.mm */; };
-		33560DAA284E099300B6B8C4 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 336E6BA1284A25CC0057061C /* Shaders.metal */; };
-		33560DAB284E099700B6B8C4 /* Vertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 336E6BA2284A25CC0057061C /* Vertex.glsl */; };
-		33560DAC284E099B00B6B8C4 /* Fragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B9F284A25CC0057061C /* Fragment.glsl */; };
 		33560DB8284E1E5600B6B8C4 /* VideoDriver_CocoaQuartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33560DB6284E1E5000B6B8C4 /* VideoDriver_CocoaQuartz.mm */; };
 		33560DBB284E1F6000B6B8C4 /* VideoDriver_OpenGLES.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33560DBA284E1F6000B6B8C4 /* VideoDriver_OpenGLES.mm */; };
 		33560DBF28534B6400B6B8C4 /* ios_wnd.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33560DBE28534B6400B6B8C4 /* ios_wnd.mm */; };
@@ -897,7 +897,6 @@
 		336E6B9B284A25670057061C /* ai in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B99284A25660057061C /* ai */; };
 		336E6B9C284A25670057061C /* baseset in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B9A284A25660057061C /* baseset */; };
 		336E6B9E284A25750057061C /* scripts in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B9D284A25750057061C /* scripts */; };
-		336E6BA4284A25CC0057061C /* gs_instruments.dls in Resources */ = {isa = PBXBuildFile; fileRef = 336E6BA0284A25CC0057061C /* gs_instruments.dls */; };
 		336E6BDF284A5FFE0057061C /* cocoa_ogl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6BDB284A5FFD0057061C /* cocoa_ogl.mm */; };
 		336E6BE0284A5FFE0057061C /* cocoa_wnd.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6BDC284A5FFD0057061C /* cocoa_wnd.mm */; };
 		336E6BE1284A5FFE0057061C /* cocoa_v.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6BDD284A5FFD0057061C /* cocoa_v.mm */; };
@@ -1447,6 +1446,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		330B25302A1B9D960093DD5C /* gs_instruments.dls */ = {isa = PBXFileReference; lastKnownFileType = file; path = gs_instruments.dls; sourceTree = "<group>"; };
+		330B25322A1B9DBE0093DD5C /* Fragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Fragment.glsl; sourceTree = "<group>"; };
+		330B25332A1B9DBF0093DD5C /* Shaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
+		330B25342A1B9DBF0093DD5C /* Vertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Vertex.glsl; sourceTree = "<group>"; };
 		33523885282BAEEE006B68EE /* OpenTTD_Mac_Test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OpenTTD_Mac_Test; sourceTree = BUILT_PRODUCTS_DIR; };
 		33523888282BAEEE006B68EE /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
 		33523891282BB08F006B68EE /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
@@ -2684,15 +2687,11 @@
 		336E69A4284A09370057061C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		336E69A9284A09370057061C /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
 		336E69AB284A09370057061C /* OpenTTD_Mac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OpenTTD_Mac.entitlements; sourceTree = "<group>"; };
-		336E6B96284A250F0057061C /* game */ = {isa = PBXFileReference; lastKnownFileType = folder; name = game; path = ../../../../build/game; sourceTree = "<group>"; };
-		336E6B97284A25310057061C /* lang */ = {isa = PBXFileReference; lastKnownFileType = folder; name = lang; path = ../../../../build/lang; sourceTree = "<group>"; };
-		336E6B99284A25660057061C /* ai */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ai; path = ../../../../build/ai; sourceTree = "<group>"; };
-		336E6B9A284A25660057061C /* baseset */ = {isa = PBXFileReference; lastKnownFileType = folder; name = baseset; path = ../../../../build/baseset; sourceTree = "<group>"; };
-		336E6B9D284A25750057061C /* scripts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = scripts; path = ../../../../bin/scripts; sourceTree = "<group>"; };
-		336E6B9F284A25CC0057061C /* Fragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Fragment.glsl; path = "../../../../../../Library/Mobile Documents/com~apple~CloudDocs/Customers/OpenTTD/os/ios/OpenTTD/Fragment.glsl"; sourceTree = "<group>"; };
-		336E6BA0284A25CC0057061C /* gs_instruments.dls */ = {isa = PBXFileReference; lastKnownFileType = file; name = gs_instruments.dls; path = ../../../../../gs_instruments.dls; sourceTree = "<group>"; };
-		336E6BA1284A25CC0057061C /* Shaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Shaders.metal; path = "../../../../../../Library/Mobile Documents/com~apple~CloudDocs/Customers/OpenTTD/os/ios/OpenTTD/Shaders.metal"; sourceTree = "<group>"; };
-		336E6BA2284A25CC0057061C /* Vertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Vertex.glsl; path = "../../../../../../Library/Mobile Documents/com~apple~CloudDocs/Customers/OpenTTD/os/ios/OpenTTD/Vertex.glsl"; sourceTree = "<group>"; };
+		336E6B96284A250F0057061C /* game */ = {isa = PBXFileReference; lastKnownFileType = text; name = game; path = ../../../../Downloads/openttd/OpenTTD/build/game; sourceTree = "<group>"; };
+		336E6B97284A25310057061C /* lang */ = {isa = PBXFileReference; lastKnownFileType = text; name = lang; path = ../../../../Downloads/openttd/OpenTTD/build/lang; sourceTree = "<group>"; };
+		336E6B99284A25660057061C /* ai */ = {isa = PBXFileReference; lastKnownFileType = text; name = ai; path = ../../../../Downloads/openttd/OpenTTD/build/ai; sourceTree = "<group>"; };
+		336E6B9A284A25660057061C /* baseset */ = {isa = PBXFileReference; lastKnownFileType = text; name = baseset; path = ../../../../Downloads/openttd/OpenTTD/build/baseset; sourceTree = "<group>"; };
+		336E6B9D284A25750057061C /* scripts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = scripts; path = ../../../../../../Downloads/openttd/OpenTTD/bin/scripts; sourceTree = "<group>"; };
 		336E6BD8284A5FFD0057061C /* cocoa_ogl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cocoa_ogl.h; sourceTree = "<group>"; };
 		336E6BD9284A5FFD0057061C /* cocoa_keys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cocoa_keys.h; sourceTree = "<group>"; };
 		336E6BDA284A5FFD0057061C /* cocoa_wnd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cocoa_wnd.h; sourceTree = "<group>"; };
@@ -4470,10 +4469,10 @@
 		336E6B8F284A24AB0057061C /* bin */ = {
 			isa = PBXGroup;
 			children = (
-				336E6B9F284A25CC0057061C /* Fragment.glsl */,
-				336E6BA0284A25CC0057061C /* gs_instruments.dls */,
-				336E6BA1284A25CC0057061C /* Shaders.metal */,
-				336E6BA2284A25CC0057061C /* Vertex.glsl */,
+				330B25322A1B9DBE0093DD5C /* Fragment.glsl */,
+				330B25332A1B9DBF0093DD5C /* Shaders.metal */,
+				330B25342A1B9DBF0093DD5C /* Vertex.glsl */,
+				330B25302A1B9D960093DD5C /* gs_instruments.dls */,
 				336E6B9D284A25750057061C /* scripts */,
 				336E6B99284A25660057061C /* ai */,
 				336E6B9A284A25660057061C /* baseset */,
@@ -4672,7 +4671,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				336E6BA4284A25CC0057061C /* gs_instruments.dls in Resources */,
 				336E6B9B284A25670057061C /* ai in Resources */,
 				336E6B98284A25310057061C /* lang in Resources */,
 				336E69A5284A09370057061C /* Assets.xcassets in Resources */,
@@ -4687,16 +4685,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				33A02CBE285F359900075442 /* lang in Resources */,
-				33560DA3284CC87800B6B8C4 /* gs_instruments.dls in Resources */,
 				33A02CBF285F359D00075442 /* baseset in Resources */,
 				33A02CC1285F35A400075442 /* scripts in Resources */,
+				330B25312A1B9D960093DD5C /* gs_instruments.dls in Resources */,
 				33A02CD8286EE9C400075442 /* DevConfig.xcconfig in Resources */,
+				330B25352A1B9DBF0093DD5C /* Fragment.glsl in Resources */,
 				33A02CD0286C9B6800075442 /* InhouseConfig.xcconfig in Resources */,
 				336E6C16284A787A0057061C /* LaunchScreen.storyboard in Resources */,
 				33A02CC0285F35A000075442 /* ai in Resources */,
 				336E6C13284A787A0057061C /* Assets.xcassets in Resources */,
-				33560DAB284E099700B6B8C4 /* Vertex.glsl in Resources */,
-				33560DAC284E099B00B6B8C4 /* Fragment.glsl in Resources */,
+				330B25372A1B9DBF0093DD5C /* Vertex.glsl in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5792,7 +5790,6 @@
 				336E6CF5284A7A5C0057061C /* network_gamelist.cpp in Sources */,
 				336E6C86284A7A2A0057061C /* bitmath_func.cpp in Sources */,
 				336E6D78284A7AF50057061C /* settings_table.cpp in Sources */,
-				33560DAA284E099300B6B8C4 /* Shaders.metal in Sources */,
 				33560DBF28534B6400B6B8C4 /* ios_wnd.mm in Sources */,
 				33560DA1284CC43600B6B8C4 /* font_osx.cpp in Sources */,
 				336E6C71284A7A2A0057061C /* 8bpp_optimized.cpp in Sources */,
@@ -5902,6 +5899,7 @@
 				336E6D85284A7AF50057061C /* station_cmd.cpp in Sources */,
 				336E6D5F284A7AF50057061C /* settings_gui.cpp in Sources */,
 				336E6D38284A7A980057061C /* subsidy_sl.cpp in Sources */,
+				330B25392A1B9DD70093DD5C /* Shaders.metal in Sources */,
 				336E6DA1284A7AF50057061C /* script_group.cpp in Sources */,
 				336E6D0A284A7A5C0057061C /* newgrf_roadtype.cpp in Sources */,
 				336E6DAB284A7AF50057061C /* script_engine.cpp in Sources */,
