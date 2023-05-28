@@ -94,7 +94,6 @@ bool IsOSKOpenedFor(const Window *w, int button) {
         case UIGestureRecognizerStateChanged: {
             Point point = [self gamePoint:[recognizer locationInView:self]];
             _cursor.UpdateCursorPosition(point.x, point.y, false);
-            _left_button_down = true;
             HandleMouseEvents();
         }
         default:
@@ -201,38 +200,61 @@ bool IsOSKOpenedFor(const Window *w, int button) {
         UITouch *touch = touches.anyObject;
         Point point = [self gamePoint:[touch locationInView:self]];
         _cursor.UpdateCursorPosition(point.x, point.y, false);
-        _left_button_down = true;
+        if (@available(iOS 13.4, *)) {
+            if (event.buttonMask == 2) {
+                _right_button_down = true;
+                _right_button_clicked = true;
+            } else {
+                _left_button_down = true;
+            }
+        } else {
+            _left_button_down = true;
+        }
+
         HandleMouseEvents();
     }
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    if (_left_button_down) {
+    if (_left_button_down || _right_button_down) {
         UITouch *touch = touches.anyObject;
         Point point = [self gamePoint:[touch locationInView:self]];
         _cursor.UpdateCursorPosition(point.x, point.y, false);
-        _left_button_down = true;
+        if (@available(iOS 13.4, *)) {
+            if (event.buttonMask == 2) {
+                _right_button_down = true;
+            } else {
+                _left_button_down = true;
+            }
+        } else {
+            _left_button_down = true;
+        }
         HandleMouseEvents();
     }
 }
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    if (_left_button_down) {
+    if (_left_button_down || _right_button_down) {
         UITouch *touch = touches.anyObject;
         Point point = [self gamePoint:[touch locationInView:self]];
         _cursor.UpdateCursorPosition(point.x, point.y, false);
+        _right_button_down = false;
+        _right_button_clicked = false;
         _left_button_down = false;
         _left_button_clicked = false;
+
         HandleMouseEvents();
     }
 }
 
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    if (_left_button_down) {
+    if (_left_button_down || _right_button_down) {
         ResetObjectToPlace();
         UITouch *touch = touches.anyObject;
         Point point = [self gamePoint:[touch locationInView:self]];
         _cursor.UpdateCursorPosition(point.x, point.y, false);
+        _right_button_down = false;
+        _right_button_clicked = false;
         _left_button_down = false;
         _left_button_clicked = false;
         HandleMouseEvents();
@@ -380,9 +402,10 @@ bool IsOSKOpenedFor(const Window *w, int button) {
             [self handleKeypress:presse.key.keyCode chars:[ presse.key characters ]];
         }
     } else {
-        [ self internalHandleKeycode:presse.key.keyCode unicode:unicode_str[0] pressed:YES modifiers:presse.key.modifierFlags ];
-        for (size_t i = 1; i < unicode_str.size(); i++) {
-            [ self internalHandleKeycode:0 unicode:unicode_str[i] pressed:YES modifiers:presse.key.modifierFlags ];
+        if ([self internalHandleKeycode:presse.key.keyCode unicode:unicode_str[0] pressed:YES modifiers:presse.key.modifierFlags]) {
+            for (size_t i = 1; i < unicode_str.size(); i++) {
+                [ self internalHandleKeycode:0 unicode:unicode_str[i] pressed:YES modifiers:presse.key.modifierFlags ];
+            }
         }
     }
 }
@@ -393,7 +416,7 @@ bool IsOSKOpenedFor(const Window *w, int button) {
     std::vector<WChar> unicode_str = NSStringToUTF32([ presse.key characters ]);
     if (unicode_str.empty()) unicode_str.push_back(0);
 
-    [ self internalHandleKeycode:presse.key.keyCode unicode:unicode_str[0] pressed:NO modifiers:presse.key.modifierFlags ];
+    [self internalHandleKeycode:presse.key.keyCode unicode:unicode_str[0] pressed:NO modifiers:presse.key.modifierFlags];
 }
 
 - (BOOL)internalHandleKeycode:(unsigned short)keycode unicode:(WChar)unicode pressed:(BOOL)down modifiers:(NSUInteger)modifiers
