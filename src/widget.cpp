@@ -2066,8 +2066,7 @@ void NWidgetViewport::Draw(const Window *w)
  */
 void NWidgetViewport::InitializeViewport(Window *w, uint32 follow_flags, ZoomLevel zoom)
 {
-    + _settings_client.gui.statusbar_pos_offset
-	InitializeWindowViewport(w, this->pos_x, this->pos_y, this->current_x, this->current_y, follow_flags, zoom);
+    InitializeWindowViewport(w, this->pos_x, this->pos_y, this->current_x, this->current_y, follow_flags, zoom);
 }
 
 /**

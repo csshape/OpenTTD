@@ -13,6 +13,18 @@
 
 #include "safeguards.h"
 
+#import <Foundation/Foundation.h>
+
+static const char * versionNumber() {
+    NSDictionary *info = [[NSBundle mainBundle] infoDictionary];
+    NSString *version = [info objectForKey:@"CFBundleShortVersionString"];
+    
+//    char *text = new char[[version length]];
+//    [version getCString:text maxLength:[version length] encoding:NSASCIIStringEncoding];
+    const char *text = [version UTF8String];
+    return text;
+}
+
 /**
  * Is this version of OpenTTD a release version?
  * @return True if it is a release version.
@@ -35,7 +47,7 @@ bool IsReleasedVersion()
  *
  * <modified> shows a "M", if the binary is made from modified source code.
  */
-const char _openttd_revision[] = "20220509-master-m867f6a5964";
+const char _openttd_revision[] = "12.2";
 
 /**
  * The text version of OpenTTD's build date.
@@ -70,14 +82,14 @@ const byte _openttd_revision_modified = 2;
  * If this is non-0, then _openttd_revision is the name of the tag,
  * and the version is likely a beta, release candidate, or real release.
  */
-const byte _openttd_revision_tagged = 0;
+const byte _openttd_revision_tagged = 1;
 
 /**
  * To check compatibility of BaNaNaS content, this version string is used.
  * It should never contain things like "beta", but only the release version
  * we are compatible with.
  */
-const char _openttd_content_version[] = "13.0";
+const char _openttd_content_version[] = "12.2";
 
 /**
  * The NewGRF revision of OTTD:
@@ -95,4 +107,5 @@ const char _openttd_content_version[] = "13.0";
  * the "patch" part of the version. To make sure "1.11.0" is smaller than "12.0", we
  * have to adjust the major by 16.
  */
-const uint32 _openttd_newgrf_version = (13 + 16) << 24 | 0 << 20 | 0 << 19 | 28004;
+//const uint32 _openttd_newgrf_version = (13 + 16) << 24 | 0 << 20 | 0 << 19 | 28004;
+const uint32 _openttd_newgrf_version = (12 + 16) << 24 | 2 << 20 | 0 << 19 | 28004;

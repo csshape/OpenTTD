@@ -103,13 +103,15 @@ static void CheckPaletteAnim()
     self.window.clipsToBounds = true;
     
     self.window.backgroundColor = [UIColor redColor];
-    
-    UIWindow *win = _cocoa_touch_driver->window;
 
-    self.viewController = (ViewController*)win.rootViewController;
-    
-    self.window.rootViewController = self.viewController;
-    
+    if (_cocoa_touch_driver) {
+        UIWindow *win = _cocoa_touch_driver->window;
+        self.viewController = (ViewController*)win.rootViewController;
+        self.window.rootViewController = self.viewController;
+    } else {
+        self.window.rootViewController = [[UIViewController alloc] init];
+    }
+
     [self.window makeKeyAndVisible];
     
     if (OSErrorMessage) {

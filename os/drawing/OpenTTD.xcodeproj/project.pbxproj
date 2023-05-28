@@ -7,9 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		330B25462A1BA1AE0093DD5C /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 330B25452A1BA1AE0093DD5C /* Shaders.metal */; };
-		330B254D2A1BA2540093DD5C /* game in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B96284A250F0057061C /* game */; };
-		330B254F2A1BA2580093DD5C /* game in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B96284A250F0057061C /* game */; };
+		330A2EB22A2377F0005A1F17 /* gs_instruments.dls in Resources */ = {isa = PBXBuildFile; fileRef = 330B253E2A1BA1AD0093DD5C /* gs_instruments.dls */; };
+		330A2EB32A2377F9005A1F17 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 330B25452A1BA1AE0093DD5C /* Shaders.metal */; };
+		330A2EB42A2377FD005A1F17 /* Fragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 330B25442A1BA1AD0093DD5C /* Fragment.glsl */; };
+		330A2EB52A237801005A1F17 /* Vertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 330B25432A1BA1AD0093DD5C /* Vertex.glsl */; };
+		330A2EB62A23780B005A1F17 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 330B25452A1BA1AE0093DD5C /* Shaders.metal */; };
+		330A2EBD2A2393F7005A1F17 /* ai in Resources */ = {isa = PBXBuildFile; fileRef = 330A2EB92A2393F7005A1F17 /* ai */; };
+		330A2EBE2A2393F7005A1F17 /* ai in Resources */ = {isa = PBXBuildFile; fileRef = 330A2EB92A2393F7005A1F17 /* ai */; };
+		330A2EBF2A2393F7005A1F17 /* lang in Resources */ = {isa = PBXBuildFile; fileRef = 330A2EBA2A2393F7005A1F17 /* lang */; };
+		330A2EC02A2393F7005A1F17 /* lang in Resources */ = {isa = PBXBuildFile; fileRef = 330A2EBA2A2393F7005A1F17 /* lang */; };
+		330A2EC12A2393F7005A1F17 /* baseset in Resources */ = {isa = PBXBuildFile; fileRef = 330A2EBB2A2393F7005A1F17 /* baseset */; };
+		330A2EC22A2393F7005A1F17 /* baseset in Resources */ = {isa = PBXBuildFile; fileRef = 330A2EBB2A2393F7005A1F17 /* baseset */; };
+		330A2EC32A2393F7005A1F17 /* game in Resources */ = {isa = PBXBuildFile; fileRef = 330A2EBC2A2393F7005A1F17 /* game */; };
+		330A2EC42A2393F7005A1F17 /* game in Resources */ = {isa = PBXBuildFile; fileRef = 330A2EBC2A2393F7005A1F17 /* game */; };
+		330A2EC62A23941B005A1F17 /* scripts in Resources */ = {isa = PBXBuildFile; fileRef = 330A2EC52A23941B005A1F17 /* scripts */; };
+		330A2EC72A23941B005A1F17 /* scripts in Resources */ = {isa = PBXBuildFile; fileRef = 330A2EC52A23941B005A1F17 /* scripts */; };
 		33523889282BAEEE006B68EE /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33523888282BAEEE006B68EE /* main.mm */; };
 		335244F5282BBEC8006B68EE /* spritecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FAA282BBEC7006B68EE /* spritecache.cpp */; };
 		335244F6282BBEC8006B68EE /* cargomonitor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FAB282BBEC7006B68EE /* cargomonitor.cpp */; };
@@ -892,10 +904,6 @@
 		336E6B8C284A15E50057061C /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 335246C8282BD815006B68EE /* CoreText.framework */; };
 		336E6B8D284A15F40057061C /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 336E69862849FE4B0057061C /* OpenGL.framework */; };
 		336E6B8E284A160D0057061C /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 336E69842849FE040057061C /* Cocoa.framework */; };
-		336E6B98284A25310057061C /* lang in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B97284A25310057061C /* lang */; };
-		336E6B9B284A25670057061C /* ai in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B99284A25660057061C /* ai */; };
-		336E6B9C284A25670057061C /* baseset in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B9A284A25660057061C /* baseset */; };
-		336E6B9E284A25750057061C /* scripts in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B9D284A25750057061C /* scripts */; };
 		336E6BDF284A5FFE0057061C /* cocoa_ogl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6BDB284A5FFD0057061C /* cocoa_ogl.mm */; };
 		336E6BE0284A5FFE0057061C /* cocoa_wnd.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6BDC284A5FFD0057061C /* cocoa_wnd.mm */; };
 		336E6BE1284A5FFE0057061C /* cocoa_v.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6BDD284A5FFD0057061C /* cocoa_v.mm */; };
@@ -1332,10 +1340,6 @@
 		336E6DE8284B4A890057061C /* cocoa_touch_m.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 336E6DE6284B4A890057061C /* cocoa_touch_m.cpp */; settings = {COMPILER_FLAGS = " -w"; }; };
 		336E6DEA284B4AA20057061C /* ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6DE9284B4AA20057061C /* ios.mm */; };
 		33A02CBC285C7DFC00075442 /* cocoa_v.mm in Sources */ = {isa = PBXBuildFile; fileRef = 336E6BDD284A5FFD0057061C /* cocoa_v.mm */; };
-		33A02CBE285F359900075442 /* lang in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B97284A25310057061C /* lang */; };
-		33A02CBF285F359D00075442 /* baseset in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B9A284A25660057061C /* baseset */; };
-		33A02CC0285F35A000075442 /* ai in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B99284A25660057061C /* ai */; };
-		33A02CC1285F35A400075442 /* scripts in Resources */ = {isa = PBXBuildFile; fileRef = 336E6B9D284A25750057061C /* scripts */; };
 		33A02CC52861CB8500075442 /* GameInputView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33A02CC42861CB8500075442 /* GameInputView.mm */; };
 		33A02CC828630F0300075442 /* ios_s.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33A02CC628630F0300075442 /* ios_s.cpp */; settings = {COMPILER_FLAGS = " -w"; }; };
 		33A02CCB286437FC00075442 /* dedicated_v.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33A02CC9286437FB00075442 /* dedicated_v.cpp */; settings = {COMPILER_FLAGS = " -w"; }; };
@@ -1445,6 +1449,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		330A2EB92A2393F7005A1F17 /* ai */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ai; path = ../../../../build/ai; sourceTree = "<group>"; };
+		330A2EBA2A2393F7005A1F17 /* lang */ = {isa = PBXFileReference; lastKnownFileType = folder; name = lang; path = ../../../../build/lang; sourceTree = "<group>"; };
+		330A2EBB2A2393F7005A1F17 /* baseset */ = {isa = PBXFileReference; lastKnownFileType = folder; name = baseset; path = ../../../../build/baseset; sourceTree = "<group>"; };
+		330A2EBC2A2393F7005A1F17 /* game */ = {isa = PBXFileReference; lastKnownFileType = folder; name = game; path = ../../../../build/game; sourceTree = "<group>"; };
+		330A2EC52A23941B005A1F17 /* scripts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = scripts; path = ../../../../bin/scripts; sourceTree = "<group>"; };
 		330B253E2A1BA1AD0093DD5C /* gs_instruments.dls */ = {isa = PBXFileReference; lastKnownFileType = file; path = gs_instruments.dls; sourceTree = "<group>"; };
 		330B25432A1BA1AD0093DD5C /* Vertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Vertex.glsl; sourceTree = "<group>"; };
 		330B25442A1BA1AD0093DD5C /* Fragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Fragment.glsl; sourceTree = "<group>"; };
@@ -2686,11 +2695,6 @@
 		336E69A4284A09370057061C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		336E69A9284A09370057061C /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
 		336E69AB284A09370057061C /* OpenTTD_Mac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OpenTTD_Mac.entitlements; sourceTree = "<group>"; };
-		336E6B96284A250F0057061C /* game */ = {isa = PBXFileReference; lastKnownFileType = folder; name = game; path = ../../../../../../Downloads/openttd/OpenTTD/build/game; sourceTree = "<group>"; };
-		336E6B97284A25310057061C /* lang */ = {isa = PBXFileReference; lastKnownFileType = folder; name = lang; path = ../../../../../../Downloads/openttd/OpenTTD/build/lang; sourceTree = "<group>"; };
-		336E6B99284A25660057061C /* ai */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ai; path = ../../../../../../Downloads/openttd/OpenTTD/build/ai; sourceTree = "<group>"; };
-		336E6B9A284A25660057061C /* baseset */ = {isa = PBXFileReference; lastKnownFileType = folder; name = baseset; path = ../../../../../../Downloads/openttd/OpenTTD/build/baseset; sourceTree = "<group>"; };
-		336E6B9D284A25750057061C /* scripts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = scripts; path = ../../../../../../Downloads/openttd/OpenTTD/bin/scripts; sourceTree = "<group>"; };
 		336E6BD8284A5FFD0057061C /* cocoa_ogl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cocoa_ogl.h; sourceTree = "<group>"; };
 		336E6BD9284A5FFD0057061C /* cocoa_keys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cocoa_keys.h; sourceTree = "<group>"; };
 		336E6BDA284A5FFD0057061C /* cocoa_wnd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cocoa_wnd.h; sourceTree = "<group>"; };
@@ -4468,15 +4472,15 @@
 		336E6B8F284A24AB0057061C /* bin */ = {
 			isa = PBXGroup;
 			children = (
+				330A2EC52A23941B005A1F17 /* scripts */,
+				330A2EB92A2393F7005A1F17 /* ai */,
+				330A2EBB2A2393F7005A1F17 /* baseset */,
+				330A2EBC2A2393F7005A1F17 /* game */,
+				330A2EBA2A2393F7005A1F17 /* lang */,
 				330B25452A1BA1AE0093DD5C /* Shaders.metal */,
 				330B25442A1BA1AD0093DD5C /* Fragment.glsl */,
 				330B253E2A1BA1AD0093DD5C /* gs_instruments.dls */,
 				330B25432A1BA1AD0093DD5C /* Vertex.glsl */,
-				336E6B9D284A25750057061C /* scripts */,
-				336E6B99284A25660057061C /* ai */,
-				336E6B9A284A25660057061C /* baseset */,
-				336E6B97284A25310057061C /* lang */,
-				336E6B96284A250F0057061C /* game */,
 			);
 			path = bin;
 			sourceTree = "<group>";
@@ -4670,13 +4674,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				336E6B9B284A25670057061C /* ai in Resources */,
-				336E6B98284A25310057061C /* lang in Resources */,
+				330A2EBF2A2393F7005A1F17 /* lang in Resources */,
 				336E69A5284A09370057061C /* Assets.xcassets in Resources */,
-				336E6B9E284A25750057061C /* scripts in Resources */,
-				330B254D2A1BA2540093DD5C /* game in Resources */,
-				336E6B9C284A25670057061C /* baseset in Resources */,
+				330A2EBD2A2393F7005A1F17 /* ai in Resources */,
+				330A2EC12A2393F7005A1F17 /* baseset in Resources */,
 				336E6BFB284A62CA0057061C /* MainMenu.xib in Resources */,
+				330A2EC32A2393F7005A1F17 /* game in Resources */,
+				330A2EC62A23941B005A1F17 /* scripts in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4684,15 +4688,18 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				33A02CBE285F359900075442 /* lang in Resources */,
-				33A02CBF285F359D00075442 /* baseset in Resources */,
-				330B254F2A1BA2580093DD5C /* game in Resources */,
-				33A02CC1285F35A400075442 /* scripts in Resources */,
+				330A2EB22A2377F0005A1F17 /* gs_instruments.dls in Resources */,
+				330A2EC22A2393F7005A1F17 /* baseset in Resources */,
+				330A2EBE2A2393F7005A1F17 /* ai in Resources */,
+				330A2EB52A237801005A1F17 /* Vertex.glsl in Resources */,
 				33A02CD8286EE9C400075442 /* DevConfig.xcconfig in Resources */,
 				33A02CD0286C9B6800075442 /* InhouseConfig.xcconfig in Resources */,
 				336E6C16284A787A0057061C /* LaunchScreen.storyboard in Resources */,
-				33A02CC0285F35A000075442 /* ai in Resources */,
+				330A2EC72A23941B005A1F17 /* scripts in Resources */,
+				330A2EC02A2393F7005A1F17 /* lang in Resources */,
 				336E6C13284A787A0057061C /* Assets.xcassets in Resources */,
+				330A2EC42A2393F7005A1F17 /* game in Resources */,
+				330A2EB42A2377FD005A1F17 /* Fragment.glsl in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4919,7 +4926,6 @@
 				335245C9282BBEC8006B68EE /* fileio.cpp in Sources */,
 				3352468F282BBEC9006B68EE /* texteff.cpp in Sources */,
 				335245BE282BBEC8006B68EE /* 40bpp_anim.cpp in Sources */,
-				330B25462A1BA1AE0093DD5C /* Shaders.metal in Sources */,
 				33524528282BBEC8006B68EE /* newgrf_cargo.cpp in Sources */,
 				33524600282BBEC8006B68EE /* script_tilelist.cpp in Sources */,
 				33524641282BBEC9006B68EE /* road.cpp in Sources */,
@@ -5330,6 +5336,7 @@
 				336E6B18284A10810057061C /* script_story_page.cpp in Sources */,
 				336E6A46284A0F850057061C /* genworld_gui.cpp in Sources */,
 				336E6B41284A109C0057061C /* vehicle_cmd.cpp in Sources */,
+				330A2EB62A23780B005A1F17 /* Shaders.metal in Sources */,
 				336E69FB284A0F1D0057061C /* 8bpp_base.cpp in Sources */,
 				336E6A98284A0FFD0057061C /* newgrf_commons.cpp in Sources */,
 				336E6AFC284A10810057061C /* script_objecttypelist.cpp in Sources */,
@@ -5888,6 +5895,7 @@
 				336E6D60284A7AF50057061C /* signs_gui.cpp in Sources */,
 				336E6DD9284A7B0D0057061C /* train_cmd.cpp in Sources */,
 				336E6DBC284A7B0D0057061C /* vehicle_cmd.cpp in Sources */,
+				330A2EB32A2377F9005A1F17 /* Shaders.metal in Sources */,
 				336E6D70284A7AF50057061C /* smallmap_gui.cpp in Sources */,
 				336E6D1A284A7A7C0057061C /* yapf_ship.cpp in Sources */,
 				336E6CE0284A7A520057061C /* packet.cpp in Sources */,
@@ -6412,7 +6420,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -6473,7 +6481,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

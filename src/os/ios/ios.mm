@@ -103,7 +103,7 @@ void ShowOSErrorBox(const char *buf, bool system)
 {
 	if ([UIApplication sharedApplication] == nil) {
 		OSErrorMessage = buf;
-		UIApplicationMain(*_NSGetArgc(), *_NSGetArgv(), nil, @"AppDelegate");
+        UIApplicationMain(*_NSGetArgc(), *_NSGetArgv(), nil, @"AppDelegate");
 	} else {
 		[[UIApplication sharedApplication].delegate performSelector:@selector(showErrorMessage:) withObject:@(buf)];
 	}
