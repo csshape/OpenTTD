@@ -14,6 +14,8 @@
 @interface ViewController ()
 @property (readonly, nonatomic) AppDelegate *appDelegate;
 @property (strong, nonatomic) GameInputView *inputView;
+@property (strong, nonatomic) UIView *darkScreenView;
+
 @end
 
 @implementation ViewController
@@ -68,6 +70,34 @@
 
 - (void)pressesEnded:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
     [self.inputView pressesEnded:presses withEvent:event];
+}
+
+- (UIImage *)getImageFromView {
+    UIView * view = self.cocoaView;
+    UIGraphicsBeginImageContextWithOptions(view.bounds.size, view.opaque, 0.0f);
+    [view drawViewHierarchyInRect:view.bounds afterScreenUpdates:NO];
+    UIImage *snapshotImageFromMyView = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+
+    return snapshotImageFromMyView;
+}
+
+- (void)setCocoaView:(UIView *)cocoaView {
+    _cocoaView = cocoaView;
+    [self.view addSubview:cocoaView];
+}
+
+- (void)setDarkScreen:(BOOL)on {
+    if (self.darkScreenView == nil) {
+        UIView *view = [UIView new];
+        view.frame = self.view.bounds;
+        view.backgroundColor = [UIColor blackColor];
+        view.userInteractionEnabled = false;
+        [self.view insertSubview:view belowSubview:self.inputView];
+        self.darkScreenView = view;
+    }
+
+    self.darkScreenView.hidden = !on;
 }
 
 @end

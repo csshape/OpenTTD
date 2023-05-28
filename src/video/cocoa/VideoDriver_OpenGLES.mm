@@ -417,7 +417,7 @@ void VideoDriver_OpenGLES::OpenGLStart() {
         if (glContext != nil) {
             eaglLayer = [CAEAGLLayer layer];
             eaglLayer.opaque = YES;
-            eaglLayer.contentsScale = [UIScreen mainScreen].nativeScale;
+            eaglLayer.contentsScale = [UIScreen getScreen].nativeScale;
         } else {
             NSLog(@"Error initializing context");
             goto opengl_fail;

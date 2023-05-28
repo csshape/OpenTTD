@@ -70,6 +70,9 @@ static void CheckPaletteAnim()
 @property (strong, nonatomic) ViewController *viewController;
 @property (strong, nonatomic) CADisplayLink *displayLink;
 @property (strong, nonatomic) NSOperationQueue *queue;
+
+@property (strong, nonatomic) UIWindow *externalWindow;
+@property (strong, nonatomic) UIImageView *imageView;
 @end
 
 @implementation AppDelegate
@@ -99,14 +102,14 @@ static void CheckPaletteAnim()
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    self.window = [[OTTD_CocoaWindow alloc] initWithFrame: [UIScreen mainScreen].bounds];
+    self.window = [[OTTD_CocoaWindow alloc] initWithFrame: [UIScreen getScreen].bounds];
     self.window.clipsToBounds = true;
-    
+
     self.window.backgroundColor = [UIColor redColor];
 
     if (_cocoa_touch_driver) {
-        UIWindow *win = _cocoa_touch_driver->window;
-        self.viewController = (ViewController*)win.rootViewController;
+        UIWindow *window = _cocoa_touch_driver->window;
+        self.viewController = (ViewController*)window.rootViewController;
         self.window.rootViewController = self.viewController;
     } else {
         self.window.rootViewController = [[UIViewController alloc] init];
@@ -126,7 +129,9 @@ static void CheckPaletteAnim()
     }
     
     [self.viewController updateLayer];
-    
+
+    [self setupScreenNotifications];
+
     return YES;
 }
 
@@ -220,7 +225,62 @@ static void CheckPaletteAnim()
         
         GameLoop();
         _cocoa_touch_driver->OpenGLTick();
+
+        if (self.externalWindow) {
+            self.imageView.image = [self.viewController getImageFromView];
+        }
     }
+}
+
+- (void)setupScreenNotifications {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(externalScreenDidConnect:) name:UIScreenDidConnectNotification object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(externalScreenDidDisconnect:) name:UIScreenDidDisconnectNotification object:nil];
+
+}
+
+-(void)externalScreenDidConnect:(NSNotification *)notification {
+    UIScreen *screen = (UIScreen *)[notification object];
+    if (screen != nil) {
+        [self setupExternalScreen:screen];
+    }
+}
+
+-(void)externalScreenDidDisconnect:(NSNotification *)notification {
+    id obj = [notification object];
+    if (obj != nil) {
+        [self teardownExternalScreen];
+    }
+}
+
+-(void)setupExternalScreen:(UIScreen *)screen {
+    UIViewController *viewController = [UIViewController new];
+
+    self.externalWindow = [[OTTD_CocoaWindow alloc] initWithFrame:screen.bounds];
+    self.externalWindow.rootViewController = viewController;
+    self.externalWindow.screen = screen;
+    self.externalWindow.hidden = false;
+
+    [self.externalWindow makeKeyAndVisible];
+
+    UIImageView *view = [UIImageView new];
+    view.frame = screen.bounds;
+    view.backgroundColor = [UIColor darkGrayColor];
+//    view.contentMode = UIViewContentModeScaleAspectFit;
+    [viewController.view addSubview:view];
+
+    [self.viewController setDarkScreen:YES];
+
+    self.imageView = view;
+}
+
+-(void)teardownExternalScreen {
+    if (self.externalWindow != nil) {
+        self.externalWindow.hidden = true;
+        self.externalWindow = nil;
+    }
+
+    [self.viewController setDarkScreen:NO];
 }
 
 @end

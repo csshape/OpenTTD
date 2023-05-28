@@ -10,7 +10,11 @@
 
 @interface ViewController : UIViewController
 
+@property (strong, nonatomic) UIView *cocoaView;
+
 - (void)updateLayer;
+- (UIImage *)getImageFromView;
+- (void)setDarkScreen:(BOOL)on;
 
 @end
 

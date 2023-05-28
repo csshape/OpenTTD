@@ -15,6 +15,7 @@
 
 #if defined(IOS)
 #import <UIKit/UIKit.h>
+#import "UIScreen+Helper.h"
 #include "ios_wnd.h"
 #else
 #import <Cocoa/Cocoa.h>

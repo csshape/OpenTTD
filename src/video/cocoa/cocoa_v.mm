@@ -351,7 +351,8 @@ std::vector<int> VideoDriver_Cocoa::GetListOfMonitorRefreshRates()
 Dimension VideoDriver_Cocoa::GetScreenSize() const
 {
 #if defined(IOS)
-    CGRect frame = [[UIScreen mainScreen] bounds];
+    UIScreen *screen = [UIScreen getScreen];
+    CGRect frame = [screen bounds];
     return { static_cast<uint>(frame.size.width), static_cast<uint>(frame.size.height) };
 #else
     NSRect frame = [ [ NSScreen mainScreen ] frame ];
@@ -430,7 +431,8 @@ void VideoDriver_Cocoa::UpdateVideoModes()
 	_resolutions.clear();
 
 #if defined(IOS)
-    CGSize maxSize = [[UIScreen mainScreen] bounds].size;
+    UIScreen *screen = [UIScreen getScreen];
+    CGSize maxSize = [screen bounds].size;
     for (const auto &d : _default_resolutions) {
         if (d.width < maxSize.width && d.height < maxSize.height) _resolutions.push_back(d);
     }
@@ -461,23 +463,27 @@ bool VideoDriver_Cocoa::MakeWindow(int width, int height)
 {
 	this->setup = true;
 #if defined(IOS)
-    this->window = [[OTTD_CocoaWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    UIScreen *screen = [UIScreen getScreen];
+    this->window = [[OTTD_CocoaWindow alloc] initWithFrame:screen.bounds];
+    this->window.screen = screen;
+    this->window.hidden = false;
+
     CGRect view_frame = [this->window bounds];
     OTTD_CocoaView *cocoaview = [ [OTTD_CocoaView alloc] initWithFrame:view_frame];
     this->cocoaview = cocoaview;
-    
+
     UIView *draw_view = this->AllocateDrawView();
-    
+
     ViewController *viewController = [[ViewController alloc] init];
     viewController.view.frame = this->window.bounds;
     this->window.rootViewController = viewController;
-    
-    [viewController.view addSubview:this->cocoaview];
-    [this->cocoaview addSubview:draw_view ];
-    
+
+    viewController.cocoaView = cocoaview;
+    [cocoaview addSubview:draw_view];
+
     cocoaview.translatesAutoresizingMaskIntoConstraints = false;
     draw_view.translatesAutoresizingMaskIntoConstraints = false;
-    
+
     NSDictionary *views = NSDictionaryOfVariableBindings(cocoaview, draw_view);
     [viewController.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0-[cocoaview]-0-|" options:0 metrics:nil views:views]];
     [viewController.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-0-[cocoaview]-0-|" options:0 metrics:nil views:views]];

@@ -22,6 +22,7 @@
 		330A2EC42A2393F7005A1F17 /* game in Resources */ = {isa = PBXBuildFile; fileRef = 330A2EBC2A2393F7005A1F17 /* game */; };
 		330A2EC62A23941B005A1F17 /* scripts in Resources */ = {isa = PBXBuildFile; fileRef = 330A2EC52A23941B005A1F17 /* scripts */; };
 		330A2EC72A23941B005A1F17 /* scripts in Resources */ = {isa = PBXBuildFile; fileRef = 330A2EC52A23941B005A1F17 /* scripts */; };
+		330A2ECA2A23B066005A1F17 /* UIScreen+Helper.m in Sources */ = {isa = PBXBuildFile; fileRef = 330A2EC92A23B066005A1F17 /* UIScreen+Helper.m */; };
 		33523889282BAEEE006B68EE /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33523888282BAEEE006B68EE /* main.mm */; };
 		335244F5282BBEC8006B68EE /* spritecache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FAA282BBEC7006B68EE /* spritecache.cpp */; };
 		335244F6282BBEC8006B68EE /* cargomonitor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33523FAB282BBEC7006B68EE /* cargomonitor.cpp */; };
@@ -1454,6 +1455,8 @@
 		330A2EBB2A2393F7005A1F17 /* baseset */ = {isa = PBXFileReference; lastKnownFileType = folder; name = baseset; path = ../../../../build/baseset; sourceTree = "<group>"; };
 		330A2EBC2A2393F7005A1F17 /* game */ = {isa = PBXFileReference; lastKnownFileType = folder; name = game; path = ../../../../build/game; sourceTree = "<group>"; };
 		330A2EC52A23941B005A1F17 /* scripts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = scripts; path = ../../../../bin/scripts; sourceTree = "<group>"; };
+		330A2EC82A23B066005A1F17 /* UIScreen+Helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIScreen+Helper.h"; sourceTree = "<group>"; };
+		330A2EC92A23B066005A1F17 /* UIScreen+Helper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIScreen+Helper.m"; sourceTree = "<group>"; };
 		330B253E2A1BA1AD0093DD5C /* gs_instruments.dls */ = {isa = PBXFileReference; lastKnownFileType = file; path = gs_instruments.dls; sourceTree = "<group>"; };
 		330B25432A1BA1AD0093DD5C /* Vertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Vertex.glsl; sourceTree = "<group>"; };
 		330B25442A1BA1AD0093DD5C /* Fragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Fragment.glsl; sourceTree = "<group>"; };
@@ -4500,6 +4503,8 @@
 				33A02CC42861CB8500075442 /* GameInputView.mm */,
 				33A02CCF286C9B6800075442 /* InhouseConfig.xcconfig */,
 				33A02CD7286EE9C400075442 /* DevConfig.xcconfig */,
+				330A2EC82A23B066005A1F17 /* UIScreen+Helper.h */,
+				330A2EC92A23B066005A1F17 /* UIScreen+Helper.m */,
 			);
 			path = OpenTTD_iOS;
 			sourceTree = "<group>";
@@ -5604,6 +5609,7 @@
 				336E6DCA284A7B0D0057061C /* town_gui.cpp in Sources */,
 				336E6D13284A7A7C0057061C /* roadveh_gui.cpp in Sources */,
 				336E6CD6284A7A520057061C /* tcp_game.cpp in Sources */,
+				330A2ECA2A23B066005A1F17 /* UIScreen+Helper.m in Sources */,
 				336E6D32284A7A980057061C /* script_scanner.cpp in Sources */,
 				336E6CC8284A7A520057061C /* highscore_gui.cpp in Sources */,
 				336E6D2F284A7A980057061C /* map_sl.cpp in Sources */,
