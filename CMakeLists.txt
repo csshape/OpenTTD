@@ -170,7 +170,16 @@ if(APPLE)
 endif()
 
 if(NOT EMSCRIPTEN AND NOT OPTION_DEDICATED)
-    find_package(OpenGL COMPONENTS OpenGL)
+    if(APPLE)
+        # On macOS, prefer the system OpenGL framework over X11 libGL from XQuartz.
+        set(_CMAKE_FIND_FRAMEWORK "${CMAKE_FIND_FRAMEWORK}")
+        set(CMAKE_FIND_FRAMEWORK FIRST)
+        find_package(OpenGL COMPONENTS OpenGL)
+        set(CMAKE_FIND_FRAMEWORK "${_CMAKE_FIND_FRAMEWORK}")
+        unset(_CMAKE_FIND_FRAMEWORK)
+    else()
+        find_package(OpenGL COMPONENTS OpenGL)
+    endif()
 endif()
 
 if(MSVC)
@@ -305,6 +314,13 @@ if(IPO_FOUND)
     set_target_properties(openttd PROPERTIES INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO True)
 endif()
 set_target_properties(openttd PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
+if(XCODE)
+    # Ensure runs from Xcode can locate generated data dirs like lang/ and baseset/.
+    set_target_properties(openttd PROPERTIES
+        XCODE_GENERATE_SCHEME TRUE
+        XCODE_SCHEME_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+    )
+endif()
 
 include(LinkPackage)
 link_package(PNG TARGET PNG::PNG ENCOURAGED)
