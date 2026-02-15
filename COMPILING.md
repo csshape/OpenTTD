@@ -82,6 +82,46 @@ Change `<location of vcpkg>` to where you have installed vcpkg. After this
 in the build folder are MSVC project files. MSVC can rebuild the project
 files himself via the `ZERO_CHECK` project.
 
+## macOS (Xcode)
+
+OpenTTD supports generating an Xcode project through CMake.
+
+For a universal macOS build (`arm64` + `x86_64`), use the presets from
+`CMakePresets.json`:
+
+```bash
+cmake --preset macos-xcode-universal
+cmake --build --preset macos-xcode-universal-build
+cmake --build --preset macos-xcode-universal-package
+```
+
+The configure step generates an Xcode project in `build/xcode-universal/`.
+Open the generated `.xcodeproj` in that directory and build the `openttd`
+target with the `RelWithDebInfo` configuration.
+
+Expected outputs:
+
+- `build/xcode-universal/RelWithDebInfo/openttd` (compiled binary)
+- `build/xcode-universal/bundles/openttd-<version>-macos-universal.*`
+  (packaged output from `package`)
+
+This workflow produces unsigned artifacts. Signing and notarization are
+separate release steps.
+
+OpenTTD on macOS always uses system frameworks (Cocoa, QuartzCore,
+AudioToolbox, AudioUnit). Other libraries are optional when found by CMake.
+If optional libraries are missing, the build can still succeed with a reduced
+feature set.
+For the universal preset, PNG and LZO are disabled by default to avoid
+architecture mismatch with arm64-only Homebrew libraries during x86_64 linking.
+
+Troubleshooting:
+
+- `xcode-select -p` should point to a valid Xcode installation.
+- Verify the compiler with `xcrun --find clang++`.
+- If CMake reports no C++ compiler, make sure Xcode and its command line tools
+  are installed and selected.
+
 ## All other platforms
 Minimum required version of CMake is 3.16.
 By default this produces a Debug build with assertations enabled.
