@@ -497,6 +497,7 @@ int openttd_main(std::span<std::string_view> arguments)
 {
 	_game_session_stats.start_time = std::chrono::steady_clock::now();
 	_game_session_stats.savegame_size = std::nullopt;
+	const std::string_view executable_name = arguments.empty() ? std::string_view("openttd") : arguments[0];
 
 	std::string musicdriver;
 	std::string sounddriver;
@@ -517,7 +518,7 @@ int openttd_main(std::span<std::string_view> arguments)
 	_switch_mode = SwitchMode::Menu;
 
 	auto options = CreateOptions();
-	GetOptData mgo(arguments.subspan(1), options);
+	GetOptData mgo(arguments.size() > 1 ? arguments.subspan(1) : std::span<std::string_view>{}, options);
 
 	int i;
 	while ((i = mgo.GetOpt()) != -1) {
@@ -603,7 +604,7 @@ int openttd_main(std::span<std::string_view> arguments)
 			}
 			break;
 		case 'q': {
-			DeterminePaths(arguments[0], only_local_path);
+			DeterminePaths(executable_name, only_local_path);
 			if (mgo.opt.empty()) {
 				return 1;
 			}
@@ -651,7 +652,7 @@ int openttd_main(std::span<std::string_view> arguments)
 		 *
 		 * The next two functions are needed to list the graphics sets. We can't do them earlier
 		 * because then we cannot show it on the debug console as that hasn't been configured yet. */
-		DeterminePaths(arguments[0], only_local_path);
+		DeterminePaths(executable_name, only_local_path);
 		TarScanner::DoScan(TarScanner::Mode::Baseset);
 		BaseGraphics::FindSets();
 		BaseSounds::FindSets();
@@ -663,7 +664,7 @@ int openttd_main(std::span<std::string_view> arguments)
 		return 1;
 	}
 
-	DeterminePaths(arguments[0], only_local_path);
+	DeterminePaths(executable_name, only_local_path);
 	TarScanner::DoScan(TarScanner::Mode::Baseset);
 
 	if (dedicated) Debug(net, 3, "Starting dedicated server, version {}", _openttd_revision);
@@ -750,6 +751,10 @@ int openttd_main(std::span<std::string_view> arguments)
 	}
 
 	if (videodriver.empty() && !_ini_videodriver.empty()) videodriver = _ini_videodriver;
+#if defined(OTTD_IOS)
+	/* iOS builds are expected to use the SDL-free Metal backend by default. */
+	if (videodriver.empty()) videodriver = "ios-metal";
+#endif
 	DriverFactoryBase::SelectDriver(videodriver, Driver::Type::Video);
 
 	InitializeSpriteSorter();

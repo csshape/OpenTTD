@@ -1,7 +1,7 @@
 add_files(
     crashlog_unix.cpp
     survey_unix.cpp
-    CONDITION UNIX AND NOT APPLE
+    CONDITION UNIX AND (NOT APPLE OR OTTD_APPLE_IOS)
 )
 
 add_files(
@@ -11,11 +11,17 @@ add_files(
 )
 
 add_files(
+    ios_main.h
+    ios_main.mm
+    CONDITION OTTD_APPLE_IOS
+)
+
+add_files(
     font_unix.cpp
     font_unix.h
     CONDITION Fontconfig_FOUND
 )
 
-if(UNIX AND NOT APPLE)
+if(UNIX AND (NOT APPLE OR OTTD_APPLE_IOS))
     target_sources(openttd PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/unix_main.cpp)
 endif()

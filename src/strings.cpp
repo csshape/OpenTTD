@@ -2147,7 +2147,7 @@ bool ReadLanguagePack(const LanguageMetadata *lang)
 
 /* Win32 implementation in win32.cpp.
  * OS X implementation in os/macosx/macos.mm. */
-#if !(defined(_WIN32) || defined(__APPLE__))
+#if !(defined(_WIN32) || (defined(__APPLE__) && !defined(OTTD_IOS)))
 /**
  * Determine the current charset based on the environment
  * First check some default values, after this one we passed ourselves
@@ -2176,7 +2176,7 @@ std::optional<std::string> GetCurrentLocale(const char *param)
 }
 #else
 std::optional<std::string> GetCurrentLocale(const char *param);
-#endif /* !(defined(_WIN32) || defined(__APPLE__)) */
+#endif /* !(defined(_WIN32) || (defined(__APPLE__) && !defined(OTTD_IOS))) */
 
 /**
  * Get the language with the given NewGRF language ID.

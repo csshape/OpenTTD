@@ -23,7 +23,7 @@
 #	define _CRT_NONSTDC_NO_WARNINGS
 #endif
 
-#if defined(__APPLE__)
+#if defined(__APPLE__) && !defined(OTTD_IOS)
 #	include "os/macosx/osx_stdafx.h"
 #else
 /* It seems that we need to include stdint.h before anything else

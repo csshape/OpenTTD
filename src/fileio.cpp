@@ -7,6 +7,12 @@
 
 /** @file fileio.cpp Standard in/out file operations. */
 
+#ifdef OTTD_IOS
+/* Include CoreFoundation before stdafx.h to avoid macro conflicts with
+ * geometry_type.hpp which redefines Point/Rect on Apple platforms. */
+#include <CoreFoundation/CoreFoundation.h>
+#endif
+
 #include "stdafx.h"
 #include "core/string_consumer.hpp"
 #include "fileio_func.h"
@@ -871,6 +877,24 @@ void DetermineBasePaths(std::string_view exe)
 #ifdef WITH_COCOA
 extern void CocoaSetApplicationBundleDir();
 	CocoaSetApplicationBundleDir();
+#elif defined(OTTD_IOS)
+	/* On iOS, WITH_COCOA is not defined, but CoreFoundation is available
+	 * and we need the bundle path to find baseset/lang resources. */
+	{
+		CFURLRef url = CFBundleCopyResourcesDirectoryURL(CFBundleGetMainBundle());
+		if (url != nullptr) {
+			char buf[PATH_MAX];
+			if (CFURLGetFileSystemRepresentation(url, true, reinterpret_cast<UInt8 *>(buf), sizeof(buf))) {
+				_searchpaths[SP_APPLICATION_BUNDLE_DIR] = buf;
+				AppendPathSeparator(_searchpaths[SP_APPLICATION_BUNDLE_DIR]);
+			} else {
+				_searchpaths[SP_APPLICATION_BUNDLE_DIR].clear();
+			}
+			CFRelease(url);
+		} else {
+			_searchpaths[SP_APPLICATION_BUNDLE_DIR].clear();
+		}
+	}
 #else
 	_searchpaths[Searchpath::ApplicationBundleDir].clear();
 #endif

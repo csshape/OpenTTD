@@ -14,7 +14,7 @@ if(NOT OPTION_DEDICATED)
     add_files(
         cocoa_m.cpp
         cocoa_m.h
-        CONDITION APPLE
+        CONDITION APPLE AND NOT OTTD_APPLE_IOS
     )
 
     add_files(

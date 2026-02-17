@@ -122,6 +122,39 @@ Troubleshooting:
 - If CMake reports no C++ compiler, make sure Xcode and its command line tools
   are installed and selected.
 
+## iPadOS (Simulator, experimental)
+
+OpenTTD also supports an experimental iPad simulator build via Xcode.
+This target is intended for development/testing and currently focuses on
+startup and menu-level validation.
+
+Presets are defined in `CMakePresets.json`:
+
+```bash
+cmake --preset ios-simulator-xcode
+cmake --build --preset ios-simulator-build
+```
+
+If you use vcpkg for dependencies (recommended for SDL2 on iOS), set
+`VCPKG_ROOT` first and use the vcpkg preset:
+
+```bash
+export VCPKG_ROOT=<location of vcpkg>
+cmake --preset ios-simulator-xcode-vcpkg
+cmake --build --preset ios-simulator-build-vcpkg
+```
+
+The configure step generates an Xcode project in
+`build/xcode-ios-simulator/`.
+
+Notes:
+
+- iPadOS builds are SDL2-based; Cocoa video/sound drivers are macOS-only.
+- For the iOS simulator presets, some optional desktop dependencies are
+  disabled by default.
+- The build copies `lang/` and `baseset/` into the app bundle output so the
+  game can discover runtime data when launched from Xcode.
+
 ## All other platforms
 Minimum required version of CMake is 3.16.
 By default this produces a Debug build with assertations enabled.

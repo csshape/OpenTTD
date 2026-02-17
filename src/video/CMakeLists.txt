@@ -1,4 +1,6 @@
-add_subdirectory(cocoa)
+if(APPLE AND NOT OTTD_APPLE_IOS)
+    add_subdirectory(cocoa)
+endif()
 
 if(NOT OPTION_DEDICATED)
     add_files(
@@ -18,13 +20,19 @@ if(NOT OPTION_DEDICATED)
         sdl2_v.h
         sdl2_default_v.cpp
         sdl2_default_v.h
-        CONDITION SDL2_FOUND
+        CONDITION SDL2_FOUND AND NOT OTTD_APPLE_IOS
     )
 
     add_files(
         sdl2_opengl_v.cpp
         sdl2_opengl_v.h
-        CONDITION SDL2_FOUND AND OPENGL_FOUND
+        CONDITION SDL2_FOUND AND OPENGL_FOUND AND NOT OTTD_APPLE_IOS
+    )
+
+    add_files(
+        ios_glkit_v.h
+        ios_glkit_v.mm
+        CONDITION OTTD_APPLE_IOS
     )
 
     add_files(

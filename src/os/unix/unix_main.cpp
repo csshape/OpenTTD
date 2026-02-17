@@ -16,6 +16,10 @@
 #include <time.h>
 #include <signal.h>
 
+#if defined(OTTD_IOS) && !defined(WITH_SDL2)
+#include "ios_main.h"
+#endif
+
 #include "../../safeguards.h"
 
 int CDECL main(int argc, char *argv[])
@@ -33,5 +37,9 @@ int CDECL main(int argc, char *argv[])
 
 	signal(SIGPIPE, SIG_IGN);
 
+#if defined(OTTD_IOS) && !defined(WITH_SDL2)
+	return IOSRunMain(params);
+#else
 	return openttd_main(params);
+#endif
 }

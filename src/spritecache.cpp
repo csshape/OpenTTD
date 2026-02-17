@@ -36,6 +36,9 @@ static std::vector<std::unique_ptr<SpriteFile>> _sprite_files;
 
 static inline SpriteCache *GetSpriteCache(uint index)
 {
+	if (index >= _spritecache.size()) {
+		UserError("Sprite cache index out of range (index {}, size {}). Base sprites may be missing or not loaded yet.", index, _spritecache.size());
+	}
 	return &_spritecache[index];
 }
 
@@ -681,6 +684,17 @@ bool LoadNextSprite(SpriteID load_index, SpriteFile &file, uint file_sprite_id)
 
 void DupSprite(SpriteID old_spr, SpriteID new_spr)
 {
+	if (!SpriteExists(old_spr)) {
+		Debug(sprite, 0, "Requested to duplicate missing sprite #{} to #{}.", old_spr, new_spr);
+
+		if (old_spr != SPR_IMG_QUERY && SpriteExists(SPR_IMG_QUERY)) {
+			Debug(sprite, 0, "Falling back to query sprite #{} for duplication to #{}.", SPR_IMG_QUERY, new_spr);
+			old_spr = SPR_IMG_QUERY;
+		} else {
+			UserError("Cannot duplicate sprite #{} to #{}: source sprite is missing (sprite cache size {}).", old_spr, new_spr, _spritecache.size());
+		}
+	}
+
 	SpriteCache *scnew = AllocateSpriteCache(new_spr); // may reallocate: so put it first
 	SpriteCache *scold = GetSpriteCache(old_spr);
 
@@ -854,12 +868,16 @@ void *GetRawSprite(SpriteID sprite, SpriteType type, SpriteAllocator *allocator,
 {
 	assert(type != SpriteType::MapGen || IsMapgenSpriteID(sprite));
 	assert(type < SpriteType::Invalid);
+	SpriteID requested_sprite = sprite;
 
 	if (!SpriteExists(sprite)) {
 		Debug(sprite, 1, "Tried to load non-existing sprite #{}. Probable cause: Wrong/missing NewGRFs", sprite);
 
 		/* SPR_IMG_QUERY is a BIG FAT RED ? */
 		sprite = SPR_IMG_QUERY;
+		if (!SpriteExists(sprite)) {
+			UserError("Tried to draw sprite #{} before base sprites were loaded (fallback sprite #{} is missing).", requested_sprite, SPR_IMG_QUERY);
+		}
 	}
 
 	SpriteCache *sc = GetSpriteCache(sprite);

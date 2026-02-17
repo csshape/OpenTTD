@@ -7,7 +7,7 @@ if(OPTION_INSTALL_FHS)
     set(DOCS_DESTINATION_DIR "${CMAKE_INSTALL_DOCDIR}")
     set(MAN_DESTINATION_DIR "${CMAKE_INSTALL_MANDIR}")
 else()
-    if(APPLE)
+    if(OTTD_APPLE_MACOS)
         set(BINARY_DESTINATION_DIR "../MacOS")
     else()
         set(BINARY_DESTINATION_DIR ".")
@@ -18,6 +18,9 @@ else()
 endif()
 
 install(TARGETS openttd
+        BUNDLE
+            DESTINATION ${BINARY_DESTINATION_DIR}
+            COMPONENT Runtime
         RUNTIME
             DESTINATION ${BINARY_DESTINATION_DIR}
             COMPONENT Runtime
@@ -125,7 +128,7 @@ if(WIN32)
         endif()
     endif()
 endif()
-if(APPLE AND CMAKE_OSX_ARCHITECTURES)
+if((OTTD_APPLE_MACOS OR OTTD_APPLE_IOS) AND CMAKE_OSX_ARCHITECTURES)
     string(TOLOWER "${CMAKE_OSX_ARCHITECTURES}" ARCHITECTURE)
 endif()
 
@@ -140,7 +143,7 @@ set(CPACK_PACKAGE_CONTACT "OpenTTD <info@openttd.org>")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "OpenTTD")
 set(CPACK_PACKAGE_CHECKSUM "SHA256")
 
-if((APPLE OR WIN32) AND EXISTS ${PANDOC_EXECUTABLE})
+if((OTTD_APPLE_MACOS OR WIN32) AND EXISTS ${PANDOC_EXECUTABLE})
     execute_process(COMMAND ${PANDOC_EXECUTABLE} "${CMAKE_SOURCE_DIR}/COPYING.md" -s -o "${CMAKE_BINARY_DIR}/COPYING.rtf")
     set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/COPYING.rtf")
 else()
@@ -153,7 +156,7 @@ set(CPACK_PACKAGE_EXECUTABLES "openttd;OpenTTD")
 set(CPACK_STRIP_FILES YES)
 set(CPACK_OUTPUT_FILE_PREFIX "bundles")
 
-if(APPLE)
+if(OTTD_APPLE_MACOS)
     # Stripping would produce unreadable stacktraces.
     set(CPACK_STRIP_FILES NO)
     set(CPACK_GENERATOR "Bundle")
@@ -164,6 +167,10 @@ if(APPLE)
     else()
         set(CPACK_PACKAGE_FILE_NAME "openttd-#CPACK_PACKAGE_VERSION#-macos-${CPACK_SYSTEM_NAME}")
     endif()
+elseif(OTTD_APPLE_IOS)
+    # iOS packaging is handled by Xcode archives/export; keep CPack output simple.
+    set(CPACK_GENERATOR "ZIP")
+    set(CPACK_PACKAGE_FILE_NAME "openttd-#CPACK_PACKAGE_VERSION#-ios-${CPACK_SYSTEM_NAME}")
 elseif(WIN32)
     set(CPACK_GENERATOR "ZIP")
     if(OPTION_USE_NSIS)

@@ -23,7 +23,30 @@ if (EMSCRIPTEN)
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
-set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
+
+if(APPLE)
+    if(CMAKE_SYSTEM_NAME STREQUAL "iOS" OR CMAKE_OSX_SYSROOT MATCHES "iphone")
+        set(OTTD_APPLE_IOS ON)
+    else()
+        set(OTTD_APPLE_IOS OFF)
+    endif()
+else()
+    set(OTTD_APPLE_IOS OFF)
+endif()
+
+if(APPLE AND NOT OTTD_APPLE_IOS)
+    set(OTTD_APPLE_MACOS ON)
+else()
+    set(OTTD_APPLE_MACOS OFF)
+endif()
+
+if(OTTD_APPLE_IOS)
+    add_definitions(-DOTTD_IOS)
+endif()
+
+if(APPLE AND NOT OTTD_APPLE_IOS AND NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
+endif()
 
 # Use GNUInstallDirs to allow customisation
 # but set our own default data and bin dir
@@ -45,6 +68,12 @@ set_static_if_needed()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS NO)
+
+if(XCODE)
+    # Ensure Xcode-generated projects consistently use C++20, including tool targets.
+    set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++20")
+    set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
+endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS YES)
 
@@ -143,11 +172,15 @@ if(NOT OPTION_DEDICATED)
     if(WIN32)
         find_package(Xaudio2)
     else()
-        find_package(Allegro)
-        if(NOT APPLE)
+        if(NOT OTTD_APPLE_IOS)
+            find_package(Allegro)
+        endif()
+        if(NOT OTTD_APPLE_MACOS)
             find_package(Freetype)
-            find_package(SDL2)
-            find_package(Fluidsynth)
+            if(NOT OTTD_APPLE_IOS)
+                find_package(SDL2)
+                find_package(Fluidsynth)
+            endif()
             if(Freetype_FOUND)
                 find_package(Fontconfig)
             endif()
@@ -163,21 +196,23 @@ if(APPLE)
 
     find_package(Iconv)
 
-    find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox)
-    find_library(AUDIOUNIT_LIBRARY AudioUnit)
-    find_library(COCOA_LIBRARY Cocoa)
-    find_library(QUARTZCORE_LIBRARY QuartzCore)
+    if(OTTD_APPLE_MACOS)
+        find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox)
+        find_library(AUDIOUNIT_LIBRARY AudioUnit)
+        find_library(COCOA_LIBRARY Cocoa)
+        find_library(QUARTZCORE_LIBRARY QuartzCore)
+    endif()
 endif()
 
 if(NOT EMSCRIPTEN AND NOT OPTION_DEDICATED)
-    if(APPLE)
+    if(OTTD_APPLE_MACOS)
         # On macOS, prefer the system OpenGL framework over X11 libGL from XQuartz.
         set(_CMAKE_FIND_FRAMEWORK "${CMAKE_FIND_FRAMEWORK}")
         set(CMAKE_FIND_FRAMEWORK FIRST)
         find_package(OpenGL COMPONENTS OpenGL)
         set(CMAKE_FIND_FRAMEWORK "${_CMAKE_FIND_FRAMEWORK}")
         unset(_CMAKE_FIND_FRAMEWORK)
-    else()
+    elseif(NOT OTTD_APPLE_IOS)
         find_package(OpenGL COMPONENTS OpenGL)
     endif()
 endif()
@@ -206,7 +241,7 @@ if(UNIX AND NOT APPLE AND NOT OPTION_DEDICATED)
         message(WARNING "Without HarfBuzz and ICU i18n the game will not be able to render right-to-left languages correctly")
     endif()
 endif()
-if(APPLE)
+if(OTTD_APPLE_MACOS)
     if(NOT AUDIOTOOLBOX_LIBRARY)
         message(FATAL_ERROR "AudioToolbox is required for this platform")
     endif()
@@ -255,6 +290,14 @@ add_executable(openttd WIN32)
 add_executable(openttd_test)
 set_target_properties(openttd PROPERTIES OUTPUT_NAME "${BINARY_NAME}")
 # All other files are added via target_sources()
+
+if(XCODE AND OTTD_APPLE_IOS)
+    # Keep libc++ headers before C SDK headers on iOS; Xcode's default system
+    # include injection can reverse the order and break <c*> wrappers.
+    set_target_properties(openttd_lib openttd openttd_test PROPERTIES
+        XCODE_ATTRIBUTE_SYSTEM_HEADER_SEARCH_PATHS "$(inherited)"
+    )
+endif()
 
 if(MSVC)
     # Add DPI manifest to project; other WIN32 targets get this via ottdres.rc
@@ -322,6 +365,31 @@ if(XCODE)
     )
 endif()
 
+if(OTTD_APPLE_IOS)
+    option(OTTD_IOS_FETCH_OPENGFX "Fetch and bundle OpenGFX for iOS builds when no graphics set is present." ON)
+
+    set_target_properties(openttd PROPERTIES
+        MACOSX_BUNDLE TRUE
+        XCODE_ATTRIBUTE_GENERATE_INFOPLIST_FILE YES
+        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "org.openttd.openttd"
+        XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "2"
+    )
+    add_custom_command(TARGET openttd POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}/lang" "$<TARGET_FILE_DIR:openttd>/lang"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}/baseset" "$<TARGET_FILE_DIR:openttd>/baseset"
+    )
+
+    if(OTTD_IOS_FETCH_OPENGFX)
+        add_custom_command(TARGET openttd POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+                -DDEST_BASESET_DIR=$<TARGET_FILE_DIR:openttd>/baseset
+                -DWORK_DIR=${CMAKE_BINARY_DIR}/opengfx-cache
+                -P "${CMAKE_SOURCE_DIR}/cmake/scripts/EnsureOpenGFX.cmake"
+            VERBATIM
+        )
+    endif()
+endif()
+
 include(LinkPackage)
 link_package(PNG TARGET PNG::PNG ENCOURAGED)
 link_package(ZLIB TARGET ZLIB::ZLIB ENCOURAGED)
@@ -338,8 +406,21 @@ if(NOT EMSCRIPTEN)
 endif()
 
 if(NOT OPTION_DEDICATED)
-    link_package(Fluidsynth)
-    link_package(SDL2 TARGET SDL2::SDL2)
+    if(NOT OTTD_APPLE_IOS)
+        link_package(Fluidsynth)
+        link_package(SDL2 TARGET SDL2::SDL2)
+        if(SDL2_FOUND)
+            # The Xcode generator does not propagate INTERFACE_INCLUDE_DIRECTORIES
+            # from OBJECT library dependencies. Add SDL2 include dirs via compiler
+            # flags so they are available to all targets.
+            foreach(_dir IN LISTS SDL2_INCLUDE_DIRS)
+                set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I${_dir}")
+                set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${_dir}")
+                set(CMAKE_OBJC_FLAGS "${CMAKE_OBJC_FLAGS} -I${_dir}")
+                set(CMAKE_OBJCXX_FLAGS "${CMAKE_OBJCXX_FLAGS} -I${_dir}")
+            endforeach()
+        endif()
+    endif()
     link_package(Allegro)
     link_package(FREETYPE TARGET Freetype::Freetype)
     link_package(Fontconfig TARGET Fontconfig::Fontconfig)
@@ -349,20 +430,22 @@ if(NOT OPTION_DEDICATED)
     link_package(OpusFile TARGET OpusFile::opusfile)
     link_package(Soxr TARGET Soxr::soxr)
 
-    if(SDL2_FOUND AND OPENGL_FOUND AND UNIX)
-        # SDL2 dynamically loads OpenGL if needed, so do not link to OpenGL when
-        # on Linux. For Windows, we need to link to OpenGL as we also have a win32
-        # driver using it.
-        add_definitions(-DWITH_OPENGL)
-        message(STATUS "OpenGL found -- -DWITH_OPENGL -- (via SDL2)")
-    else()
-        link_package(OpenGL TARGET OpenGL::GL)
+    if(NOT OTTD_APPLE_IOS)
+        if(SDL2_FOUND AND OPENGL_FOUND AND UNIX)
+            # SDL2 dynamically loads OpenGL if needed, so do not link to OpenGL when
+            # on Linux. For Windows, we need to link to OpenGL as we also have a win32
+            # driver using it.
+            add_definitions(-DWITH_OPENGL)
+            message(STATUS "OpenGL found -- -DWITH_OPENGL -- (via SDL2)")
+        else()
+            link_package(OpenGL TARGET OpenGL::GL)
+        endif()
     endif()
 endif()
 
 include(3rdparty/llvm/CheckAtomic)
 
-if(APPLE)
+if(OTTD_APPLE_MACOS)
     link_package(Iconv TARGET Iconv::Iconv)
 
     target_link_libraries(openttd_lib
@@ -375,6 +458,36 @@ if(APPLE)
     add_definitions(
         -DWITH_COCOA
     )
+endif()
+
+if(OTTD_APPLE_IOS)
+    link_package(Iconv TARGET Iconv::Iconv)
+
+    find_library(FOUNDATION_LIBRARY Foundation)
+    find_library(COREFOUNDATION_LIBRARY CoreFoundation)
+    find_library(COREGRAPHICS_LIBRARY CoreGraphics)
+    find_library(QUARTZCORE_LIBRARY QuartzCore)
+    find_library(UIKIT_LIBRARY UIKit)
+    find_library(METAL_LIBRARY Metal)
+
+    if(FOUNDATION_LIBRARY)
+        target_link_libraries(openttd_lib ${FOUNDATION_LIBRARY})
+    endif()
+    if(COREFOUNDATION_LIBRARY)
+        target_link_libraries(openttd_lib ${COREFOUNDATION_LIBRARY})
+    endif()
+    if(COREGRAPHICS_LIBRARY)
+        target_link_libraries(openttd_lib ${COREGRAPHICS_LIBRARY})
+    endif()
+    if(QUARTZCORE_LIBRARY)
+        target_link_libraries(openttd_lib ${QUARTZCORE_LIBRARY})
+    endif()
+    if(UIKIT_LIBRARY)
+        target_link_libraries(openttd_lib ${UIKIT_LIBRARY})
+    endif()
+    if(METAL_LIBRARY)
+        target_link_libraries(openttd_lib ${METAL_LIBRARY})
+    endif()
 endif()
 
 if(EMSCRIPTEN)
@@ -482,7 +595,7 @@ enable_testing()
 
 add_subdirectory(regression)
 
-if(APPLE OR WIN32)
+if(OTTD_APPLE_MACOS OR WIN32)
     find_package(Pandoc)
 endif()
 
