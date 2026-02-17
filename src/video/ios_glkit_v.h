@@ -28,6 +28,7 @@ public:
 	bool ToggleFullscreen(bool fullscreen) override;
 	bool AfterBlitterChange() override;
 	void SetScreensaverInhibited(bool inhibited) override;
+	bool UseSystemCursor() override { return true; }
 
 	std::vector<int> GetListOfMonitorRefreshRates() override;
 	std::string_view GetInfoString() const override { return this->driver_info; }
