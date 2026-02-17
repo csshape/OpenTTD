@@ -33,9 +33,7 @@ static std::vector<std::string_view> _ios_params;
 	(void)launchOptions;
 
 	_window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-	UIViewController *root = [[UIViewController alloc] init];
-	_window.rootViewController = root;
-	[root release];
+	_window.rootViewController = [[[UIViewController alloc] init] autorelease];
 	[_window makeKeyAndVisible];
 
 	std::thread engine_thread([] {

@@ -34,6 +34,7 @@ public:
 	std::string_view GetName() const override { return "ios-metal"; }
 
 	void OnDisplayFrame();
+	void NotifySizeChanged();
 
 private:
 	std::atomic<bool> allow_tick{false};

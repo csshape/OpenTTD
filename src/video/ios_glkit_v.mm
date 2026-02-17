@@ -246,6 +246,26 @@ static NSUInteger CountActiveTouches(NSSet<UITouch *> *all)
 }
 @end
 
+@interface OTTDViewController : UIViewController {
+@public
+	VideoDriver_iOS_Metal *driver;
+}
+@end
+
+@implementation OTTDViewController
+
+- (BOOL)prefersStatusBarHidden { return YES; }
+- (BOOL)prefersHomeIndicatorAutoHidden { return YES; }
+- (UIRectEdge)preferredScreenEdgesDeferringSystemGestures { return UIRectEdgeAll; }
+
+- (void)viewDidLayoutSubviews
+{
+	[super viewDidLayoutSubviews];
+	if (self->driver != nullptr) self->driver->NotifySizeChanged();
+}
+
+@end
+
 static void RunOnMainThreadSync(dispatch_block_t block)
 {
 	if ([NSThread isMainThread]) {
@@ -328,11 +348,10 @@ bool VideoDriver_iOS_Metal::SetupContextAndView()
 			window = [[[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds] autorelease];
 		}
 
-		UIViewController *root = window.rootViewController;
-		if (root == nil) {
-			root = [[[UIViewController alloc] init] autorelease];
-			window.rootViewController = root;
-		}
+		OTTDViewController *ottd_root = [[[OTTDViewController alloc] init] autorelease];
+		ottd_root->driver = this;
+		window.rootViewController = ottd_root;
+		UIViewController *root = ottd_root;
 
 		(void)root.view;
 
@@ -533,6 +552,8 @@ void VideoDriver_iOS_Metal::TeardownContextAndView()
 		this->metal_device = nullptr;
 
 		UIViewController *root = (UIViewController *)this->root_controller;
+		OTTDViewController *ottd_root = (OTTDViewController *)root;
+		if (ottd_root != nil) ottd_root->driver = nullptr;
 		if (root != nil) [root release];
 		this->root_controller = nullptr;
 
@@ -871,6 +892,11 @@ std::vector<int> VideoDriver_iOS_Metal::GetListOfMonitorRefreshRates()
 		}
 	});
 	return { fps };
+}
+
+void VideoDriver_iOS_Metal::NotifySizeChanged()
+{
+	this->AllocateBackingStore(0, 0, false);
 }
 
 #include "../safeguards.h"
