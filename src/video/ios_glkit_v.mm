@@ -21,6 +21,7 @@
 #include "../gfx_func.h"
 #include "../openttd.h"
 #include "../settings_type.h"
+#include "../viewport_func.h"
 #include "../window_func.h"
 #include "ios_glkit_v.h"
 
@@ -37,8 +38,25 @@ static FVideoDriver_iOS_MetalCompatSDL iFVideoDriver_iOS_MetalCompatSDL;
 	CGPoint _single_touch_prev;   ///< Previous single-touch location in view points.
 	CGPoint _pan_prev_centroid;   ///< Previous two-finger centroid in view points.
 	bool    _in_two_finger_pan;   ///< Whether we are currently in two-finger pan mode.
+	CGFloat _pinch_prev_dist;     ///< Spread (distance) between two active fingers, in view points.
+	float   _pinch_accum;         ///< Accumulated pinch-magnitude (fraction of a zoom step).
 }
 @end
+
+/** Return the spread (distance) between the first two active touches in view coordinates. */
+static CGFloat SpreadOfActiveTouches(NSSet<UITouch *> *all, UIView *v)
+{
+	CGPoint pts[2];
+	NSUInteger n = 0;
+	for (UITouch *t in all) {
+		if (t.phase == UITouchPhaseEnded || t.phase == UITouchPhaseCancelled) continue;
+		pts[n++] = [t locationInView:v];
+		if (n == 2) break;
+	}
+	if (n < 2) return 0.0;
+	CGFloat dx = pts[0].x - pts[1].x, dy = pts[0].y - pts[1].y;
+	return sqrt(dx * dx + dy * dy);
+}
 
 /** Return the centroid of all non-ended touches in view coordinates. */
 static CGPoint CentroidOfActiveTouches(NSSet<UITouch *> *all, UIView *v)
@@ -79,6 +97,8 @@ static NSUInteger CountActiveTouches(NSSet<UITouch *> *all)
 		_in_two_finger_pan = false;
 		_single_touch_prev = CGPointZero;
 		_pan_prev_centroid = CGPointZero;
+		_pinch_prev_dist = 0.0;
+		_pinch_accum = 0.0f;
 
 		/* Long press (0.5 s) acts as a right-click to open context menus. */
 		UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc]
@@ -116,6 +136,9 @@ static NSUInteger CountActiveTouches(NSSet<UITouch *> *all)
 		_cursor.UpdateCursorPosition((int)px.x, (int)px.y);
 		_cursor.in_window = true;
 
+		_pinch_prev_dist = SpreadOfActiveTouches(all, self);
+		_pinch_accum = 0.0f;
+
 		/* Simulate a right-button press so the viewport scrolls. */
 		_right_button_down = true;
 		_right_button_clicked = true;
@@ -128,7 +151,7 @@ static NSUInteger CountActiveTouches(NSSet<UITouch *> *all)
 		_cursor.in_window = true;
 
 		_left_button_down = true;
-		_left_button_clicked = true;
+		HandleMouseEvents();
 	}
 }
 
@@ -149,6 +172,28 @@ static NSUInteger CountActiveTouches(NSSet<UITouch *> *all)
 			_cursor.UpdateCursorPosition((int)px.x, (int)px.y);
 		}
 		_pan_prev_centroid = cen;
+
+		/* Pinch-zoom: accumulate spread change and emit discrete zoom steps.
+		 * We call ZoomInOrOutToCursorWindow() directly instead of routing
+		 * through HandleMouseEvents(), because HandleViewportScroll() returns
+		 * ES_HANDLED while the right-button pan is active, which would block
+		 * the mousewheel path in MouseLoop entirely. */
+		CGFloat new_dist = SpreadOfActiveTouches(all, self);
+		if (_pinch_prev_dist > 0.0 && new_dist > 0.0) {
+			_pinch_accum += log2f((float)(new_dist / _pinch_prev_dist)) * 3.0f;
+			Window *main_w = GetMainWindow();
+			if (main_w != nullptr) {
+				while (_pinch_accum >= 1.0f) {
+					_pinch_accum -= 1.0f;
+					ZoomInOrOutToCursorWindow(true, main_w);   /* zoom in */
+				}
+				while (_pinch_accum <= -1.0f) {
+					_pinch_accum += 1.0f;
+					ZoomInOrOutToCursorWindow(false, main_w);  /* zoom out */
+				}
+			}
+		}
+		_pinch_prev_dist = new_dist;
 	} else {
 		/* Find the moved/stationary touch. */
 		UITouch *t = nil;
@@ -183,6 +228,8 @@ static NSUInteger CountActiveTouches(NSSet<UITouch *> *all)
 			_right_button_down = false;
 			_right_button_clicked = false;
 			_in_two_finger_pan = false;
+			_pinch_prev_dist = 0.0;
+			_pinch_accum = 0.0f;
 
 			if (remaining == 1) {
 				/* Resume single-touch tracking for the remaining finger. */
@@ -201,6 +248,7 @@ static NSUInteger CountActiveTouches(NSSet<UITouch *> *all)
 		if (remaining == 0) {
 			_left_button_down = false;
 			_left_button_clicked = false;
+			HandleMouseEvents();
 		}
 	}
 }
