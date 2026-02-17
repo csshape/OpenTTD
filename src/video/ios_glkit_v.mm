@@ -318,7 +318,6 @@ bool VideoDriver_iOS_Metal::SetupContextAndView()
 {
 	__block bool ok = true;
 
-
 	RunOnMainThreadSync(^{
 		UIApplication *app = [UIApplication sharedApplication];
 		UIWindow *window = nil;
@@ -359,8 +358,7 @@ bool VideoDriver_iOS_Metal::SetupContextAndView()
 		layer.pixelFormat = MTLPixelFormatBGRA8Unorm;
 		layer.framebufferOnly = YES;
 		layer.contentsScale = scale;
-		CGSize drawable_size = CGSizeMake(std::max(1.0, view.bounds.size.width * scale), std::max(1.0, view.bounds.size.height * scale));
-		layer.drawableSize = drawable_size;
+		layer.drawableSize = CGSizeMake(std::max(1.0, view.bounds.size.width * scale), std::max(1.0, view.bounds.size.height * scale));
 
 		[root.view addSubview:view];
 		[window makeKeyAndVisible];
@@ -370,7 +368,6 @@ bool VideoDriver_iOS_Metal::SetupContextAndView()
 		this->metal_view = [view retain];
 		this->metal_layer = [layer retain];
 		this->metal_device = [device retain];
-
 	});
 
 	return ok;
@@ -379,7 +376,6 @@ bool VideoDriver_iOS_Metal::SetupContextAndView()
 bool VideoDriver_iOS_Metal::InitMetalPipeline()
 {
 	__block bool ok = true;
-
 
 	RunOnMainThreadSync(^{
 		id<MTLDevice> device = (id<MTLDevice>)this->metal_device;
@@ -398,6 +394,7 @@ bool VideoDriver_iOS_Metal::InitMetalPipeline()
 		NSString *shader_source = [NSString stringWithUTF8String:metal_shader_src];
 		id<MTLLibrary> library = [device newLibraryWithSource:shader_source options:nil error:&error];
 		if (library == nil) {
+			if (error != nil) Debug(driver, 0, "iOS Metal: shader compile failed: {}", [[error localizedDescription] UTF8String]);
 			[queue release];
 			ok = false;
 			return;
@@ -421,6 +418,7 @@ bool VideoDriver_iOS_Metal::InitMetalPipeline()
 
 		id<MTLRenderPipelineState> pipeline = [device newRenderPipelineStateWithDescriptor:descriptor error:&error];
 		if (pipeline == nil) {
+			if (error != nil) Debug(driver, 0, "iOS Metal: pipeline creation failed: {}", [[error localizedDescription] UTF8String]);
 			[vertex_function release];
 			[fragment_function release];
 			[library release];
@@ -435,7 +433,6 @@ bool VideoDriver_iOS_Metal::InitMetalPipeline()
 
 		this->metal_queue = queue;
 		this->metal_pipeline = pipeline;
-
 	});
 
 	return ok;
@@ -445,11 +442,8 @@ bool VideoDriver_iOS_Metal::StartDisplayLink()
 {
 	__block bool ok = true;
 
-
 	RunOnMainThreadSync(^{
-		if (this->display_link != nullptr) {
-			return;
-		}
+		if (this->display_link != nullptr) return;
 
 		OTTD_iOSDisplayLinkTarget *target = [[OTTD_iOSDisplayLinkTarget alloc] init];
 		target->driver = this;
@@ -470,7 +464,6 @@ bool VideoDriver_iOS_Metal::StartDisplayLink()
 
 		this->display_link_target = target;
 		this->display_link = [display_link retain];
-
 	});
 
 	return ok;
@@ -554,7 +547,6 @@ bool VideoDriver_iOS_Metal::AllocateBackingStore([[maybe_unused]] int w, [[maybe
 	__block bool changed = false;
 	__block bool ok = true;
 
-
 	RunOnMainThreadSync(^{
 		UIView *view = (UIView *)this->metal_view;
 		CAMetalLayer *layer = (CAMetalLayer *)this->metal_layer;
@@ -566,6 +558,22 @@ bool VideoDriver_iOS_Metal::AllocateBackingStore([[maybe_unused]] int w, [[maybe
 
 		CGFloat scale = view.contentScaleFactor;
 		CGSize bounds = view.bounds.size;
+
+		/* view.bounds may be zero if UIKit has not completed its first layout pass yet.
+		 * Fall back to the screen's native pixel size so we never allocate a 1×1 buffer. */
+		if (bounds.width < 1.0 || bounds.height < 1.0) {
+			CGRect native = [UIScreen mainScreen].nativeBounds;
+			if (native.size.width > 0.0 && native.size.height > 0.0) {
+				bounds = native.size;
+				scale = 1.0; /* nativeBounds is already in pixels */
+			} else {
+				CGRect screen_bounds = [UIScreen mainScreen].bounds;
+				CGFloat screen_scale = [UIScreen mainScreen].scale;
+				bounds = CGSizeMake(screen_bounds.size.width * screen_scale,
+				                    screen_bounds.size.height * screen_scale);
+				scale = 1.0;
+			}
+		}
 
 		CGSize drawable_size = CGSizeMake(std::max(1.0, bounds.width * scale), std::max(1.0, bounds.height * scale));
 		layer.drawableSize = drawable_size;
@@ -630,7 +638,6 @@ bool VideoDriver_iOS_Metal::AllocateBackingStore([[maybe_unused]] int w, [[maybe
 
 		CopyPalette(this->local_palette, true);
 		changed = true;
-
 	});
 
 	if (!ok) return false;
@@ -709,7 +716,6 @@ void VideoDriver_iOS_Metal::OnDisplayFrame()
 {
 	if (_exit_game) return;
 	if (!this->allow_tick.load(std::memory_order_acquire)) return;
-
 	this->Tick();
 }
 
@@ -756,12 +762,8 @@ void VideoDriver_iOS_Metal::Paint()
 {
 	PerformanceMeasurer framerate(PFE_VIDEO);
 
-	if (IsEmptyRect(this->dirty_rect) && this->local_palette.count_dirty == 0) {
-		return;
-	}
-	if (this->pixel_buffer == nullptr || this->rgba_buffer == nullptr) {
-		return;
-	}
+	if (IsEmptyRect(this->dirty_rect) && this->local_palette.count_dirty == 0) return;
+	if (this->pixel_buffer == nullptr || this->rgba_buffer == nullptr) return;
 
 	if (this->local_palette.count_dirty != 0) {
 		Blitter *blitter = BlitterFactory::GetCurrentBlitter();
@@ -802,17 +804,13 @@ void VideoDriver_iOS_Metal::Paint()
 		id<MTLCommandQueue> queue = (id<MTLCommandQueue>)this->metal_queue;
 		id<MTLRenderPipelineState> pipeline = (id<MTLRenderPipelineState>)this->metal_pipeline;
 		id<MTLTexture> texture = (id<MTLTexture>)this->metal_texture;
-		if (layer == nil || queue == nil || pipeline == nil || texture == nil) {
-			return;
-		}
+		if (layer == nil || queue == nil || pipeline == nil || texture == nil) return;
 
 		MTLRegion region = MTLRegionMake2D(0, 0, (NSUInteger)this->vid_w, (NSUInteger)this->vid_h);
 		[texture replaceRegion:region mipmapLevel:0 withBytes:this->rgba_buffer bytesPerRow:(NSUInteger)this->vid_w * 4];
 
 		id<CAMetalDrawable> drawable = [layer nextDrawable];
-		if (drawable == nil) {
-			return;
-		}
+		if (drawable == nil) return;
 
 		MTLRenderPassDescriptor *pass = [MTLRenderPassDescriptor renderPassDescriptor];
 		pass.colorAttachments[0].texture = drawable.texture;
@@ -821,14 +819,10 @@ void VideoDriver_iOS_Metal::Paint()
 		pass.colorAttachments[0].clearColor = MTLClearColorMake(0.0, 0.0, 0.0, 1.0);
 
 		id<MTLCommandBuffer> command_buffer = [queue commandBuffer];
-		if (command_buffer == nil) {
-			return;
-		}
+		if (command_buffer == nil) return;
 
 		id<MTLRenderCommandEncoder> encoder = [command_buffer renderCommandEncoderWithDescriptor:pass];
-		if (encoder == nil) {
-			return;
-		}
+		if (encoder == nil) return;
 
 		[encoder setRenderPipelineState:pipeline];
 		[encoder setFragmentTexture:texture atIndex:0];
