@@ -18,6 +18,12 @@ if(NOT OPTION_DEDICATED)
     )
 
     add_files(
+        ios_m.mm
+        ios_m.h
+        CONDITION OTTD_APPLE_IOS
+    )
+
+    add_files(
         dmusic.cpp
         dmusic.h
         win32_m.cpp

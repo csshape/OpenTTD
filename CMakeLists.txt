@@ -42,6 +42,12 @@ endif()
 
 if(OTTD_APPLE_IOS)
     add_definitions(-DOTTD_IOS)
+    set(OTTD_IOS_MIDI_SOUNDBANK "${CMAKE_SOURCE_DIR}/media/baseset/gs_instruments.dls" CACHE FILEPATH "Path to MIDI soundbank to bundle on iOS as baseset/gs_instruments.dls")
+    set(DOTTD_IOS_MIDI_SOUNDBANK "${OTTD_IOS_MIDI_SOUNDBANK}" CACHE FILEPATH "Deprecated alias for OTTD_IOS_MIDI_SOUNDBANK")
+    if(DEFINED DOTTD_IOS_MIDI_SOUNDBANK AND NOT DOTTD_IOS_MIDI_SOUNDBANK STREQUAL OTTD_IOS_MIDI_SOUNDBANK)
+        set(OTTD_IOS_MIDI_SOUNDBANK "${DOTTD_IOS_MIDI_SOUNDBANK}" CACHE FILEPATH "Path to MIDI soundbank to bundle on iOS as baseset/gs_instruments.dls" FORCE)
+    endif()
+    message(STATUS "[iOS] MIDI soundbank: ${OTTD_IOS_MIDI_SOUNDBANK}")
 endif()
 
 if(APPLE AND NOT OTTD_APPLE_IOS AND NOT CMAKE_OSX_DEPLOYMENT_TARGET)
@@ -367,6 +373,7 @@ endif()
 
 if(OTTD_APPLE_IOS)
     option(OTTD_IOS_FETCH_OPENGFX "Fetch and bundle OpenGFX for iOS builds when no graphics set is present." ON)
+    set(_OTTD_IOS_BUNDLE_DIR "${CMAKE_BINARY_DIR}/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/openttd.app")
 
     set_target_properties(openttd PROPERTIES
         MACOSX_BUNDLE TRUE
@@ -374,15 +381,24 @@ if(OTTD_APPLE_IOS)
         XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "org.openttd.openttd"
         XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "2"
     )
+    if(EXISTS "${OTTD_IOS_MIDI_SOUNDBANK}")
+        set_source_files_properties("${OTTD_IOS_MIDI_SOUNDBANK}" PROPERTIES
+            MACOSX_PACKAGE_LOCATION "baseset"
+        )
+        target_sources(openttd PRIVATE "${OTTD_IOS_MIDI_SOUNDBANK}")
+    else()
+        message(WARNING "[iOS] MIDI soundbank not found at '${OTTD_IOS_MIDI_SOUNDBANK}'. Music will fallback to Apple GM instruments.")
+    endif()
+
     add_custom_command(TARGET openttd POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}/lang" "$<TARGET_FILE_DIR:openttd>/lang"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}/baseset" "$<TARGET_FILE_DIR:openttd>/baseset"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}/lang" "${_OTTD_IOS_BUNDLE_DIR}/lang"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}/baseset" "${_OTTD_IOS_BUNDLE_DIR}/baseset"
     )
 
     if(OTTD_IOS_FETCH_OPENGFX)
         add_custom_command(TARGET openttd POST_BUILD
             COMMAND ${CMAKE_COMMAND}
-                -DDEST_BASESET_DIR=$<TARGET_FILE_DIR:openttd>/baseset
+                -DDEST_BASESET_DIR=${_OTTD_IOS_BUNDLE_DIR}/baseset
                 -DWORK_DIR=${CMAKE_BINARY_DIR}/opengfx-cache
                 -P "${CMAKE_SOURCE_DIR}/cmake/scripts/EnsureOpenGFX.cmake"
             VERBATIM
