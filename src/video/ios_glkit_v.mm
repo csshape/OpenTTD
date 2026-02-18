@@ -16,6 +16,7 @@
 #include "../blitter/factory.hpp"
 #include "../core/geometry_func.hpp"
 #include "../core/math_func.hpp"
+#include "../core/utf8.hpp"
 #include "../debug.h"
 #include "../framerate_type.h"
 #include "../gfx_func.h"
@@ -32,15 +33,217 @@ static FVideoDriver_iOS_MetalCompatGLKit iFVideoDriver_iOS_MetalCompatGLKit;
 static FVideoDriver_iOS_MetalCompatGLES iFVideoDriver_iOS_MetalCompatGLES;
 static FVideoDriver_iOS_MetalCompatSDL iFVideoDriver_iOS_MetalCompatSDL;
 
+static constexpr uint16_t HID_KEY_A = 0x04;
+static constexpr uint16_t HID_KEY_Z = 0x1D;
+static constexpr uint16_t HID_KEY_1 = 0x1E;
+static constexpr uint16_t HID_KEY_0 = 0x27;
+static constexpr uint16_t HID_KEY_RETURN = 0x28;
+static constexpr uint16_t HID_KEY_ESCAPE = 0x29;
+static constexpr uint16_t HID_KEY_BACKSPACE = 0x2A;
+static constexpr uint16_t HID_KEY_TAB = 0x2B;
+static constexpr uint16_t HID_KEY_SPACE = 0x2C;
+static constexpr uint16_t HID_KEY_MINUS = 0x2D;
+static constexpr uint16_t HID_KEY_EQUALS = 0x2E;
+static constexpr uint16_t HID_KEY_L_BRACKET = 0x2F;
+static constexpr uint16_t HID_KEY_R_BRACKET = 0x30;
+static constexpr uint16_t HID_KEY_BACKSLASH = 0x31;
+static constexpr uint16_t HID_KEY_SEMICOLON = 0x33;
+static constexpr uint16_t HID_KEY_QUOTE = 0x34;
+static constexpr uint16_t HID_KEY_BACKQUOTE = 0x35;
+static constexpr uint16_t HID_KEY_COMMA = 0x36;
+static constexpr uint16_t HID_KEY_PERIOD = 0x37;
+static constexpr uint16_t HID_KEY_SLASH = 0x38;
+static constexpr uint16_t HID_KEY_F1 = 0x3A;
+static constexpr uint16_t HID_KEY_F12 = 0x45;
+static constexpr uint16_t HID_KEY_INSERT = 0x49;
+static constexpr uint16_t HID_KEY_HOME = 0x4A;
+static constexpr uint16_t HID_KEY_PAGEUP = 0x4B;
+static constexpr uint16_t HID_KEY_DELETE = 0x4C;
+static constexpr uint16_t HID_KEY_END = 0x4D;
+static constexpr uint16_t HID_KEY_PAGEDOWN = 0x4E;
+static constexpr uint16_t HID_KEY_RIGHT = 0x4F;
+static constexpr uint16_t HID_KEY_LEFT = 0x50;
+static constexpr uint16_t HID_KEY_DOWN = 0x51;
+static constexpr uint16_t HID_KEY_UP = 0x52;
+static constexpr uint16_t HID_KEY_KP_DIVIDE = 0x54;
+static constexpr uint16_t HID_KEY_KP_MULTIPLY = 0x55;
+static constexpr uint16_t HID_KEY_KP_MINUS = 0x56;
+static constexpr uint16_t HID_KEY_KP_PLUS = 0x57;
+static constexpr uint16_t HID_KEY_KP_ENTER = 0x58;
+static constexpr uint16_t HID_KEY_KP_1 = 0x59;
+static constexpr uint16_t HID_KEY_KP_9 = 0x61;
+static constexpr uint16_t HID_KEY_KP_0 = 0x62;
+static constexpr uint16_t HID_KEY_KP_PERIOD = 0x63;
+static constexpr NSUInteger IOS_MODIFIER_SHIFT = 1u << 17;
+static constexpr NSUInteger IOS_MODIFIER_ALT = 1u << 19;
+static constexpr NSUInteger IOS_MODIFIER_COMMAND = 1u << 20;
+
+static NSUInteger GetUIntegerProperty(id object, SEL selector)
+{
+	if (object == nil || ![object respondsToSelector:selector]) return 0;
+	using UIntFn = NSUInteger (*)(id, SEL);
+	auto fn = reinterpret_cast<UIntFn>([object methodForSelector:selector]);
+	return fn == nullptr ? 0 : fn(object, selector);
+}
+
+static NSString *GetNSStringProperty(id object, SEL selector)
+{
+	if (object == nil || ![object respondsToSelector:selector]) return nil;
+	using IdFn = id (*)(id, SEL);
+	auto fn = reinterpret_cast<IdFn>([object methodForSelector:selector]);
+	if (fn == nullptr) return nil;
+
+	id value = fn(object, selector);
+	return [value isKindOfClass:[NSString class]] ? (NSString *)value : nil;
+}
+
+/** Read the UIKey HID usage code when available (iOS 13.4+). */
+static uint16_t GetHIDUsage(id key)
+{
+	return static_cast<uint16_t>(GetUIntegerProperty(key, @selector(keyCode)));
+}
+
+static std::string ToUtf8(NSString *str)
+{
+	if (str == nil || str.length == 0) return {};
+	const char *utf8 = [str UTF8String];
+	return utf8 == nullptr ? std::string{} : std::string{utf8};
+}
+
+static char32_t FirstUtf8CodePoint(std::string_view text)
+{
+	auto [len, c] = DecodeUtf8(text);
+	return len > 0 ? c : WKC_NONE;
+}
+
+static uint MapASCIICharToWKC(char c)
+{
+	if (c >= 'a' && c <= 'z') return static_cast<uint>(c - ('a' - 'A'));
+	if ((c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) return static_cast<uint>(c);
+
+	switch (c) {
+		case '/': return WKC_SLASH;
+		case ';': return WKC_SEMICOLON;
+		case '=': return WKC_EQUALS;
+		case '[': return WKC_L_BRACKET;
+		case '\\': return WKC_BACKSLASH;
+		case ']': return WKC_R_BRACKET;
+		case '\'': return WKC_SINGLEQUOTE;
+		case ',': return WKC_COMMA;
+		case '-': return WKC_MINUS;
+		case '.': return WKC_PERIOD;
+		case '`': return WKC_BACKQUOTE;
+		case ' ': return WKC_SPACE;
+		default: return 0;
+	}
+}
+
+static uint MapHIDUsageToWKC(uint16_t usage, bool &unprintable)
+{
+	unprintable = false;
+
+	if (usage >= HID_KEY_A && usage <= HID_KEY_Z) return static_cast<uint>('A' + (usage - HID_KEY_A));
+	if (usage >= HID_KEY_F1 && usage <= HID_KEY_F12) {
+		unprintable = true;
+		return static_cast<uint>(WKC_F1 + (usage - HID_KEY_F1));
+	}
+	if (usage >= HID_KEY_1 && usage < HID_KEY_0) return static_cast<uint>('1' + (usage - HID_KEY_1));
+	if (usage >= HID_KEY_KP_1 && usage <= HID_KEY_KP_9) return static_cast<uint>('1' + (usage - HID_KEY_KP_1));
+
+	switch (usage) {
+		case HID_KEY_1: return '1';
+		case HID_KEY_0: return '0';
+		case HID_KEY_RETURN: unprintable = true; return WKC_RETURN;
+		case HID_KEY_ESCAPE: unprintable = true; return WKC_ESC;
+		case HID_KEY_BACKSPACE: unprintable = true; return WKC_BACKSPACE;
+		case HID_KEY_TAB: unprintable = true; return WKC_TAB;
+		case HID_KEY_SPACE: return WKC_SPACE;
+		case HID_KEY_MINUS: return WKC_MINUS;
+		case HID_KEY_EQUALS: return WKC_EQUALS;
+		case HID_KEY_L_BRACKET: return WKC_L_BRACKET;
+		case HID_KEY_R_BRACKET: return WKC_R_BRACKET;
+		case HID_KEY_BACKSLASH: return WKC_BACKSLASH;
+		case HID_KEY_SEMICOLON: return WKC_SEMICOLON;
+		case HID_KEY_QUOTE: return WKC_SINGLEQUOTE;
+		case HID_KEY_BACKQUOTE: return WKC_BACKQUOTE;
+		case HID_KEY_COMMA: return WKC_COMMA;
+		case HID_KEY_PERIOD: return WKC_PERIOD;
+		case HID_KEY_SLASH: return WKC_SLASH;
+		case HID_KEY_INSERT: unprintable = true; return WKC_INSERT;
+		case HID_KEY_HOME: unprintable = true; return WKC_HOME;
+		case HID_KEY_PAGEUP: unprintable = true; return WKC_PAGEUP;
+		case HID_KEY_DELETE: unprintable = true; return WKC_DELETE;
+		case HID_KEY_END: unprintable = true; return WKC_END;
+		case HID_KEY_PAGEDOWN: unprintable = true; return WKC_PAGEDOWN;
+		case HID_KEY_LEFT: unprintable = true; return WKC_LEFT;
+		case HID_KEY_RIGHT: unprintable = true; return WKC_RIGHT;
+		case HID_KEY_UP: unprintable = true; return WKC_UP;
+		case HID_KEY_DOWN: unprintable = true; return WKC_DOWN;
+		case HID_KEY_KP_0: return '0';
+		case HID_KEY_KP_DIVIDE: return WKC_NUM_DIV;
+		case HID_KEY_KP_MULTIPLY: return WKC_NUM_MUL;
+		case HID_KEY_KP_MINUS: return WKC_NUM_MINUS;
+		case HID_KEY_KP_PLUS: return WKC_NUM_PLUS;
+		case HID_KEY_KP_ENTER: unprintable = true; return WKC_NUM_ENTER;
+		case HID_KEY_KP_PERIOD: return WKC_NUM_DECIMAL;
+		default: return 0;
+	}
+}
+
+static uint ConvertIOSKeyIntoMy(id key, char32_t &character, std::string &text)
+{
+	character = WKC_NONE;
+	text = ToUtf8(GetNSStringProperty(key, @selector(characters)));
+
+	bool unprintable = false;
+	uint base = MapHIDUsageToWKC(GetHIDUsage(key), unprintable);
+
+	/* Older iOS versions do not expose keyCode; recover what we can from text. */
+	if (base == 0) {
+		NSString *ignoring = GetNSStringProperty(key, @selector(charactersIgnoringModifiers));
+		if (ignoring != nil && ignoring.length == 1) {
+			std::string fallback = ToUtf8(ignoring);
+			if (!fallback.empty()) base = MapASCIICharToWKC(fallback[0]);
+		} else if ([ignoring isEqualToString:UIKeyInputUpArrow]) {
+			unprintable = true;
+			base = WKC_UP;
+		} else if ([ignoring isEqualToString:UIKeyInputDownArrow]) {
+			unprintable = true;
+			base = WKC_DOWN;
+		} else if ([ignoring isEqualToString:UIKeyInputLeftArrow]) {
+			unprintable = true;
+			base = WKC_LEFT;
+		} else if ([ignoring isEqualToString:UIKeyInputRightArrow]) {
+			unprintable = true;
+			base = WKC_RIGHT;
+		}
+	}
+
+	uint keycode = base;
+	NSUInteger mods = GetUIntegerProperty(key, @selector(modifierFlags));
+	if ((mods & IOS_MODIFIER_SHIFT) != 0) keycode |= WKC_SHIFT;
+	if ((mods & IOS_MODIFIER_ALT) != 0) keycode |= WKC_ALT;
+	if ((mods & IOS_MODIFIER_COMMAND) != 0) keycode |= WKC_CTRL; // Cmd acts as PC Ctrl on iPad.
+
+	bool suppress_character = unprintable || (keycode & (WKC_CTRL | WKC_ALT | WKC_META)) != 0;
+	if (!suppress_character && !text.empty()) {
+		character = FirstUtf8CodePoint(text);
+	}
+
+	return keycode;
+}
+
 /** Minimal UIView subclass with CAMetalLayer backing and touch input. */
 @interface OTTDMetalView : UIView {
 @private
+	VideoDriver_iOS_Metal *_driver; ///< Bridge to the C++ input pipeline.
 	CGPoint _single_touch_prev;   ///< Previous single-touch location in view points.
 	CGPoint _pan_prev_centroid;   ///< Previous two-finger centroid in view points.
 	bool    _in_two_finger_pan;   ///< Whether we are currently in two-finger pan mode.
 	CGFloat _pinch_prev_dist;     ///< Spread (distance) between two active fingers, in view points.
 	float   _pinch_accum;         ///< Accumulated pinch-magnitude (fraction of a zoom step).
 }
+- (void)setDriver:(VideoDriver_iOS_Metal *)driver;
 @end
 
 /** Return the spread (distance) between the first two active touches in view coordinates. */
@@ -93,6 +296,7 @@ static NSUInteger CountActiveTouches(NSSet<UITouch *> *all)
 {
 	self = [super initWithFrame:frame];
 	if (self) {
+		_driver = nullptr;
 		self.multipleTouchEnabled = YES;
 		_in_two_finger_pan = false;
 		_single_touch_prev = CGPointZero;
@@ -110,11 +314,83 @@ static NSUInteger CountActiveTouches(NSSet<UITouch *> *all)
 	return self;
 }
 
+- (void)setDriver:(VideoDriver_iOS_Metal *)driver
+{
+	_driver = driver;
+}
+
+- (BOOL)canBecomeFirstResponder
+{
+	return YES;
+}
+
+- (void)didMoveToWindow
+{
+	[super didMoveToWindow];
+	if (self.window != nil) [self becomeFirstResponder];
+}
+
 /** Convert a view-space point to game pixel coordinates. */
 - (CGPoint)_pixelPoint:(CGPoint)pt
 {
 	CGFloat s = self.contentScaleFactor;
 	return CGPointMake(pt.x * s, pt.y * s);
+}
+
+- (void)_ottdHandleKeyPresses:(NSSet<UIPress *> *)presses down:(BOOL)down
+{
+	for (UIPress *press in presses) {
+		id key = nil;
+		SEL key_selector = @selector(key);
+		if ([press respondsToSelector:key_selector]) {
+			using KeyFn = id (*)(id, SEL);
+			auto key_fn = reinterpret_cast<KeyFn>([press methodForSelector:key_selector]);
+			if (key_fn != nullptr) key = key_fn(press, key_selector);
+		}
+		if (key == nil) continue;
+
+		NSUInteger mods = GetUIntegerProperty(key, @selector(modifierFlags));
+		bool command = (mods & IOS_MODIFIER_COMMAND) != 0;
+		bool shift = (mods & IOS_MODIFIER_SHIFT) != 0;
+		bool alt = (mods & IOS_MODIFIER_ALT) != 0;
+
+		if (_driver == nullptr) continue;
+		_driver->OnHardwareModifierState(command, shift, alt);
+
+		char32_t character = WKC_NONE;
+		std::string text{};
+		uint keycode = ConvertIOSKeyIntoMy(key, character, text);
+
+		if (down) {
+			_driver->OnHardwareKeyDown(keycode, character, text);
+		} else {
+			_driver->OnHardwareKeyUp(keycode);
+		}
+	}
+}
+
+- (void)pressesBegan:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
+{
+	[self _ottdHandleKeyPresses:presses down:YES];
+	[super pressesBegan:presses withEvent:event];
+}
+
+- (void)pressesChanged:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
+{
+	[self _ottdHandleKeyPresses:presses down:YES];
+	[super pressesChanged:presses withEvent:event];
+}
+
+- (void)pressesEnded:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
+{
+	[self _ottdHandleKeyPresses:presses down:NO];
+	[super pressesEnded:presses withEvent:event];
+}
+
+- (void)pressesCancelled:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
+{
+	[self _ottdHandleKeyPresses:presses down:NO];
+	[super pressesCancelled:presses withEvent:event];
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
@@ -414,6 +690,7 @@ bool VideoDriver_iOS_Metal::SetupContextAndView()
 			ok = false;
 			return;
 		}
+		[view setDriver:this];
 
 		view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
@@ -429,6 +706,7 @@ bool VideoDriver_iOS_Metal::SetupContextAndView()
 
 		[root.view addSubview:view];
 		[window makeKeyAndVisible];
+		[view becomeFirstResponder];
 
 		this->ui_window = [window retain];
 		this->root_controller = [root retain];
@@ -786,6 +1064,134 @@ void VideoDriver_iOS_Metal::OnDisplayFrame()
 	if (_exit_game) return;
 	if (!this->allow_tick.load(std::memory_order_acquire)) return;
 	this->Tick();
+}
+
+static bool IsNonTextEditBoxKey(uint keycode)
+{
+	uint base = keycode & ~WKC_SPECIAL_KEYS;
+
+	switch (base) {
+		case WKC_ESC:
+		case WKC_BACKSPACE:
+		case WKC_INSERT:
+		case WKC_DELETE:
+		case WKC_PAGEUP:
+		case WKC_PAGEDOWN:
+		case WKC_END:
+		case WKC_HOME:
+		case WKC_LEFT:
+		case WKC_UP:
+		case WKC_RIGHT:
+		case WKC_DOWN:
+		case WKC_RETURN:
+		case WKC_TAB:
+		case WKC_NUM_ENTER:
+			return true;
+
+		default:
+			break;
+	}
+
+	if (base >= WKC_F1 && base <= WKC_F12) return true;
+	return (keycode & (WKC_META | WKC_CTRL | WKC_ALT)) != 0;
+}
+
+void VideoDriver_iOS_Metal::OnHardwareModifierState(bool command_down, bool shift_down, bool alt_down)
+{
+	this->command_down = command_down;
+	this->shift_down = shift_down;
+	this->alt_down = alt_down;
+}
+
+void VideoDriver_iOS_Metal::OnHardwareKeyDown(uint keycode, char32_t character, std::string_view text)
+{
+	uint base = keycode & ~WKC_SPECIAL_KEYS;
+	if (base == WKC_NONE && text.empty()) {
+		if ((keycode & (WKC_SHIFT | WKC_CTRL | WKC_ALT | WKC_META)) == 0) {
+			Debug(driver, 4, "iOS keyboard: ignored unmapped key event");
+		}
+		return;
+	}
+
+	switch (base) {
+		case WKC_TAB:
+			this->tab_down = true;
+			break;
+		case WKC_LEFT:
+			this->directional_keys |= 1;
+			break;
+		case WKC_UP:
+			this->directional_keys |= 2;
+			break;
+		case WKC_RIGHT:
+			this->directional_keys |= 4;
+			break;
+		case WKC_DOWN:
+			this->directional_keys |= 8;
+			break;
+		default:
+			break;
+	}
+
+	if (!this->edit_box_focused || IsNonTextEditBoxKey(keycode) || text.empty()) {
+		HandleKeypress(keycode, character);
+		return;
+	}
+
+	if (base == WKC_BACKQUOTE && FocusedWindowIsConsole()) {
+		HandleKeypress(keycode, character != WKC_NONE ? character : FirstUtf8CodePoint(text));
+		return;
+	}
+
+	HandleTextInput(text);
+}
+
+void VideoDriver_iOS_Metal::OnHardwareKeyUp(uint keycode)
+{
+	uint base = keycode & ~WKC_SPECIAL_KEYS;
+
+	switch (base) {
+		case WKC_TAB:
+			this->tab_down = false;
+			break;
+		case WKC_LEFT:
+			this->directional_keys &= ~1;
+			break;
+		case WKC_UP:
+			this->directional_keys &= ~2;
+			break;
+		case WKC_RIGHT:
+			this->directional_keys &= ~4;
+			break;
+		case WKC_DOWN:
+			this->directional_keys &= ~8;
+			break;
+		default:
+			break;
+	}
+}
+
+void VideoDriver_iOS_Metal::InputLoop()
+{
+	bool old_ctrl_pressed = _ctrl_pressed;
+
+	_ctrl_pressed = this->command_down;
+	_shift_pressed = this->shift_down;
+
+	this->fast_forward_key_pressed = this->tab_down && !this->alt_down;
+	_dirkeys = this->directional_keys;
+
+	if (old_ctrl_pressed != _ctrl_pressed) HandleCtrlChanged();
+}
+
+void VideoDriver_iOS_Metal::EditBoxGainedFocus()
+{
+	this->edit_box_focused = true;
+}
+
+void VideoDriver_iOS_Metal::EditBoxLostFocus()
+{
+	this->edit_box_focused = false;
 }
 
 void VideoDriver_iOS_Metal::MakeDirty(int left, int top, int width, int height)

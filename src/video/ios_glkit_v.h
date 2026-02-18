@@ -36,6 +36,9 @@ public:
 
 	void OnDisplayFrame();
 	void NotifySizeChanged();
+	void OnHardwareModifierState(bool command_down, bool shift_down, bool alt_down);
+	void OnHardwareKeyDown(uint keycode, char32_t character, std::string_view text);
+	void OnHardwareKeyUp(uint keycode);
 
 private:
 	std::atomic<bool> allow_tick{false};
@@ -59,11 +62,20 @@ private:
 	uint32_t *rgba_buffer = nullptr;
 	int vid_w = 0;
 	int vid_h = 0;
+	bool edit_box_focused = false;
+	bool command_down = false;
+	bool shift_down = false;
+	bool alt_down = false;
+	bool tab_down = false;
+	uint8_t directional_keys = 0;
 
 	Dimension GetScreenSize() const override;
+	void InputLoop() override;
 	bool LockVideoBuffer() override;
 	void UnlockVideoBuffer() override;
 	bool PollEvent() override { return false; }
+	void EditBoxGainedFocus() override;
+	void EditBoxLostFocus() override;
 
 	void Paint() override;
 	void *GetVideoPointer();
