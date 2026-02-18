@@ -463,12 +463,26 @@ endif()
 if(OTTD_APPLE_IOS)
     link_package(Iconv TARGET Iconv::Iconv)
 
+    find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox)
+    find_library(AVFOUNDATION_LIBRARY AVFoundation)
     find_library(FOUNDATION_LIBRARY Foundation)
     find_library(COREFOUNDATION_LIBRARY CoreFoundation)
     find_library(COREGRAPHICS_LIBRARY CoreGraphics)
     find_library(QUARTZCORE_LIBRARY QuartzCore)
     find_library(UIKIT_LIBRARY UIKit)
     find_library(METAL_LIBRARY Metal)
+
+    if(NOT AUDIOTOOLBOX_LIBRARY)
+        message(FATAL_ERROR "AudioToolbox is required for iOS builds")
+    endif()
+    if(NOT AVFOUNDATION_LIBRARY)
+        message(FATAL_ERROR "AVFoundation is required for iOS builds")
+    endif()
+
+    target_link_libraries(openttd_lib
+        ${AUDIOTOOLBOX_LIBRARY}
+        ${AVFOUNDATION_LIBRARY}
+    )
 
     if(FOUNDATION_LIBRARY)
         target_link_libraries(openttd_lib ${FOUNDATION_LIBRARY})

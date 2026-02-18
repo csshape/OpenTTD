@@ -8,9 +8,11 @@
 /** @file ios_main.mm iOS app bootstrap for SDL2-free builds. */
 
 #import <UIKit/UIKit.h>
+#import <AVFoundation/AVFoundation.h>
 
 #include "../../stdafx.h"
 
+#include "../../debug.h"
 #include "../../openttd.h"
 #include "ios_main.h"
 
@@ -31,6 +33,17 @@ static std::vector<std::string_view> _ios_params;
 {
 	(void)application;
 	(void)launchOptions;
+
+	AVAudioSession *audio_session = [AVAudioSession sharedInstance];
+	NSError *audio_error = nil;
+	if (![audio_session setCategory:AVAudioSessionCategoryAmbient error:&audio_error]) {
+		Debug(driver, 0, "ios_main: Failed to configure AVAudioSession category: {}", [[audio_error localizedDescription] UTF8String]);
+	}
+
+	audio_error = nil;
+	if (![audio_session setActive:YES error:&audio_error]) {
+		Debug(driver, 0, "ios_main: Failed to activate AVAudioSession: {}", [[audio_error localizedDescription] UTF8String]);
+	}
 
 	_window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
 	_window.rootViewController = [[[UIViewController alloc] init] autorelease];

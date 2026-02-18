@@ -18,6 +18,12 @@ if(NOT OPTION_DEDICATED)
     )
 
     add_files(
+        ios_s.cpp
+        ios_s.h
+        CONDITION OTTD_APPLE_IOS
+    )
+
+    add_files(
         win32_s.cpp
         win32_s.h
         CONDITION WIN32
