@@ -42,12 +42,27 @@ endif()
 
 if(OTTD_APPLE_IOS)
     add_definitions(-DOTTD_IOS)
+    set(OTTD_IOS_MIN_DEPLOYMENT_TARGET "18.0" CACHE STRING "Minimum supported iOS deployment target for iOS builds")
     set(OTTD_IOS_MIDI_SOUNDBANK "${CMAKE_SOURCE_DIR}/media/baseset/gs_instruments.dls" CACHE FILEPATH "Path to MIDI soundbank to bundle on iOS as baseset/gs_instruments.dls")
+    set(OTTD_IOS_BUNDLE_IDENTIFIER "dk.egernet.openttd" CACHE STRING "Bundle identifier for iOS builds")
+    set(OTTD_IOS_MARKETING_VERSION "${PROJECT_VERSION}" CACHE STRING "Default CFBundleShortVersionString for iOS builds")
+    set(OTTD_IOS_BUILD_NUMBER "1" CACHE STRING "Default CFBundleVersion for iOS builds")
+    if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+        set(CMAKE_OSX_DEPLOYMENT_TARGET "${OTTD_IOS_MIN_DEPLOYMENT_TARGET}")
+    endif()
+    if(CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS OTTD_IOS_MIN_DEPLOYMENT_TARGET)
+        message(FATAL_ERROR "[iOS] CMAKE_OSX_DEPLOYMENT_TARGET (${CMAKE_OSX_DEPLOYMENT_TARGET}) must be >= ${OTTD_IOS_MIN_DEPLOYMENT_TARGET}.")
+    endif()
+    if(OTTD_IOS_BUNDLE_IDENTIFIER STREQUAL "")
+        message(FATAL_ERROR "[iOS] OTTD_IOS_BUNDLE_IDENTIFIER cannot be empty. Pass -DOTTD_IOS_BUNDLE_IDENTIFIER=com.example.openttd.")
+    endif()
     set(DOTTD_IOS_MIDI_SOUNDBANK "${OTTD_IOS_MIDI_SOUNDBANK}" CACHE FILEPATH "Deprecated alias for OTTD_IOS_MIDI_SOUNDBANK")
     if(DEFINED DOTTD_IOS_MIDI_SOUNDBANK AND NOT DOTTD_IOS_MIDI_SOUNDBANK STREQUAL OTTD_IOS_MIDI_SOUNDBANK)
         set(OTTD_IOS_MIDI_SOUNDBANK "${DOTTD_IOS_MIDI_SOUNDBANK}" CACHE FILEPATH "Path to MIDI soundbank to bundle on iOS as baseset/gs_instruments.dls" FORCE)
     endif()
     message(STATUS "[iOS] MIDI soundbank: ${OTTD_IOS_MIDI_SOUNDBANK}")
+    message(STATUS "[iOS] Deployment target: ${CMAKE_OSX_DEPLOYMENT_TARGET}")
+    message(STATUS "[iOS] Bundle identifier: ${OTTD_IOS_BUNDLE_IDENTIFIER}")
 endif()
 
 if(APPLE AND NOT OTTD_APPLE_IOS AND NOT CMAKE_OSX_DEPLOYMENT_TARGET)
@@ -374,13 +389,39 @@ endif()
 if(OTTD_APPLE_IOS)
     option(OTTD_IOS_FETCH_OPENGFX "Fetch and bundle OpenGFX for iOS builds when no graphics set is present." ON)
     set(_OTTD_IOS_BUNDLE_DIR "${CMAKE_BINARY_DIR}/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/openttd.app")
+    set(_OTTD_IOS_ASSET_CATALOG "${CMAKE_SOURCE_DIR}/os/ios/Assets.xcassets")
+    set(_OTTD_IOS_LAUNCH_SCREEN "${CMAKE_SOURCE_DIR}/os/ios/LaunchScreen.storyboard")
 
     set_target_properties(openttd PROPERTIES
         MACOSX_BUNDLE TRUE
+        SKIP_INSTALL FALSE
         XCODE_ATTRIBUTE_GENERATE_INFOPLIST_FILE YES
-        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "org.openttd.openttd"
+        XCODE_ATTRIBUTE_SKIP_INSTALL "NO"
+        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "${OTTD_IOS_BUNDLE_IDENTIFIER}"
         XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "2"
+        XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon"
+        XCODE_ATTRIBUTE_MARKETING_VERSION "${OTTD_IOS_MARKETING_VERSION}"
+        XCODE_ATTRIBUTE_CURRENT_PROJECT_VERSION "${OTTD_IOS_BUILD_NUMBER}"
+        XCODE_ATTRIBUTE_SUPPORTED_PLATFORMS "iphoneos"
+        XCODE_ATTRIBUTE_INSTALL_PATH "$(LOCAL_APPS_DIR)"
+        XCODE_ATTRIBUTE_INFOPLIST_KEY_UILaunchStoryboardName "LaunchScreen"
+        XCODE_ATTRIBUTE_INFOPLIST_KEY_UISupportedInterfaceOrientations "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        XCODE_ATTRIBUTE_INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
     )
+    # Make sure LaunchScreen is part of bundle resources for App Store validation.
+    set_source_files_properties("${_OTTD_IOS_LAUNCH_SCREEN}" PROPERTIES
+        MACOSX_PACKAGE_LOCATION "Resources"
+    )
+    target_sources(openttd PRIVATE "${_OTTD_IOS_LAUNCH_SCREEN}")
+    if(EXISTS "${_OTTD_IOS_ASSET_CATALOG}")
+        # Keep the asset catalog as an explicit bundle resource for Xcode.
+        set_source_files_properties("${_OTTD_IOS_ASSET_CATALOG}" PROPERTIES
+            MACOSX_PACKAGE_LOCATION "Resources"
+        )
+        target_sources(openttd PRIVATE "${_OTTD_IOS_ASSET_CATALOG}")
+    else()
+        message(WARNING "[iOS] Asset catalog not found at '${_OTTD_IOS_ASSET_CATALOG}'. Archive validation may fail due to missing app icons.")
+    endif()
     if(EXISTS "${OTTD_IOS_MIDI_SOUNDBANK}")
         set_source_files_properties("${OTTD_IOS_MIDI_SOUNDBANK}" PROPERTIES
             MACOSX_PACKAGE_LOCATION "baseset"

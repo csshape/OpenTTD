@@ -135,6 +135,12 @@ cmake --preset ios-simulator-xcode
 cmake --build --preset ios-simulator-build
 ```
 
+Set custom bundle identifier during configure:
+
+```bash
+cmake --preset ios-simulator-xcode -DOTTD_IOS_BUNDLE_IDENTIFIER=com.example.openttd
+```
+
 If you use vcpkg for dependencies (recommended for SDL2 on iOS), set
 `VCPKG_ROOT` first and use the vcpkg preset:
 
@@ -150,10 +156,53 @@ The configure step generates an Xcode project in
 Notes:
 
 - iPadOS builds are SDL2-based; Cocoa video/sound drivers are macOS-only.
+- iPadOS presets target minimum iOS version 18.0.
 - For the iOS simulator presets, some optional desktop dependencies are
   disabled by default.
 - The build copies `lang/` and `baseset/` into the app bundle output so the
   game can discover runtime data when launched from Xcode.
+
+## iPadOS (Device Release + TestFlight preparation)
+
+For archiving and manual upload to TestFlight from Xcode, use the iPad device
+release presets:
+
+```bash
+cmake --preset macos-xcode-universal
+cmake --build --preset macos-xcode-universal-tools-release
+```
+
+This builds the native `strgen` and `settingsgen` host tools used by iOS build
+scripts in `Release`, matching the iOS archive configuration.
+
+```bash
+cmake --preset ios-device-xcode-release
+cmake --build --preset ios-device-build-release
+```
+
+Set custom bundle identifier during configure:
+
+```bash
+cmake --preset ios-device-xcode-release -DOTTD_IOS_BUNDLE_IDENTIFIER=com.example.openttd
+```
+
+If you use vcpkg:
+
+```bash
+export VCPKG_ROOT=<location of vcpkg>
+cmake --preset ios-device-xcode-release-vcpkg
+cmake --build --preset ios-device-build-release-vcpkg
+```
+
+The configure step generates an Xcode project in
+`build/xcode-ios-device-release/`.
+
+Signing and TestFlight upload are done manually in Xcode. See
+`docs/ios_testflight_release.md` for the end-to-end archive/upload runbook.
+
+If Xcode fails in `CompileAssetCatalogVariant` with
+`No available simulator runtimes for platform iphonesimulator`, install at
+least one iOS Simulator runtime via `Xcode > Settings > Platforms`.
 
 ## All other platforms
 Minimum required version of CMake is 3.16.

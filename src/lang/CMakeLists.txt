@@ -74,8 +74,17 @@ set(LANG_SOURCE_FILES
 set(LANG_BINARY_DIR ${CMAKE_BINARY_DIR}/lang)
 
 if (HOST_BINARY_DIR)
+    if (NOT EXISTS "${HOST_BINARY_DIR}/strgen.cmake")
+        message(FATAL_ERROR "HOST_BINARY_DIR is set to '${HOST_BINARY_DIR}', but '${HOST_BINARY_DIR}/strgen.cmake' was not found. Build host tools first (target 'strgen').")
+    endif()
     include(${HOST_BINARY_DIR}/strgen.cmake)
 endif()
+
+if (NOT TARGET strgen)
+    message(FATAL_ERROR "Target 'strgen' is required to generate language artifacts. Configure with HOST_BINARY_DIR pointing to a native build that exported strgen.")
+endif()
+
+set(STRGEN_EXECUTABLE $<TARGET_FILE:strgen>)
 
 # Walk over all the (finished) language files, and generate a command to compile them
 foreach(LANG_SOURCE_FILE IN LISTS LANG_SOURCE_FILES)
@@ -85,7 +94,7 @@ foreach(LANG_SOURCE_FILE IN LISTS LANG_SOURCE_FILES)
 
     add_custom_command(OUTPUT ${LANG_BINARY_FILE}
             COMMAND ${CMAKE_COMMAND} -E make_directory ${LANG_BINARY_DIR}
-            COMMAND strgen
+            COMMAND ${STRGEN_EXECUTABLE}
                     -s ${CMAKE_CURRENT_SOURCE_DIR}
                     -d ${LANG_BINARY_DIR}
                     ${LANG_SOURCE_FILE}
@@ -114,7 +123,7 @@ set(TABLE_BINARY_DIR ${GENERATED_BINARY_DIR}/table)
 # Generate a command and target to create the strings table
 add_custom_command_timestamp(OUTPUT ${TABLE_BINARY_DIR}/strings.h
         COMMAND ${CMAKE_COMMAND} -E make_directory ${TABLE_BINARY_DIR}
-        COMMAND strgen
+        COMMAND ${STRGEN_EXECUTABLE}
                 -s ${CMAKE_CURRENT_SOURCE_DIR}
                 -d ${TABLE_BINARY_DIR}
         DEPENDS strgen ${MASTER_LANG_FILE}

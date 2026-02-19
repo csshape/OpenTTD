@@ -25,13 +25,22 @@ set(TABLE_INI_SOURCE_FILES
 )
 
 if (HOST_BINARY_DIR)
+    if (NOT EXISTS "${HOST_BINARY_DIR}/settingsgen.cmake")
+        message(FATAL_ERROR "HOST_BINARY_DIR is set to '${HOST_BINARY_DIR}', but '${HOST_BINARY_DIR}/settingsgen.cmake' was not found. Build host tools first (target 'settingsgen').")
+    endif()
     include(${HOST_BINARY_DIR}/settingsgen.cmake)
 endif()
+
+if (NOT TARGET settingsgen)
+    message(FATAL_ERROR "Target 'settingsgen' is required to generate table/settings.h. Configure with HOST_BINARY_DIR pointing to a native build that exported settingsgen.")
+endif()
+
+set(SETTINGSGEN_EXECUTABLE $<TARGET_FILE:settingsgen>)
 
 # Generate a command and target to create the settings table
 add_custom_command_timestamp(OUTPUT ${TABLE_BINARY_DIR}/settings.h
         COMMAND ${CMAKE_COMMAND} -E make_directory ${TABLE_BINARY_DIR}
-        COMMAND settingsgen
+        COMMAND ${SETTINGSGEN_EXECUTABLE}
                 -o ${TABLE_BINARY_DIR}/settings.h
                 -b ${CMAKE_SOURCE_DIR}/src/table/settings.h.preamble
                 -a ${CMAKE_SOURCE_DIR}/src/table/settings.h.postamble
