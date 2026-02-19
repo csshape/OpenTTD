@@ -691,7 +691,7 @@ void GuiShowTooltips(Window *parent, EncodedString &&text, TooltipCloseCondition
 {
 	CloseWindowById(WindowClass::ToolTips, 0);
 
-	if (text.empty() || !_cursor.in_window) return;
+	if (!_settings_client.gui.show_tooltips || text.empty() || !_cursor.in_window) return;
 
 	new TooltipsWindow(parent, std::move(text), close_tooltip);
 }

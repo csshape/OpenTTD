@@ -1597,6 +1597,8 @@ STR_CONFIG_SETTING_HOVER_DELAY_HELPTEXT                         :Delay before to
 STR_CONFIG_SETTING_HOVER_DELAY_VALUE                            :Hover for {COMMA} millisecond{P 0 "" s}
 ###setting-zero-is-special
 STR_CONFIG_SETTING_HOVER_DELAY_DISABLED                         :Right click
+STR_CONFIG_SETTING_SHOW_TOOLTIPS                                :Enable tooltips: {STRING}
+STR_CONFIG_SETTING_SHOW_TOOLTIPS_HELPTEXT                       :Display tooltip windows when hovering or right-clicking interface elements
 
 STR_CONFIG_SETTING_POPULATION_IN_LABEL                          :Show town population in the town name label: {STRING}
 STR_CONFIG_SETTING_POPULATION_IN_LABEL_HELPTEXT                 :Display the population of towns in their label on the map

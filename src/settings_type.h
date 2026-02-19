@@ -227,6 +227,7 @@ struct GUISettings {
 	ViewportAutoscrolling auto_scrolling; ///< scroll when moving mouse to the edge.
 	uint8_t errmsg_duration; ///< duration of error message
 	uint16_t hover_delay_ms; ///< time required to activate a hover event, in milliseconds
+	bool show_tooltips; ///< show tooltip windows in the interface
 	bool link_terraform_toolbar; ///< display terraform toolbar when displaying rail, road, water and airport toolbars
 	uint8_t smallmap_land_colour; ///< colour used for land and heightmap at the smallmap
 	uint8_t linkgraph_colours; ///< linkgraph overlay colours
