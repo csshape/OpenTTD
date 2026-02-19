@@ -391,11 +391,13 @@ if(OTTD_APPLE_IOS)
     set(_OTTD_IOS_BUNDLE_DIR "${CMAKE_BINARY_DIR}/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/openttd.app")
     set(_OTTD_IOS_ASSET_CATALOG "${CMAKE_SOURCE_DIR}/os/ios/Assets.xcassets")
     set(_OTTD_IOS_LAUNCH_SCREEN "${CMAKE_SOURCE_DIR}/os/ios/LaunchScreen.storyboard")
+    set(_OTTD_IOS_INFO_PLIST "${CMAKE_SOURCE_DIR}/os/ios/Info.plist")
 
     set_target_properties(openttd PROPERTIES
         MACOSX_BUNDLE TRUE
+        MACOSX_BUNDLE_INFO_PLIST "${_OTTD_IOS_INFO_PLIST}"
         SKIP_INSTALL FALSE
-        XCODE_ATTRIBUTE_GENERATE_INFOPLIST_FILE YES
+        XCODE_ATTRIBUTE_GENERATE_INFOPLIST_FILE NO
         XCODE_ATTRIBUTE_SKIP_INSTALL "NO"
         XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "${OTTD_IOS_BUNDLE_IDENTIFIER}"
         XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "2"
@@ -404,9 +406,6 @@ if(OTTD_APPLE_IOS)
         XCODE_ATTRIBUTE_CURRENT_PROJECT_VERSION "${OTTD_IOS_BUILD_NUMBER}"
         XCODE_ATTRIBUTE_SUPPORTED_PLATFORMS "iphoneos"
         XCODE_ATTRIBUTE_INSTALL_PATH "$(LOCAL_APPS_DIR)"
-        XCODE_ATTRIBUTE_INFOPLIST_KEY_UILaunchStoryboardName "LaunchScreen"
-        XCODE_ATTRIBUTE_INFOPLIST_KEY_UISupportedInterfaceOrientations "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
-        XCODE_ATTRIBUTE_INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
     )
     # Make sure LaunchScreen is part of bundle resources for App Store validation.
     set_source_files_properties("${_OTTD_IOS_LAUNCH_SCREEN}" PROPERTIES

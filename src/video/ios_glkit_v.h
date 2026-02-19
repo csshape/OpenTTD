@@ -28,7 +28,7 @@ public:
 	bool ToggleFullscreen(bool fullscreen) override;
 	bool AfterBlitterChange() override;
 	void SetScreensaverInhibited(bool inhibited) override;
-	bool UseSystemCursor() override { return true; }
+	bool UseSystemCursor() override;
 
 	std::vector<int> GetListOfMonitorRefreshRates() override;
 	std::string_view GetInfoString() const override { return this->driver_info; }
@@ -36,6 +36,7 @@ public:
 
 	void OnDisplayFrame();
 	void NotifySizeChanged();
+	void HandleScreenTopologyChanged();
 	void OnHardwareModifierState(bool command_down, bool shift_down, bool alt_down);
 	void OnHardwareKeyDown(uint keycode, char32_t character, std::string_view text);
 	void OnHardwareKeyUp(uint keycode);
@@ -57,11 +58,15 @@ private:
 	void *metal_texture = nullptr;
 	void *display_link = nullptr;
 	void *display_link_target = nullptr;
+	void *active_screen = nullptr;
+	void *screen_observer = nullptr;
+	void *input_proxy_view = nullptr;
 
 	uint8_t *pixel_buffer = nullptr;
 	uint32_t *rgba_buffer = nullptr;
 	int vid_w = 0;
 	int vid_h = 0;
+	bool using_external_screen = false;
 	bool edit_box_focused = false;
 	bool command_down = false;
 	bool shift_down = false;
@@ -82,6 +87,9 @@ private:
 	void ReleaseVideoPointer();
 
 	bool SetupContextAndView();
+	void UpdateInputProxyView();
+	void RegisterScreenNotifications();
+	void UnregisterScreenNotifications();
 	bool StartDisplayLink();
 	void StopDisplayLink();
 	void TeardownContextAndView();

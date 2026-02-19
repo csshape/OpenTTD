@@ -32,6 +32,7 @@ static FVideoDriver_iOS_Metal iFVideoDriver_iOS_Metal;
 static FVideoDriver_iOS_MetalCompatGLKit iFVideoDriver_iOS_MetalCompatGLKit;
 static FVideoDriver_iOS_MetalCompatGLES iFVideoDriver_iOS_MetalCompatGLES;
 static FVideoDriver_iOS_MetalCompatSDL iFVideoDriver_iOS_MetalCompatSDL;
+static NSString *const kWindowSceneRoleExternalDisplay = @"UIWindowSceneSessionRoleExternalDisplay";
 
 static constexpr uint16_t HID_KEY_A = 0x04;
 static constexpr uint16_t HID_KEY_Z = 0x1D;
@@ -239,6 +240,8 @@ static uint ConvertIOSKeyIntoMy(id key, char32_t &character, std::string &text)
 	VideoDriver_iOS_Metal *_driver; ///< Bridge to the C++ input pipeline.
 	CGPoint _single_touch_prev;   ///< Previous single-touch location in view points.
 	CGPoint _pan_prev_centroid;   ///< Previous two-finger centroid in view points.
+	CGPoint _hover_prev;          ///< Previous hover location for indirect pointer relative movement.
+	bool    _hover_has_prev;      ///< True once we have a previous hover sample.
 	bool    _in_two_finger_pan;   ///< Whether we are currently in two-finger pan mode.
 	CGFloat _pinch_prev_dist;     ///< Spread (distance) between two active fingers, in view points.
 	float   _pinch_accum;         ///< Accumulated pinch-magnitude (fraction of a zoom step).
@@ -285,6 +288,15 @@ static NSUInteger CountActiveTouches(NSSet<UITouch *> *all)
 	return n;
 }
 
+static bool IsSecondaryMouseButtonPressed(UIEvent *event)
+{
+	if (event == nil) return false;
+	if (@available(iOS 13.4, *)) {
+		return (event.buttonMask & 2u) != 0; // UIEventButtonMaskSecondary
+	}
+	return false;
+}
+
 @implementation OTTDMetalView
 
 + (Class)layerClass
@@ -301,6 +313,8 @@ static NSUInteger CountActiveTouches(NSSet<UITouch *> *all)
 		_in_two_finger_pan = false;
 		_single_touch_prev = CGPointZero;
 		_pan_prev_centroid = CGPointZero;
+		_hover_prev = CGPointZero;
+		_hover_has_prev = false;
 		_pinch_prev_dist = 0.0;
 		_pinch_accum = 0.0f;
 
@@ -310,6 +324,12 @@ static NSUInteger CountActiveTouches(NSSet<UITouch *> *all)
 		lp.minimumPressDuration = 0.5;
 		[self addGestureRecognizer:lp];
 		[lp release];
+
+		/* Hover/mouse pointer movement updates cursor without requiring touch-down. */
+		UIHoverGestureRecognizer *hover = [[UIHoverGestureRecognizer alloc]
+			initWithTarget:self action:@selector(_ottd_hover:)];
+		[self addGestureRecognizer:hover];
+		[hover release];
 	}
 	return self;
 }
@@ -333,8 +353,61 @@ static NSUInteger CountActiveTouches(NSSet<UITouch *> *all)
 /** Convert a view-space point to game pixel coordinates. */
 - (CGPoint)_pixelPoint:(CGPoint)pt
 {
-	CGFloat s = self.contentScaleFactor;
-	return CGPointMake(pt.x * s, pt.y * s);
+	CGSize bounds = self.bounds.size;
+	if (bounds.width > 0.0 && bounds.height > 0.0 && _screen.width > 0 && _screen.height > 0) {
+		CGFloat sx = (CGFloat)_screen.width / bounds.width;
+		CGFloat sy = (CGFloat)_screen.height / bounds.height;
+		return CGPointMake(pt.x * sx, pt.y * sy);
+	}
+
+	CGFloat sx = self.contentScaleFactor > 0.0 ? self.contentScaleFactor : 1.0;
+	CGFloat sy = sx;
+	if (bounds.width > 0.0 && bounds.height > 0.0) {
+		if ([self.layer isKindOfClass:[CAMetalLayer class]]) {
+			CAMetalLayer *layer = (CAMetalLayer *)self.layer;
+			CGSize drawable = layer.drawableSize;
+			if (drawable.width > 0.0 && drawable.height > 0.0) {
+				sx = drawable.width / bounds.width;
+				sy = drawable.height / bounds.height;
+			}
+		}
+	}
+	return CGPointMake(pt.x * sx, pt.y * sy);
+}
+
+/** Convert delta in view points to game pixels, using current drawable-to-view ratio. */
+- (CGPoint)_pixelDelta:(CGPoint)delta
+{
+	CGPoint p0 = [self _pixelPoint:CGPointZero];
+	CGPoint p1 = [self _pixelPoint:CGPointMake(delta.x, delta.y)];
+	return CGPointMake(p1.x - p0.x, p1.y - p0.y);
+}
+
+- (void)_ottd_hover:(UIHoverGestureRecognizer *)rec
+{
+	if (_driver == nullptr) return;
+
+	CGPoint pt = [rec locationInView:self];
+	if (rec.state == UIGestureRecognizerStateBegan) {
+		_hover_prev = pt;
+		_hover_has_prev = true;
+	}
+
+	if (_cursor.fix_at && _hover_has_prev) {
+		CGPoint d = [self _pixelDelta:CGPointMake(pt.x - _hover_prev.x, pt.y - _hover_prev.y)];
+		_cursor.UpdateCursorPositionRelative((int)d.x, (int)d.y);
+	} else {
+		CGPoint px = [self _pixelPoint:pt];
+		_cursor.UpdateCursorPosition((int)px.x, (int)px.y);
+		_cursor.in_window = true;
+	}
+	_hover_prev = pt;
+	_hover_has_prev = true;
+	HandleMouseEvents();
+
+	if (rec.state == UIGestureRecognizerStateEnded || rec.state == UIGestureRecognizerStateCancelled || rec.state == UIGestureRecognizerStateFailed) {
+		_hover_has_prev = false;
+	}
 }
 
 - (void)_ottdHandleKeyPresses:(NSSet<UIPress *> *)presses down:(BOOL)down
@@ -426,7 +499,16 @@ static NSUInteger CountActiveTouches(NSSet<UITouch *> *all)
 		_cursor.UpdateCursorPosition((int)px.x, (int)px.y);
 		_cursor.in_window = true;
 
-		_left_button_down = true;
+		if (IsSecondaryMouseButtonPressed(event)) {
+			_left_button_down = false;
+			_left_button_clicked = false;
+			_right_button_down = true;
+			_right_button_clicked = true;
+		} else {
+			_right_button_down = false;
+			_right_button_clicked = false;
+			_left_button_down = true;
+		}
 		HandleMouseEvents();
 	}
 }
@@ -434,14 +516,14 @@ static NSUInteger CountActiveTouches(NSSet<UITouch *> *all)
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
 	NSSet<UITouch *> *all = event.allTouches;
-	CGFloat scale = self.contentScaleFactor;
 
 	if (_in_two_finger_pan) {
 		CGPoint cen = CentroidOfActiveTouches(all, self);
 		if (_cursor.fix_at) {
 			/* Cursor is locked (e.g. during map drag); supply relative delta. */
-			int dx = (int)((cen.x - _pan_prev_centroid.x) * scale);
-			int dy = (int)((cen.y - _pan_prev_centroid.y) * scale);
+			CGPoint d = [self _pixelDelta:CGPointMake(cen.x - _pan_prev_centroid.x, cen.y - _pan_prev_centroid.y)];
+			int dx = (int)d.x;
+			int dy = (int)d.y;
 			_cursor.UpdateCursorPositionRelative(dx, dy);
 		} else {
 			CGPoint px = [self _pixelPoint:cen];
@@ -483,14 +565,26 @@ static NSUInteger CountActiveTouches(NSSet<UITouch *> *all)
 
 		CGPoint pt = [t locationInView:self];
 		if (_cursor.fix_at) {
-			int dx = (int)((pt.x - _single_touch_prev.x) * scale);
-			int dy = (int)((pt.y - _single_touch_prev.y) * scale);
+			CGPoint d = [self _pixelDelta:CGPointMake(pt.x - _single_touch_prev.x, pt.y - _single_touch_prev.y)];
+			int dx = (int)d.x;
+			int dy = (int)d.y;
 			_cursor.UpdateCursorPositionRelative(dx, dy);
 		} else {
 			CGPoint px = [self _pixelPoint:pt];
 			_cursor.UpdateCursorPosition((int)px.x, (int)px.y);
 		}
 		_single_touch_prev = pt;
+
+		if (IsSecondaryMouseButtonPressed(event)) {
+			_left_button_down = false;
+			_left_button_clicked = false;
+			_right_button_down = true;
+		} else {
+			_right_button_down = false;
+			_right_button_clicked = false;
+			_left_button_down = true;
+		}
+		HandleMouseEvents();
 	}
 }
 
@@ -522,6 +616,8 @@ static NSUInteger CountActiveTouches(NSSet<UITouch *> *all)
 		}
 	} else {
 		if (remaining == 0) {
+			_right_button_down = false;
+			_right_button_clicked = false;
 			_left_button_down = false;
 			_left_button_clicked = false;
 			HandleMouseEvents();
@@ -555,6 +651,19 @@ static NSUInteger CountActiveTouches(NSSet<UITouch *> *all)
 
 @end
 
+/** Input-only view used on the iPad screen while rendering on an external display. */
+@interface OTTDInputProxyView : OTTDMetalView
+@end
+
+@implementation OTTDInputProxyView
+
++ (Class)layerClass
+{
+	return [CALayer class];
+}
+
+@end
+
 /** Objective-C bridge object for CADisplayLink callback. */
 @interface OTTD_iOSDisplayLinkTarget : NSObject {
 @public
@@ -570,6 +679,20 @@ static NSUInteger CountActiveTouches(NSSet<UITouch *> *all)
 }
 @end
 
+@interface OTTD_iOSScreenObserver : NSObject {
+@public
+	VideoDriver_iOS_Metal *driver;
+}
+- (void)onScreenChanged:(NSNotification *)notification;
+@end
+
+@implementation OTTD_iOSScreenObserver
+- (void)onScreenChanged:(__unused NSNotification *)notification
+{
+	if (driver != nullptr) driver->HandleScreenTopologyChanged();
+}
+@end
+
 @interface OTTDViewController : UIViewController {
 @public
 	VideoDriver_iOS_Metal *driver;
@@ -581,6 +704,15 @@ static NSUInteger CountActiveTouches(NSSet<UITouch *> *all)
 - (BOOL)prefersStatusBarHidden { return YES; }
 - (BOOL)prefersHomeIndicatorAutoHidden { return YES; }
 - (UIRectEdge)preferredScreenEdgesDeferringSystemGestures { return UIRectEdgeAll; }
+
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+{
+	[super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+	if (self->driver == nullptr) return;
+	[coordinator animateAlongsideTransition:nil completion:^(__unused id<UIViewControllerTransitionCoordinatorContext> context) {
+		if (self->driver != nullptr) self->driver->NotifySizeChanged();
+	}];
+}
 
 - (void)viewDidLayoutSubviews
 {
@@ -597,6 +729,145 @@ static void RunOnMainThreadSync(dispatch_block_t block)
 		return;
 	}
 	dispatch_sync(dispatch_get_main_queue(), block);
+}
+
+static CGSize GetPixelSizeForScreen(UIScreen *screen)
+{
+	if (screen == nil) return CGSizeMake(0.0, 0.0);
+
+	UIScreenMode *mode = screen.currentMode;
+	if (mode != nil && mode.size.width > 0.0 && mode.size.height > 0.0) {
+		return mode.size;
+	}
+
+	CGRect native = screen.nativeBounds;
+	if (native.size.width > 0.0 && native.size.height > 0.0) {
+		return native.size;
+	}
+
+	CGRect bounds = screen.bounds;
+	CGFloat scale = screen.scale > 0.0 ? screen.scale : 1.0;
+	return CGSizeMake(bounds.size.width * scale, bounds.size.height * scale);
+}
+
+static uint64_t GetScreenPixelArea(UIScreen *screen)
+{
+	CGSize size = GetPixelSizeForScreen(screen);
+	if (size.width <= 0.0 || size.height <= 0.0) return 0;
+	return static_cast<uint64_t>(size.width) * static_cast<uint64_t>(size.height);
+}
+
+static UIScreen *PickPreferredScreen()
+{
+	UIScreen *main = [UIScreen mainScreen];
+	UIScreen *preferred = main;
+	uint64_t preferred_pixels = 0;
+
+	NSArray<UIScreen *> *screens = [UIScreen screens];
+	for (UIScreen *screen in screens) {
+		if (screen == main) continue;
+
+		uint64_t pixels = GetScreenPixelArea(screen);
+		if (preferred == main || pixels > preferred_pixels) {
+			preferred = screen;
+			preferred_pixels = pixels;
+		}
+	}
+
+	return preferred;
+}
+
+static UIWindowScene *FindWindowSceneForScreen(UIScreen *screen)
+{
+	UIApplication *app = [UIApplication sharedApplication];
+	for (UIScene *scene in app.connectedScenes) {
+		if (![scene isKindOfClass:[UIWindowScene class]]) continue;
+		UIWindowScene *window_scene = (UIWindowScene *)scene;
+		if (screen == nil || window_scene.screen == screen) return window_scene;
+	}
+	return nil;
+}
+
+static UIWindow *FindWindowForScreen(UIScreen *screen)
+{
+	UIWindowScene *window_scene = FindWindowSceneForScreen(screen);
+	if (window_scene != nil) {
+		for (UIWindow *window in window_scene.windows) {
+			if (window != nil) return window;
+		}
+	}
+
+	UIApplication *app = [UIApplication sharedApplication];
+	for (UIWindow *window in app.windows) {
+		if (window == nil) continue;
+		if (window.windowScene != nil && screen != nil && window.windowScene.screen != screen) continue;
+		return window;
+	}
+	return nil;
+}
+
+static CGFloat GetViewScaleForScreen(UIScreen *screen)
+{
+	if (screen == nil) return 1.0;
+	if (screen.nativeScale > 0.0) return screen.nativeScale;
+	if (screen.scale > 0.0) return screen.scale;
+	return 1.0;
+}
+
+static uint64_t GetModePixelArea(UIScreenMode *mode)
+{
+	if (mode == nil) return 0;
+	CGSize size = mode.size;
+	if (size.width <= 0.0 || size.height <= 0.0) return 0;
+	return static_cast<uint64_t>(size.width) * static_cast<uint64_t>(size.height);
+}
+
+static bool IsUHD4KMode(UIScreenMode *mode)
+{
+	if (mode == nil) return false;
+	CGSize size = mode.size;
+	int w = static_cast<int>(size.width);
+	int h = static_cast<int>(size.height);
+	return (w == 3840 && h == 2160) || (w == 2160 && h == 3840);
+}
+
+static void ConfigureScreenForMaximumResolution(UIScreen *screen)
+{
+	if (screen == nil || screen == [UIScreen mainScreen]) return;
+
+	NSArray<UIScreenMode *> *modes = screen.availableModes;
+	if (modes.count == 0) return;
+
+	UIScreenMode *fourk_mode = nil;
+	UIScreenMode *best_mode = screen.currentMode;
+	uint64_t best_pixels = GetModePixelArea(best_mode);
+
+	for (UIScreenMode *mode in modes) {
+		if (fourk_mode == nil && IsUHD4KMode(mode)) fourk_mode = mode;
+
+		uint64_t pixels = GetModePixelArea(mode);
+		if (pixels > best_pixels) {
+			best_mode = mode;
+			best_pixels = pixels;
+		}
+	}
+
+	UIScreenMode *target_mode = fourk_mode != nil ? fourk_mode : best_mode;
+	if (target_mode != nil && target_mode != screen.currentMode) {
+		screen.currentMode = target_mode;
+		if (fourk_mode != nil) {
+			Debug(driver, 1, "iOS Metal: selected external 4K mode 3840x2160");
+		} else {
+			CGSize size = target_mode.size;
+			Debug(driver, 1, "iOS Metal: 4K mode unavailable, selected highest mode {}x{}", static_cast<int>(size.width), static_cast<int>(size.height));
+		}
+	}
+
+	UIScreenMode *active_mode = screen.currentMode;
+	if (active_mode != nil) {
+		CGSize size = active_mode.size;
+		Debug(driver, 1, "iOS Metal: active screen mode {}x{}", static_cast<int>(size.width), static_cast<int>(size.height));
+	}
 }
 
 /* Fullscreen textured quad shader for BGRA8 texture. */
@@ -640,19 +911,14 @@ Dimension VideoDriver_iOS_Metal::GetScreenSize() const
 	__block Dimension result = VideoDriver::GetScreenSize();
 
 	RunOnMainThreadSync(^{
-		UIScreen *screen = [UIScreen mainScreen];
-		CGRect native = screen.nativeBounds;
-		if (native.size.width > 0.0 && native.size.height > 0.0) {
-			result = { static_cast<uint>(native.size.width), static_cast<uint>(native.size.height) };
-			return;
-		}
+		UIScreen *screen = (UIScreen *)this->active_screen;
+		if (screen == nil) screen = PickPreferredScreen();
+		ConfigureScreenForMaximumResolution(screen);
 
-		CGRect bounds = screen.bounds;
-		CGFloat scale = screen.scale;
-		result = {
-			static_cast<uint>(bounds.size.width * scale),
-			static_cast<uint>(bounds.size.height * scale)
-		};
+		CGSize size = GetPixelSizeForScreen(screen);
+		if (size.width > 0.0 && size.height > 0.0) {
+			result = { static_cast<uint>(size.width), static_cast<uint>(size.height) };
+		}
 	});
 
 	return result;
@@ -663,19 +929,43 @@ bool VideoDriver_iOS_Metal::SetupContextAndView()
 	__block bool ok = true;
 
 	RunOnMainThreadSync(^{
-		UIApplication *app = [UIApplication sharedApplication];
-		UIWindow *window = nil;
-		NSArray *windows = app.windows;
-		if (windows.count > 0) window = windows[0];
+		UIScreen *screen = PickPreferredScreen();
+		if (screen == nil) {
+			ok = false;
+			return;
+		}
+		ConfigureScreenForMaximumResolution(screen);
+
+		UIWindow *window = FindWindowForScreen(screen);
 
 		if (window == nil) {
-			window = [[[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds] autorelease];
+			UIWindowScene *window_scene = FindWindowSceneForScreen(screen);
+			if (window_scene != nil) {
+				window = [[[UIWindow alloc] initWithWindowScene:window_scene] autorelease];
+			}
 		}
+
+		if (window == nil) {
+			window = [[[UIWindow alloc] initWithFrame:screen.bounds] autorelease];
+		}
+		if (window == nil) {
+			ok = false;
+			return;
+		}
+		if (window.windowScene == nil) {
+			window.screen = screen;
+			window.frame = screen.bounds;
+		} else {
+			window.frame = window.windowScene.screen.bounds;
+		}
+		window.backgroundColor = [UIColor blackColor];
 
 		OTTDViewController *ottd_root = [[[OTTDViewController alloc] init] autorelease];
 		ottd_root->driver = this;
 		window.rootViewController = ottd_root;
 		UIViewController *root = ottd_root;
+		root.view.backgroundColor = [UIColor blackColor];
+		root.view.frame = window.bounds;
 
 		(void)root.view;
 
@@ -693,8 +983,9 @@ bool VideoDriver_iOS_Metal::SetupContextAndView()
 		[view setDriver:this];
 
 		view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+		view.frame = root.view.bounds;
 
-		CGFloat scale = [UIScreen mainScreen].scale;
+		CGFloat scale = GetViewScaleForScreen(screen);
 		view.contentScaleFactor = scale;
 
 		CAMetalLayer *layer = (CAMetalLayer *)view.layer;
@@ -702,11 +993,22 @@ bool VideoDriver_iOS_Metal::SetupContextAndView()
 		layer.pixelFormat = MTLPixelFormatBGRA8Unorm;
 		layer.framebufferOnly = YES;
 		layer.contentsScale = scale;
-		layer.drawableSize = CGSizeMake(std::max(1.0, view.bounds.size.width * scale), std::max(1.0, view.bounds.size.height * scale));
+		CGSize pixel_size = GetPixelSizeForScreen(screen);
+		if (pixel_size.width < 1.0 || pixel_size.height < 1.0) {
+			pixel_size = CGSizeMake(view.bounds.size.width * scale, view.bounds.size.height * scale);
+		}
+		layer.drawableSize = CGSizeMake(std::max(1.0, pixel_size.width), std::max(1.0, pixel_size.height));
 
 		[root.view addSubview:view];
 		[window makeKeyAndVisible];
 		[view becomeFirstResponder];
+
+		UIScreen *old_screen = (UIScreen *)this->active_screen;
+		if (old_screen != screen) {
+			if (old_screen != nil) [old_screen release];
+			this->active_screen = [screen retain];
+		}
+		this->using_external_screen = (screen != [UIScreen mainScreen]);
 
 		this->ui_window = [window retain];
 		this->root_controller = [root retain];
@@ -715,7 +1017,191 @@ bool VideoDriver_iOS_Metal::SetupContextAndView()
 		this->metal_device = [device retain];
 	});
 
+	if (ok) this->UpdateInputProxyView();
+
 	return ok;
+}
+
+void VideoDriver_iOS_Metal::UpdateInputProxyView()
+{
+	RunOnMainThreadSync(^{
+		OTTDMetalView *proxy = (OTTDMetalView *)this->input_proxy_view;
+
+		if (!this->using_external_screen) {
+			if (proxy != nil) {
+				[proxy setDriver:nullptr];
+				[proxy removeFromSuperview];
+				[proxy release];
+			}
+			this->input_proxy_view = nullptr;
+			return;
+		}
+
+		UIWindow *main_window = FindWindowForScreen([UIScreen mainScreen]);
+		if (main_window == nil) return;
+
+		UIViewController *root = main_window.rootViewController;
+		if (root == nil) {
+			root = [[[UIViewController alloc] init] autorelease];
+			root.view.backgroundColor = [UIColor blackColor];
+			main_window.rootViewController = root;
+		}
+
+		UIView *container = root.view;
+		if (container == nil) return;
+
+		if (proxy == nil) {
+			proxy = [[OTTDInputProxyView alloc] initWithFrame:container.bounds];
+			proxy.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+			proxy.backgroundColor = [UIColor clearColor];
+			proxy.opaque = NO;
+			[container addSubview:proxy];
+			this->input_proxy_view = proxy;
+		} else if (proxy.superview != container) {
+			[proxy removeFromSuperview];
+			proxy.frame = container.bounds;
+			[container addSubview:proxy];
+		} else {
+			proxy.frame = container.bounds;
+		}
+
+		bool allow_proxy_input = true;
+		UIWindow *active_window = FindWindowForScreen((UIScreen *)this->active_screen);
+		if (active_window != nil && active_window.windowScene != nil) {
+			NSString *role = active_window.windowScene.session.role;
+			if ([role isEqualToString:kWindowSceneRoleExternalDisplay]) {
+				/* External display scene is interactive; prefer pointer/keyboard focus there. */
+				allow_proxy_input = false;
+			}
+		}
+
+		proxy.userInteractionEnabled = allow_proxy_input;
+		proxy.hidden = !allow_proxy_input;
+		[proxy setDriver:this];
+		if (allow_proxy_input) {
+			[container bringSubviewToFront:proxy];
+			[proxy becomeFirstResponder];
+		} else {
+			UIView *active_view = (UIView *)this->metal_view;
+			if (active_view != nil) [active_view becomeFirstResponder];
+		}
+	});
+}
+
+void VideoDriver_iOS_Metal::RegisterScreenNotifications()
+{
+	RunOnMainThreadSync(^{
+		if (this->screen_observer != nullptr) return;
+
+		OTTD_iOSScreenObserver *observer = [[OTTD_iOSScreenObserver alloc] init];
+		observer->driver = this;
+
+		NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+		[center addObserver:observer selector:@selector(onScreenChanged:) name:UIScreenDidConnectNotification object:nil];
+		[center addObserver:observer selector:@selector(onScreenChanged:) name:UIScreenDidDisconnectNotification object:nil];
+		[center addObserver:observer selector:@selector(onScreenChanged:) name:UIScreenModeDidChangeNotification object:nil];
+
+		this->screen_observer = observer;
+	});
+}
+
+void VideoDriver_iOS_Metal::UnregisterScreenNotifications()
+{
+	RunOnMainThreadSync(^{
+		OTTD_iOSScreenObserver *observer = (OTTD_iOSScreenObserver *)this->screen_observer;
+		if (observer == nil) return;
+
+		NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+		[center removeObserver:observer];
+		observer->driver = nullptr;
+		[observer release];
+		this->screen_observer = nullptr;
+	});
+}
+
+void VideoDriver_iOS_Metal::HandleScreenTopologyChanged()
+{
+	__block bool should_rebuild = false;
+	__block bool had_display_link = false;
+
+	RunOnMainThreadSync(^{
+		UIScreen *preferred = PickPreferredScreen();
+		ConfigureScreenForMaximumResolution(preferred);
+
+		UIScreen *current = (UIScreen *)this->active_screen;
+		should_rebuild = (current == nil || preferred == nil || current != preferred);
+		this->using_external_screen = (preferred != nil && preferred != [UIScreen mainScreen]);
+		if (!should_rebuild) {
+			this->driver_info = this->using_external_screen ? "ios-metal (Metal, external display)" : "ios-metal (Metal)";
+
+			UIWindow *window = (UIWindow *)this->ui_window;
+			UIView *view = (UIView *)this->metal_view;
+			CAMetalLayer *layer = (CAMetalLayer *)this->metal_layer;
+			CGRect target_bounds = preferred.bounds;
+			if (window != nil) {
+				if (window.windowScene == nil) {
+					window.frame = preferred.bounds;
+				} else {
+					window.frame = window.windowScene.screen.bounds;
+				}
+				target_bounds = window.bounds;
+			}
+			CGFloat scale = GetViewScaleForScreen(preferred);
+			if (view != nil) {
+				view.frame = target_bounds;
+				view.contentScaleFactor = scale;
+			}
+			if (layer != nil) {
+				layer.contentsScale = scale;
+				CGSize pixel_size = GetPixelSizeForScreen(preferred);
+				if (pixel_size.width < 1.0 || pixel_size.height < 1.0) {
+					pixel_size = CGSizeMake(target_bounds.size.width * scale, target_bounds.size.height * scale);
+				}
+				layer.drawableSize = CGSizeMake(std::max(1.0, pixel_size.width), std::max(1.0, pixel_size.height));
+			}
+
+			CGSize current_size = GetPixelSizeForScreen(preferred);
+			if (current_size.width > 0.0 && current_size.height > 0.0) {
+				_cur_resolution.width = static_cast<uint>(current_size.width);
+				_cur_resolution.height = static_cast<uint>(current_size.height);
+			}
+		}
+
+		had_display_link = (this->display_link != nullptr);
+	});
+
+	this->UpdateInputProxyView();
+
+	if (should_rebuild) {
+		this->StopDisplayLink();
+		this->TeardownContextAndView();
+
+		if (!this->SetupContextAndView()) {
+			Debug(driver, 0, "iOS Metal: Failed to rebuild context after screen topology change");
+			return;
+		}
+		if (!this->InitMetalPipeline()) {
+			Debug(driver, 0, "iOS Metal: Failed to rebuild Metal pipeline after screen topology change");
+			return;
+		}
+		if (!this->AllocateBackingStore(_cur_resolution.width, _cur_resolution.height, true)) {
+			Debug(driver, 0, "iOS Metal: Failed to rebuild backing store after screen topology change");
+			return;
+		}
+
+		Dimension screen_size = this->GetScreenSize();
+		_resolutions.clear();
+		_resolutions.push_back(screen_size);
+		_cur_resolution = screen_size;
+		this->driver_info = this->using_external_screen ? "ios-metal (Metal, external display)" : "ios-metal (Metal)";
+
+		if (had_display_link && !this->StartDisplayLink()) {
+			Debug(driver, 0, "iOS Metal: Failed to restart display link after screen topology change");
+		}
+		return;
+	}
+
+	this->NotifySizeChanged();
 }
 
 bool VideoDriver_iOS_Metal::InitMetalPipeline()
@@ -793,14 +1279,27 @@ bool VideoDriver_iOS_Metal::StartDisplayLink()
 		OTTD_iOSDisplayLinkTarget *target = [[OTTD_iOSDisplayLinkTarget alloc] init];
 		target->driver = this;
 
-		CADisplayLink *display_link = [CADisplayLink displayLinkWithTarget:target selector:@selector(onDisplayLink:)];
+		UIScreen *screen = (UIScreen *)this->active_screen;
+		if (screen == nil) screen = PickPreferredScreen();
+
+		CADisplayLink *display_link = nil;
+		if (screen != nil && [screen respondsToSelector:@selector(displayLinkWithTarget:selector:)]) {
+			display_link = [screen displayLinkWithTarget:target selector:@selector(onDisplayLink:)];
+		}
+		if (display_link == nil) {
+			display_link = [CADisplayLink displayLinkWithTarget:target selector:@selector(onDisplayLink:)];
+		}
 		if (display_link == nil) {
 			[target release];
 			ok = false;
 			return;
 		}
 
-		int target_fps = Clamp(_settings_client.gui.refresh_rate, 10, 120);
+		int max_fps = 120;
+		if (screen != nil && [screen respondsToSelector:@selector(maximumFramesPerSecond)]) {
+			max_fps = std::max(10, static_cast<int>(screen.maximumFramesPerSecond));
+		}
+		int target_fps = Clamp(_settings_client.gui.refresh_rate, 10, max_fps);
 		if ([display_link respondsToSelector:@selector(setPreferredFramesPerSecond:)]) {
 			display_link.preferredFramesPerSecond = target_fps;
 		}
@@ -860,6 +1359,14 @@ void VideoDriver_iOS_Metal::DestroyMetalResources()
 void VideoDriver_iOS_Metal::TeardownContextAndView()
 {
 	RunOnMainThreadSync(^{
+		OTTDMetalView *proxy = (OTTDMetalView *)this->input_proxy_view;
+		if (proxy != nil) {
+			[proxy setDriver:nullptr];
+			[proxy removeFromSuperview];
+			[proxy release];
+		}
+		this->input_proxy_view = nullptr;
+
 		this->DestroyMetalResources();
 
 		UIView *view = (UIView *)this->metal_view;
@@ -883,9 +1390,18 @@ void VideoDriver_iOS_Metal::TeardownContextAndView()
 		if (root != nil) [root release];
 		this->root_controller = nullptr;
 
-		UIWindow *window = (UIWindow *)this->ui_window;
-		if (window != nil) [window release];
+			UIWindow *window = (UIWindow *)this->ui_window;
+			if (window != nil) {
+				window.rootViewController = nil;
+				window.hidden = YES;
+				[window release];
+			}
 		this->ui_window = nullptr;
+
+		UIScreen *screen = (UIScreen *)this->active_screen;
+		if (screen != nil) [screen release];
+		this->active_screen = nullptr;
+		this->using_external_screen = false;
 	});
 }
 
@@ -909,20 +1425,22 @@ bool VideoDriver_iOS_Metal::AllocateBackingStore([[maybe_unused]] int w, [[maybe
 		/* view.bounds may be zero if UIKit has not completed its first layout pass yet.
 		 * Fall back to the screen's native pixel size so we never allocate a 1×1 buffer. */
 		if (bounds.width < 1.0 || bounds.height < 1.0) {
-			CGRect native = [UIScreen mainScreen].nativeBounds;
-			if (native.size.width > 0.0 && native.size.height > 0.0) {
-				bounds = native.size;
-				scale = 1.0; /* nativeBounds is already in pixels */
-			} else {
-				CGRect screen_bounds = [UIScreen mainScreen].bounds;
-				CGFloat screen_scale = [UIScreen mainScreen].scale;
-				bounds = CGSizeMake(screen_bounds.size.width * screen_scale,
-				                    screen_bounds.size.height * screen_scale);
-				scale = 1.0;
-			}
+			UIScreen *screen = (UIScreen *)this->active_screen;
+			if (screen == nil) screen = PickPreferredScreen();
+			CGSize pixel_size = GetPixelSizeForScreen(screen);
+			bounds = pixel_size;
+			scale = 1.0; /* bounds are already in pixels */
 		}
 
-		CGSize drawable_size = CGSizeMake(std::max(1.0, bounds.width * scale), std::max(1.0, bounds.height * scale));
+		CGSize drawable_size{};
+		if (this->using_external_screen) {
+			UIScreen *screen = (UIScreen *)this->active_screen;
+			if (screen == nil) screen = PickPreferredScreen();
+			CGSize pixel_size = GetPixelSizeForScreen(screen);
+			drawable_size = CGSizeMake(std::max(1.0, pixel_size.width), std::max(1.0, pixel_size.height));
+		} else {
+			drawable_size = CGSizeMake(std::max(1.0, bounds.width * scale), std::max(1.0, bounds.height * scale));
+		}
 		layer.drawableSize = drawable_size;
 
 		int dw = (int)drawable_size.width;
@@ -1012,14 +1530,17 @@ std::optional<std::string_view> VideoDriver_iOS_Metal::Start([[maybe_unused]] co
 	this->UpdateAutoResolution();
 	_fullscreen = true;
 
-	_resolutions.clear();
-	Dimension screen_size = this->GetScreenSize();
-	_resolutions.push_back(screen_size);
-
 	if (!this->SetupContextAndView()) {
 		this->Stop();
 		return "Failed to initialize iOS Metal view";
 	}
+
+	/* iOS runs fullscreen; use the active screen's native size at startup. */
+	Dimension screen_size = this->GetScreenSize();
+	_resolutions.clear();
+	_resolutions.push_back(screen_size);
+	_cur_resolution = screen_size;
+	Debug(driver, 1, "iOS Metal: startup resolution {}x{}", _cur_resolution.width, _cur_resolution.height);
 
 	if (!this->InitMetalPipeline()) {
 		this->Stop();
@@ -1031,6 +1552,8 @@ std::optional<std::string_view> VideoDriver_iOS_Metal::Start([[maybe_unused]] co
 		return "Failed to allocate iOS Metal backing store";
 	}
 
+	this->RegisterScreenNotifications();
+
 	if (!this->StartDisplayLink()) {
 		this->Stop();
 		return "Failed to start iOS display link";
@@ -1040,12 +1563,13 @@ std::optional<std::string_view> VideoDriver_iOS_Metal::Start([[maybe_unused]] co
 	this->next_game_tick = now;
 	this->next_draw_tick = now;
 
-	this->driver_info = "ios-metal (Metal)";
+	this->driver_info = this->using_external_screen ? "ios-metal (Metal, external display)" : "ios-metal (Metal)";
 	return std::nullopt;
 }
 
 void VideoDriver_iOS_Metal::Stop()
 {
+	this->UnregisterScreenNotifications();
 	this->StopDisplayLink();
 	this->TeardownContextAndView();
 }
@@ -1329,6 +1853,11 @@ bool VideoDriver_iOS_Metal::AfterBlitterChange()
 	return this->AllocateBackingStore(_screen.width, _screen.height, true) || this->pixel_buffer != nullptr;
 }
 
+bool VideoDriver_iOS_Metal::UseSystemCursor()
+{
+	return !this->using_external_screen;
+}
+
 void VideoDriver_iOS_Metal::SetScreensaverInhibited(bool inhibited)
 {
 	RunOnMainThreadSync(^{
@@ -1340,7 +1869,8 @@ std::vector<int> VideoDriver_iOS_Metal::GetListOfMonitorRefreshRates()
 {
 	__block int fps = 60;
 	RunOnMainThreadSync(^{
-		UIScreen *screen = [UIScreen mainScreen];
+		UIScreen *screen = (UIScreen *)this->active_screen;
+		if (screen == nil) screen = PickPreferredScreen();
 		if ([screen respondsToSelector:@selector(maximumFramesPerSecond)]) {
 			fps = static_cast<int>(screen.maximumFramesPerSecond);
 		}
@@ -1350,7 +1880,10 @@ std::vector<int> VideoDriver_iOS_Metal::GetListOfMonitorRefreshRates()
 
 void VideoDriver_iOS_Metal::NotifySizeChanged()
 {
-	this->AllocateBackingStore(0, 0, false);
+	if (this->AllocateBackingStore(0, 0, false)) {
+		_cur_resolution.width = _screen.width;
+		_cur_resolution.height = _screen.height;
+	}
 }
 
 #include "../safeguards.h"
