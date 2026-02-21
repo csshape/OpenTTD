@@ -870,7 +870,7 @@ static void ConfigureScreenForMaximumResolution(UIScreen *screen)
 	}
 }
 
-/* Fullscreen textured quad shader for BGRA8 texture. */
+/* Fullscreen textured quad shaders. */
 static const char *metal_shader_src = R"(
 	#include <metal_stdlib>
 	using namespace metal;
@@ -900,9 +900,19 @@ static const char *metal_shader_src = R"(
 		return out;
 	}
 
+	/* 32bpp direct BGRA path. */
 	fragment half4 fs_main(VSOut in [[stage_in]], texture2d<half> tex [[texture(0)]]) {
 		constexpr sampler s(coord::normalized, address::clamp_to_edge, filter::nearest);
 		return tex.sample(s, in.uv);
+	}
+
+	/* 8bpp indexed colour path: sample palette index then look up colour on GPU. */
+	fragment half4 fs_main_indexed(VSOut in [[stage_in]],
+	                               texture2d<uint> idx_tex [[texture(0)]],
+	                               texture1d<half> palette  [[texture(1)]]) {
+		constexpr sampler s(coord::normalized, address::clamp_to_edge, filter::nearest);
+		uint idx = idx_tex.sample(s, in.uv).r;
+		return palette.read(idx);
 	}
 )";
 
@@ -1233,15 +1243,18 @@ bool VideoDriver_iOS_Metal::InitMetalPipeline()
 
 		id<MTLFunction> vertex_function = [library newFunctionWithName:@"vs_main"];
 		id<MTLFunction> fragment_function = [library newFunctionWithName:@"fs_main"];
-		if (vertex_function == nil || fragment_function == nil) {
+		id<MTLFunction> fragment_function_indexed = [library newFunctionWithName:@"fs_main_indexed"];
+		if (vertex_function == nil || fragment_function == nil || fragment_function_indexed == nil) {
 			if (vertex_function != nil) [vertex_function release];
 			if (fragment_function != nil) [fragment_function release];
+			if (fragment_function_indexed != nil) [fragment_function_indexed release];
 			[library release];
 			[queue release];
 			ok = false;
 			return;
 		}
 
+		/* 32bpp direct BGRA pipeline. */
 		MTLRenderPipelineDescriptor *descriptor = [[[MTLRenderPipelineDescriptor alloc] init] autorelease];
 		descriptor.vertexFunction = vertex_function;
 		descriptor.fragmentFunction = fragment_function;
@@ -1252,6 +1265,47 @@ bool VideoDriver_iOS_Metal::InitMetalPipeline()
 			if (error != nil) Debug(driver, 0, "iOS Metal: pipeline creation failed: {}", [[error localizedDescription] UTF8String]);
 			[vertex_function release];
 			[fragment_function release];
+			[fragment_function_indexed release];
+			[library release];
+			[queue release];
+			ok = false;
+			return;
+		}
+
+		/* 8bpp indexed colour pipeline. */
+		MTLRenderPipelineDescriptor *descriptor_indexed = [[[MTLRenderPipelineDescriptor alloc] init] autorelease];
+		descriptor_indexed.vertexFunction = vertex_function;
+		descriptor_indexed.fragmentFunction = fragment_function_indexed;
+		descriptor_indexed.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
+
+		id<MTLRenderPipelineState> pipeline_indexed = [device newRenderPipelineStateWithDescriptor:descriptor_indexed error:&error];
+		if (pipeline_indexed == nil) {
+			if (error != nil) Debug(driver, 0, "iOS Metal: indexed pipeline creation failed: {}", [[error localizedDescription] UTF8String]);
+			[pipeline release];
+			[vertex_function release];
+			[fragment_function release];
+			[fragment_function_indexed release];
+			[library release];
+			[queue release];
+			ok = false;
+			return;
+		}
+
+		/* 1D palette texture (256 BGRA entries) for 8bpp indexed mode. */
+		MTLTextureDescriptor *pal_desc = [[[MTLTextureDescriptor alloc] init] autorelease];
+		pal_desc.textureType = MTLTextureType1D;
+		pal_desc.pixelFormat = MTLPixelFormatBGRA8Unorm;
+		pal_desc.width = 256;
+		pal_desc.storageMode = MTLStorageModeShared;
+		pal_desc.usage = MTLTextureUsageShaderRead;
+
+		id<MTLTexture> palette_texture = [device newTextureWithDescriptor:pal_desc];
+		if (palette_texture == nil) {
+			[pipeline_indexed release];
+			[pipeline release];
+			[vertex_function release];
+			[fragment_function release];
+			[fragment_function_indexed release];
 			[library release];
 			[queue release];
 			ok = false;
@@ -1260,10 +1314,13 @@ bool VideoDriver_iOS_Metal::InitMetalPipeline()
 
 		[vertex_function release];
 		[fragment_function release];
+		[fragment_function_indexed release];
 		[library release];
 
 		this->metal_queue = queue;
 		this->metal_pipeline = pipeline;
+		this->metal_pipeline_indexed = pipeline_indexed;
+		this->metal_palette_texture = palette_texture;
 	});
 
 	return ok;
@@ -1338,9 +1395,17 @@ void VideoDriver_iOS_Metal::DestroyMetalResources()
 	if (texture != nil) [texture release];
 	this->metal_texture = nullptr;
 
+	id<MTLTexture> palette_texture = (id<MTLTexture>)this->metal_palette_texture;
+	if (palette_texture != nil) [palette_texture release];
+	this->metal_palette_texture = nullptr;
+
 	id<MTLRenderPipelineState> pipeline = (id<MTLRenderPipelineState>)this->metal_pipeline;
 	if (pipeline != nil) [pipeline release];
 	this->metal_pipeline = nullptr;
+
+	id<MTLRenderPipelineState> pipeline_indexed = (id<MTLRenderPipelineState>)this->metal_pipeline_indexed;
+	if (pipeline_indexed != nil) [pipeline_indexed release];
+	this->metal_pipeline_indexed = nullptr;
 
 	id<MTLCommandQueue> queue = (id<MTLCommandQueue>)this->metal_queue;
 	if (queue != nil) [queue release];
@@ -1348,8 +1413,6 @@ void VideoDriver_iOS_Metal::DestroyMetalResources()
 
 	free(this->pixel_buffer);
 	this->pixel_buffer = nullptr;
-	free(this->rgba_buffer);
-	this->rgba_buffer = nullptr;
 	this->vid_w = 0;
 	this->vid_h = 0;
 	this->dirty_rect = {};
@@ -1451,7 +1514,7 @@ bool VideoDriver_iOS_Metal::AllocateBackingStore([[maybe_unused]] int w, [[maybe
 			return;
 		}
 
-		if (!force && dw == this->vid_w && dh == this->vid_h && this->pixel_buffer != nullptr && this->rgba_buffer != nullptr) {
+		if (!force && dw == this->vid_w && dh == this->vid_h && this->pixel_buffer != nullptr) {
 			return;
 		}
 
@@ -1464,13 +1527,10 @@ bool VideoDriver_iOS_Metal::AllocateBackingStore([[maybe_unused]] int w, [[maybe
 
 		free(this->pixel_buffer);
 		this->pixel_buffer = nullptr;
-		free(this->rgba_buffer);
-		this->rgba_buffer = nullptr;
 
 		size_t pixel_count = static_cast<size_t>(dw) * static_cast<size_t>(dh);
 		this->pixel_buffer = static_cast<uint8_t *>(calloc(pixel_count, bpp == 8 ? 1u : 4u));
-		this->rgba_buffer = static_cast<uint32_t *>(malloc(pixel_count * sizeof(uint32_t)));
-		if (this->pixel_buffer == nullptr || this->rgba_buffer == nullptr) {
+		if (this->pixel_buffer == nullptr) {
 			ok = false;
 			return;
 		}
@@ -1481,7 +1541,9 @@ bool VideoDriver_iOS_Metal::AllocateBackingStore([[maybe_unused]] int w, [[maybe
 			this->metal_texture = nullptr;
 		}
 
-		MTLTextureDescriptor *descriptor = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm width:(NSUInteger)dw height:(NSUInteger)dh mipmapped:NO];
+		/* 8bpp: R8Uint index texture; 32bpp: direct BGRA texture. */
+		MTLPixelFormat pixel_format = (bpp == 8) ? MTLPixelFormatR8Uint : MTLPixelFormatBGRA8Unorm;
+		MTLTextureDescriptor *descriptor = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixel_format width:(NSUInteger)dw height:(NSUInteger)dh mipmapped:NO];
 		descriptor.storageMode = MTLStorageModeShared;
 		descriptor.usage = MTLTextureUsageShaderRead;
 
@@ -1762,9 +1824,10 @@ void VideoDriver_iOS_Metal::Paint()
 	PerformanceMeasurer framerate(PFE_VIDEO);
 
 	if (IsEmptyRect(this->dirty_rect) && this->local_palette.count_dirty == 0) return;
-	if (this->pixel_buffer == nullptr || this->rgba_buffer == nullptr) return;
+	if (this->pixel_buffer == nullptr) return;
 
-	if (this->local_palette.count_dirty != 0) {
+	bool palette_dirty = (this->local_palette.count_dirty != 0);
+	if (palette_dirty) {
 		Blitter *blitter = BlitterFactory::GetCurrentBlitter();
 		switch (blitter->UsePaletteAnimation()) {
 			case Blitter::PaletteAnimation::VideoBackend:
@@ -1784,29 +1847,34 @@ void VideoDriver_iOS_Metal::Paint()
 	}
 
 	int bpp = BlitterFactory::GetCurrentBlitter()->GetScreenDepth();
-	size_t pixel_count = static_cast<size_t>(this->vid_w) * static_cast<size_t>(this->vid_h);
-
-	if (bpp == 8) {
-		const uint8_t *src = this->pixel_buffer;
-		uint32_t *dst = this->rgba_buffer;
-		for (size_t i = 0; i < pixel_count; i++) {
-			uint8_t idx = src[i];
-			const Colour &c = this->local_palette.palette[idx];
-			dst[i] = 0xFF000000u | (static_cast<uint32_t>(c.r) << 16) | (static_cast<uint32_t>(c.g) << 8) | static_cast<uint32_t>(c.b);
-		}
-	} else {
-		memcpy(this->rgba_buffer, this->pixel_buffer, pixel_count * sizeof(uint32_t));
-	}
 
 	RunOnMainThreadSync(^{
 		CAMetalLayer *layer = (CAMetalLayer *)this->metal_layer;
 		id<MTLCommandQueue> queue = (id<MTLCommandQueue>)this->metal_queue;
-		id<MTLRenderPipelineState> pipeline = (id<MTLRenderPipelineState>)this->metal_pipeline;
 		id<MTLTexture> texture = (id<MTLTexture>)this->metal_texture;
-		if (layer == nil || queue == nil || pipeline == nil || texture == nil) return;
+		if (layer == nil || queue == nil || texture == nil) return;
 
+		id<MTLRenderPipelineState> active_pipeline;
 		MTLRegion region = MTLRegionMake2D(0, 0, (NSUInteger)this->vid_w, (NSUInteger)this->vid_h);
-		[texture replaceRegion:region mipmapLevel:0 withBytes:this->rgba_buffer bytesPerRow:(NSUInteger)this->vid_w * 4];
+
+		if (bpp == 8) {
+			/* Upload raw 8bpp indices (4x less data than RGBA). */
+			[texture replaceRegion:region mipmapLevel:0 withBytes:this->pixel_buffer bytesPerRow:(NSUInteger)this->vid_w];
+
+			/* Upload palette only when it changed. */
+			id<MTLTexture> palette_texture = (id<MTLTexture>)this->metal_palette_texture;
+			if (palette_dirty && palette_texture != nil) {
+				[palette_texture replaceRegion:MTLRegionMake1D(0, 256) mipmapLevel:0 withBytes:this->local_palette.palette bytesPerRow:0];
+			}
+
+			active_pipeline = (id<MTLRenderPipelineState>)this->metal_pipeline_indexed;
+		} else {
+			/* Upload 32bpp BGRA pixels directly — no intermediate copy needed. */
+			[texture replaceRegion:region mipmapLevel:0 withBytes:this->pixel_buffer bytesPerRow:(NSUInteger)this->vid_w * 4];
+			active_pipeline = (id<MTLRenderPipelineState>)this->metal_pipeline;
+		}
+
+		if (active_pipeline == nil) return;
 
 		id<CAMetalDrawable> drawable = [layer nextDrawable];
 		if (drawable == nil) return;
@@ -1823,8 +1891,12 @@ void VideoDriver_iOS_Metal::Paint()
 		id<MTLRenderCommandEncoder> encoder = [command_buffer renderCommandEncoderWithDescriptor:pass];
 		if (encoder == nil) return;
 
-		[encoder setRenderPipelineState:pipeline];
+		[encoder setRenderPipelineState:active_pipeline];
 		[encoder setFragmentTexture:texture atIndex:0];
+		if (bpp == 8) {
+			id<MTLTexture> palette_texture = (id<MTLTexture>)this->metal_palette_texture;
+			[encoder setFragmentTexture:palette_texture atIndex:1];
+		}
 		[encoder drawPrimitives:MTLPrimitiveTypeTriangleStrip vertexStart:0 vertexCount:4];
 		[encoder endEncoding];
 

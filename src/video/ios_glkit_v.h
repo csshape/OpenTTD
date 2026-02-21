@@ -56,6 +56,8 @@ private:
 	void *metal_queue = nullptr;
 	void *metal_pipeline = nullptr;
 	void *metal_texture = nullptr;
+	void *metal_palette_texture = nullptr;
+	void *metal_pipeline_indexed = nullptr;
 	void *display_link = nullptr;
 	void *display_link_target = nullptr;
 	void *active_screen = nullptr;
@@ -63,7 +65,6 @@ private:
 	void *input_proxy_view = nullptr;
 
 	uint8_t *pixel_buffer = nullptr;
-	uint32_t *rgba_buffer = nullptr;
 	int vid_w = 0;
 	int vid_h = 0;
 	bool using_external_screen = false;
