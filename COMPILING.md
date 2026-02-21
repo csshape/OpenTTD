@@ -122,46 +122,6 @@ Troubleshooting:
 - If CMake reports no C++ compiler, make sure Xcode and its command line tools
   are installed and selected.
 
-## iPadOS (Simulator, experimental)
-
-OpenTTD also supports an experimental iPad simulator build via Xcode.
-This target is intended for development/testing and currently focuses on
-startup and menu-level validation.
-
-Presets are defined in `CMakePresets.json`:
-
-```bash
-cmake --preset ios-simulator-xcode
-cmake --build --preset ios-simulator-build
-```
-
-Set custom bundle identifier during configure:
-
-```bash
-cmake --preset ios-simulator-xcode -DOTTD_IOS_BUNDLE_IDENTIFIER=com.example.openttd
-```
-
-If you use vcpkg for dependencies (recommended for SDL2 on iOS), set
-`VCPKG_ROOT` first and use the vcpkg preset:
-
-```bash
-export VCPKG_ROOT=<location of vcpkg>
-cmake --preset ios-simulator-xcode-vcpkg
-cmake --build --preset ios-simulator-build-vcpkg
-```
-
-The configure step generates an Xcode project in
-`build/xcode-ios-simulator/`.
-
-Notes:
-
-- iPadOS builds are SDL2-based; Cocoa video/sound drivers are macOS-only.
-- iPadOS presets target minimum iOS version 18.0.
-- For the iOS simulator presets, some optional desktop dependencies are
-  disabled by default.
-- The build copies `lang/` and `baseset/` into the app bundle output so the
-  game can discover runtime data when launched from Xcode.
-
 ## iPadOS (Device Release + TestFlight preparation)
 
 For archiving and manual upload to TestFlight from Xcode, use the iPad device
@@ -180,18 +140,10 @@ cmake --preset ios-device-xcode-release
 cmake --build --preset ios-device-build-release
 ```
 
-Set custom bundle identifier during configure:
+To override the bundle identifier:
 
 ```bash
-cmake --preset ios-device-xcode-release -DOTTD_IOS_BUNDLE_IDENTIFIER=com.example.openttd
-```
-
-If you use vcpkg:
-
-```bash
-export VCPKG_ROOT=<location of vcpkg>
-cmake --preset ios-device-xcode-release-vcpkg
-cmake --build --preset ios-device-build-release-vcpkg
+cmake --preset ios-device-xcode-release -DOTTD_IOS_BUNDLE_IDENTIFIER=com.yourcompany.openttd
 ```
 
 The configure step generates an Xcode project in

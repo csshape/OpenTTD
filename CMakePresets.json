@@ -18,36 +18,6 @@
       }
     },
     {
-      "name": "ios-simulator-xcode",
-      "displayName": "iPadOS Simulator (Xcode)",
-      "description": "Generate an Xcode project for iPad simulator builds.",
-      "generator": "Xcode",
-      "binaryDir": "${sourceDir}/build/xcode-ios-simulator",
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
-        "CMAKE_CXX_COMPILER": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++",
-        "CMAKE_SYSTEM_NAME": "iOS",
-        "CMAKE_OSX_SYSROOT": "iphonesimulator",
-        "CMAKE_OSX_ARCHITECTURES": "arm64",
-        "CMAKE_OSX_DEPLOYMENT_TARGET": "18.0",
-        "OPTION_INSTALL_FHS": "OFF",
-        "CMAKE_DISABLE_FIND_PACKAGE_PNG": "TRUE",
-        "CMAKE_DISABLE_FIND_PACKAGE_LZO": "TRUE",
-        "CMAKE_DISABLE_FIND_PACKAGE_ALLEGRO": "TRUE",
-        "CMAKE_DISABLE_FIND_PACKAGE_Fluidsynth": "TRUE",
-        "CMAKE_DISABLE_FIND_PACKAGE_Harfbuzz": "TRUE",
-        "CMAKE_DISABLE_FIND_PACKAGE_ICU": "TRUE",
-        "CMAKE_DISABLE_FIND_PACKAGE_unofficial-breakpad": "TRUE"
-      }
-    },
-    {
-      "name": "ios-simulator-xcode-vcpkg",
-      "displayName": "iPadOS Simulator (Xcode + vcpkg)",
-      "description": "Same as ios-simulator-xcode, but with vcpkg toolchain from VCPKG_ROOT.",
-      "inherits": "ios-simulator-xcode",
-      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
-    },
-    {
       "name": "ios-device-xcode-release",
       "displayName": "iPadOS Device Release (Xcode)",
       "description": "Generate an Xcode project for iPad device release builds.",
@@ -71,13 +41,6 @@
         "CMAKE_DISABLE_FIND_PACKAGE_ICU": "TRUE",
         "CMAKE_DISABLE_FIND_PACKAGE_unofficial-breakpad": "TRUE"
       }
-    },
-    {
-      "name": "ios-device-xcode-release-vcpkg",
-      "displayName": "iPadOS Device Release (Xcode + vcpkg)",
-      "description": "Same as ios-device-xcode-release, but with vcpkg toolchain from VCPKG_ROOT.",
-      "inherits": "ios-device-xcode-release",
-      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
     }
   ],
   "buildPresets": [
@@ -110,36 +73,9 @@
       ]
     },
     {
-      "name": "ios-simulator-build",
-      "displayName": "Build OpenTTD (iPad simulator)",
-      "configurePreset": "ios-simulator-xcode",
-      "configuration": "RelWithDebInfo",
-      "targets": [
-        "openttd"
-      ]
-    },
-    {
-      "name": "ios-simulator-build-vcpkg",
-      "displayName": "Build OpenTTD (iPad simulator + vcpkg)",
-      "configurePreset": "ios-simulator-xcode-vcpkg",
-      "configuration": "RelWithDebInfo",
-      "targets": [
-        "openttd"
-      ]
-    },
-    {
       "name": "ios-device-build-release",
       "displayName": "Build OpenTTD (iPad device release)",
       "configurePreset": "ios-device-xcode-release",
-      "configuration": "Release",
-      "targets": [
-        "openttd"
-      ]
-    },
-    {
-      "name": "ios-device-build-release-vcpkg",
-      "displayName": "Build OpenTTD (iPad device release + vcpkg)",
-      "configurePreset": "ios-device-xcode-release-vcpkg",
       "configuration": "Release",
       "targets": [
         "openttd"

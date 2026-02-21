@@ -19,17 +19,10 @@ cmake --preset ios-device-xcode-release
 cmake --build --preset ios-device-build-release
 ```
 
-To override bundle identifier at configure time:
+To override the bundle identifier at configure time:
 
 ```bash
-cmake --preset ios-device-xcode-release -DOTTD_IOS_BUNDLE_IDENTIFIER=com.example.openttd
-```
-
-Optional (vcpkg):
-
-```bash
-export VCPKG_ROOT=<location of vcpkg>
-cmake --preset ios-device-xcode-release-vcpkg
+cmake --preset ios-device-xcode-release -DOTTD_IOS_BUNDLE_IDENTIFIER=com.yourcompany.openttd
 ```
 
 Open the generated project:

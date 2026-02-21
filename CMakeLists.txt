@@ -44,7 +44,7 @@ if(OTTD_APPLE_IOS)
     add_definitions(-DOTTD_IOS)
     set(OTTD_IOS_MIN_DEPLOYMENT_TARGET "18.0" CACHE STRING "Minimum supported iOS deployment target for iOS builds")
     set(OTTD_IOS_MIDI_SOUNDBANK "${CMAKE_SOURCE_DIR}/media/baseset/gs_instruments.dls" CACHE FILEPATH "Path to MIDI soundbank to bundle on iOS as baseset/gs_instruments.dls")
-    set(OTTD_IOS_BUNDLE_IDENTIFIER "dk.egernet.openttd" CACHE STRING "Bundle identifier for iOS builds")
+    set(OTTD_IOS_BUNDLE_IDENTIFIER "com.example.openttd" CACHE STRING "Bundle identifier for iOS builds")
     set(OTTD_IOS_MARKETING_VERSION "${PROJECT_VERSION}" CACHE STRING "Default CFBundleShortVersionString for iOS builds")
     set(OTTD_IOS_BUILD_NUMBER "1" CACHE STRING "Default CFBundleVersion for iOS builds")
     if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
@@ -171,7 +171,19 @@ set(CMAKE_THREAD_PREFER_PTHREAD YES)
 # Make sure we have Threads available.
 find_package(Threads REQUIRED)
 
-find_package(ZLIB)
+if(OTTD_APPLE_IOS)
+    # On iOS, libz is part of both the device and simulator platform SDKs.
+    # find_package(ZLIB) stores an absolute iPhoneOS SDK path, which breaks
+    # simulator builds. Create a plain interface target using -lz instead so
+    # Xcode's linker picks the correct SDK variant automatically.
+    set(ZLIB_FOUND TRUE)
+    add_library(ZLIB::ZLIB INTERFACE IMPORTED)
+    set_target_properties(ZLIB::ZLIB PROPERTIES
+        INTERFACE_LINK_LIBRARIES "-lz"
+    )
+else()
+    find_package(ZLIB)
+endif()
 find_package(LibLZMA)
 find_package(LZO)
 find_package(PNG)
@@ -215,7 +227,15 @@ endif()
 if(APPLE)
     enable_language(OBJCXX)
 
-    find_package(Iconv)
+    if(OTTD_APPLE_IOS)
+        # On iOS, libiconv is a system library in both the device and simulator SDKs.
+        # find_package stores an absolute iPhoneOS SDK path; use -liconv instead.
+        set(Iconv_FOUND TRUE)
+        add_library(Iconv::Iconv INTERFACE IMPORTED)
+        set_target_properties(Iconv::Iconv PROPERTIES INTERFACE_LINK_LIBRARIES "-liconv")
+    else()
+        find_package(Iconv)
+    endif()
 
     if(OTTD_APPLE_MACOS)
         find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox)
@@ -400,11 +420,12 @@ if(OTTD_APPLE_IOS)
         XCODE_ATTRIBUTE_GENERATE_INFOPLIST_FILE NO
         XCODE_ATTRIBUTE_SKIP_INSTALL "NO"
         XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "${OTTD_IOS_BUNDLE_IDENTIFIER}"
+        XCODE_ATTRIBUTE_PRODUCT_NAME "OpenTTD"
         XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "2"
         XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon"
         XCODE_ATTRIBUTE_MARKETING_VERSION "${OTTD_IOS_MARKETING_VERSION}"
         XCODE_ATTRIBUTE_CURRENT_PROJECT_VERSION "${OTTD_IOS_BUILD_NUMBER}"
-        XCODE_ATTRIBUTE_SUPPORTED_PLATFORMS "iphoneos"
+        XCODE_ATTRIBUTE_SUPPORTED_PLATFORMS "iphoneos iphonesimulator"
         XCODE_ATTRIBUTE_INSTALL_PATH "$(LOCAL_APPS_DIR)"
     )
     # Make sure LaunchScreen is part of bundle resources for App Store validation.
