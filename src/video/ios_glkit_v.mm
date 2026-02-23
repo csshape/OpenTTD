@@ -247,6 +247,7 @@ static uint ConvertIOSKeyIntoMy(id key, char32_t &character, std::string &text)
 	float   _pinch_accum;         ///< Accumulated pinch-magnitude (fraction of a zoom step).
 }
 - (void)setDriver:(VideoDriver_iOS_Metal *)driver;
+- (BOOL)usesRelativeTrackpadMode;
 @end
 
 /** Return the spread (distance) between the first two active touches in view coordinates. */
@@ -337,6 +338,24 @@ static bool IsSecondaryMouseButtonPressed(UIEvent *event)
 - (void)setDriver:(VideoDriver_iOS_Metal *)driver
 {
 	_driver = driver;
+}
+
+- (BOOL)usesRelativeTrackpadMode
+{
+	return NO;
+}
+
+- (void)_ensureCursorVisibleForRelativeMode
+{
+	if (![self usesRelativeTrackpadMode]) return;
+
+	int max_x = std::max(0, _screen.width - 1);
+	int max_y = std::max(0, _screen.height - 1);
+	int clamped_x = std::clamp(_cursor.pos.x, 0, max_x);
+	int clamped_y = std::clamp(_cursor.pos.y, 0, max_y);
+	_cursor.UpdateCursorPosition(clamped_x, clamped_y);
+	_cursor.in_window = true;
+	_cursor.dirty = true;
 }
 
 - (BOOL)canBecomeFirstResponder
@@ -472,6 +491,8 @@ static bool IsSecondaryMouseButtonPressed(UIEvent *event)
 	NSUInteger active = CountActiveTouches(all);
 
 	if (active >= 2 && !_in_two_finger_pan) {
+		[self _ensureCursorVisibleForRelativeMode];
+
 		/* Switch to two-finger pan (map scroll) mode. */
 		_in_two_finger_pan = true;
 
@@ -481,8 +502,10 @@ static bool IsSecondaryMouseButtonPressed(UIEvent *event)
 
 		CGPoint cen = CentroidOfActiveTouches(all, self);
 		_pan_prev_centroid = cen;
-		CGPoint px = [self _pixelPoint:cen];
-		_cursor.UpdateCursorPosition((int)px.x, (int)px.y);
+		if (![self usesRelativeTrackpadMode]) {
+			CGPoint px = [self _pixelPoint:cen];
+			_cursor.UpdateCursorPosition((int)px.x, (int)px.y);
+		}
 		_cursor.in_window = true;
 
 		_pinch_prev_dist = SpreadOfActiveTouches(all, self);
@@ -492,11 +515,15 @@ static bool IsSecondaryMouseButtonPressed(UIEvent *event)
 		_right_button_down = true;
 		_right_button_clicked = true;
 	} else if (active == 1 && !_in_two_finger_pan) {
+		[self _ensureCursorVisibleForRelativeMode];
+
 		UITouch *t = touches.anyObject;
 		CGPoint pt = [t locationInView:self];
 		_single_touch_prev = pt;
-		CGPoint px = [self _pixelPoint:pt];
-		_cursor.UpdateCursorPosition((int)px.x, (int)px.y);
+		if (![self usesRelativeTrackpadMode]) {
+			CGPoint px = [self _pixelPoint:pt];
+			_cursor.UpdateCursorPosition((int)px.x, (int)px.y);
+		}
 		_cursor.in_window = true;
 
 		if (IsSecondaryMouseButtonPressed(event)) {
@@ -519,12 +546,15 @@ static bool IsSecondaryMouseButtonPressed(UIEvent *event)
 
 	if (_in_two_finger_pan) {
 		CGPoint cen = CentroidOfActiveTouches(all, self);
+		CGPoint d = [self _pixelDelta:CGPointMake(cen.x - _pan_prev_centroid.x, cen.y - _pan_prev_centroid.y)];
+		int dx = (int)d.x;
+		int dy = (int)d.y;
 		if (_cursor.fix_at) {
 			/* Cursor is locked (e.g. during map drag); supply relative delta. */
-			CGPoint d = [self _pixelDelta:CGPointMake(cen.x - _pan_prev_centroid.x, cen.y - _pan_prev_centroid.y)];
-			int dx = (int)d.x;
-			int dy = (int)d.y;
 			_cursor.UpdateCursorPositionRelative(dx, dy);
+		} else if ([self usesRelativeTrackpadMode]) {
+			/* Trackpad mode: keep cursor position and apply relative motion. */
+			_cursor.UpdateCursorPosition(_cursor.pos.x + dx, _cursor.pos.y + dy);
 		} else {
 			CGPoint px = [self _pixelPoint:cen];
 			_cursor.UpdateCursorPosition((int)px.x, (int)px.y);
@@ -564,11 +594,14 @@ static bool IsSecondaryMouseButtonPressed(UIEvent *event)
 		if (t == nil) t = all.anyObject;
 
 		CGPoint pt = [t locationInView:self];
+		CGPoint d = [self _pixelDelta:CGPointMake(pt.x - _single_touch_prev.x, pt.y - _single_touch_prev.y)];
+		int dx = (int)d.x;
+		int dy = (int)d.y;
 		if (_cursor.fix_at) {
-			CGPoint d = [self _pixelDelta:CGPointMake(pt.x - _single_touch_prev.x, pt.y - _single_touch_prev.y)];
-			int dx = (int)d.x;
-			int dy = (int)d.y;
 			_cursor.UpdateCursorPositionRelative(dx, dy);
+		} else if ([self usesRelativeTrackpadMode]) {
+			/* Trackpad mode: keep cursor position and apply relative motion. */
+			_cursor.UpdateCursorPosition(_cursor.pos.x + dx, _cursor.pos.y + dy);
 		} else {
 			CGPoint px = [self _pixelPoint:pt];
 			_cursor.UpdateCursorPosition((int)px.x, (int)px.y);
@@ -607,8 +640,10 @@ static bool IsSecondaryMouseButtonPressed(UIEvent *event)
 					if (t.phase != UITouchPhaseEnded && t.phase != UITouchPhaseCancelled) {
 						CGPoint pt = [t locationInView:self];
 						_single_touch_prev = pt;
-						CGPoint px = [self _pixelPoint:pt];
-						_cursor.UpdateCursorPosition((int)px.x, (int)px.y);
+						if (![self usesRelativeTrackpadMode]) {
+							CGPoint px = [self _pixelPoint:pt];
+							_cursor.UpdateCursorPosition((int)px.x, (int)px.y);
+						}
 						break;
 					}
 				}
@@ -633,12 +668,16 @@ static bool IsSecondaryMouseButtonPressed(UIEvent *event)
 - (void)_ottd_longPress:(UILongPressGestureRecognizer *)rec
 {
 	if (rec.state == UIGestureRecognizerStateBegan) {
+		[self _ensureCursorVisibleForRelativeMode];
+
 		/* Cancel any in-progress left click and trigger a right-click instead. */
 		_left_button_down = false;
 		_left_button_clicked = false;
-		CGPoint pt = [rec locationInView:self];
-		CGPoint px = [self _pixelPoint:pt];
-		_cursor.UpdateCursorPosition((int)px.x, (int)px.y);
+		if (![self usesRelativeTrackpadMode]) {
+			CGPoint pt = [rec locationInView:self];
+			CGPoint px = [self _pixelPoint:pt];
+			_cursor.UpdateCursorPosition((int)px.x, (int)px.y);
+		}
 		_right_button_down = true;
 		_right_button_clicked = true;
 	} else if (rec.state == UIGestureRecognizerStateEnded ||
@@ -660,6 +699,11 @@ static bool IsSecondaryMouseButtonPressed(UIEvent *event)
 + (Class)layerClass
 {
 	return [CALayer class];
+}
+
+- (BOOL)usesRelativeTrackpadMode
+{
+	return YES;
 }
 
 @end
@@ -786,6 +830,23 @@ static UIWindowScene *FindWindowSceneForScreen(UIScreen *screen)
 		if (screen == nil || window_scene.screen == screen) return window_scene;
 	}
 	return nil;
+}
+
+/**
+ * Choose a screen that is safe to render to.
+ * When hot-plugging, UIScreen can appear before its UIWindowScene is ready.
+ * Rendering to such an external screen can result in wrong sizing.
+ */
+static UIScreen *PickRenderableScreen()
+{
+	UIScreen *preferred = PickPreferredScreen();
+	if (preferred == nil) return nil;
+
+	UIScreen *main = [UIScreen mainScreen];
+	if (preferred != main && FindWindowSceneForScreen(preferred) == nil) {
+		return main;
+	}
+	return preferred;
 }
 
 static UIWindow *FindWindowForScreen(UIScreen *screen)
@@ -922,7 +983,7 @@ Dimension VideoDriver_iOS_Metal::GetScreenSize() const
 
 	RunOnMainThreadSync(^{
 		UIScreen *screen = (UIScreen *)this->active_screen;
-		if (screen == nil) screen = PickPreferredScreen();
+		if (screen == nil) screen = PickRenderableScreen();
 		ConfigureScreenForMaximumResolution(screen);
 
 		CGSize size = GetPixelSizeForScreen(screen);
@@ -939,7 +1000,7 @@ bool VideoDriver_iOS_Metal::SetupContextAndView()
 	__block bool ok = true;
 
 	RunOnMainThreadSync(^{
-		UIScreen *screen = PickPreferredScreen();
+		UIScreen *screen = PickRenderableScreen();
 		if (screen == nil) {
 			ok = false;
 			return;
@@ -1110,6 +1171,9 @@ void VideoDriver_iOS_Metal::RegisterScreenNotifications()
 		[center addObserver:observer selector:@selector(onScreenChanged:) name:UIScreenDidConnectNotification object:nil];
 		[center addObserver:observer selector:@selector(onScreenChanged:) name:UIScreenDidDisconnectNotification object:nil];
 		[center addObserver:observer selector:@selector(onScreenChanged:) name:UIScreenModeDidChangeNotification object:nil];
+		[center addObserver:observer selector:@selector(onScreenChanged:) name:UISceneWillConnectNotification object:nil];
+		[center addObserver:observer selector:@selector(onScreenChanged:) name:UISceneDidActivateNotification object:nil];
+		[center addObserver:observer selector:@selector(onScreenChanged:) name:UISceneDidDisconnectNotification object:nil];
 
 		this->screen_observer = observer;
 	});
@@ -1135,7 +1199,7 @@ void VideoDriver_iOS_Metal::HandleScreenTopologyChanged()
 	__block bool had_display_link = false;
 
 	RunOnMainThreadSync(^{
-		UIScreen *preferred = PickPreferredScreen();
+		UIScreen *preferred = PickRenderableScreen();
 		ConfigureScreenForMaximumResolution(preferred);
 
 		UIScreen *current = (UIScreen *)this->active_screen;
@@ -1337,7 +1401,7 @@ bool VideoDriver_iOS_Metal::StartDisplayLink()
 		target->driver = this;
 
 		UIScreen *screen = (UIScreen *)this->active_screen;
-		if (screen == nil) screen = PickPreferredScreen();
+		if (screen == nil) screen = PickRenderableScreen();
 
 		CADisplayLink *display_link = nil;
 		if (screen != nil && [screen respondsToSelector:@selector(displayLinkWithTarget:selector:)]) {
@@ -1489,7 +1553,7 @@ bool VideoDriver_iOS_Metal::AllocateBackingStore([[maybe_unused]] int w, [[maybe
 		 * Fall back to the screen's native pixel size so we never allocate a 1×1 buffer. */
 		if (bounds.width < 1.0 || bounds.height < 1.0) {
 			UIScreen *screen = (UIScreen *)this->active_screen;
-			if (screen == nil) screen = PickPreferredScreen();
+			if (screen == nil) screen = PickRenderableScreen();
 			CGSize pixel_size = GetPixelSizeForScreen(screen);
 			bounds = pixel_size;
 			scale = 1.0; /* bounds are already in pixels */
@@ -1498,7 +1562,7 @@ bool VideoDriver_iOS_Metal::AllocateBackingStore([[maybe_unused]] int w, [[maybe
 		CGSize drawable_size{};
 		if (this->using_external_screen) {
 			UIScreen *screen = (UIScreen *)this->active_screen;
-			if (screen == nil) screen = PickPreferredScreen();
+			if (screen == nil) screen = PickRenderableScreen();
 			CGSize pixel_size = GetPixelSizeForScreen(screen);
 			drawable_size = CGSizeMake(std::max(1.0, pixel_size.width), std::max(1.0, pixel_size.height));
 		} else {
@@ -1942,7 +2006,7 @@ std::vector<int> VideoDriver_iOS_Metal::GetListOfMonitorRefreshRates()
 	__block int fps = 60;
 	RunOnMainThreadSync(^{
 		UIScreen *screen = (UIScreen *)this->active_screen;
-		if (screen == nil) screen = PickPreferredScreen();
+		if (screen == nil) screen = PickRenderableScreen();
 		if ([screen respondsToSelector:@selector(maximumFramesPerSecond)]) {
 			fps = static_cast<int>(screen.maximumFramesPerSecond);
 		}
