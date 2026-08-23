@@ -242,6 +242,7 @@ if(APPLE)
         find_library(AUDIOUNIT_LIBRARY AudioUnit)
         find_library(COCOA_LIBRARY Cocoa)
         find_library(QUARTZCORE_LIBRARY QuartzCore)
+        find_library(METAL_LIBRARY Metal)
     endif()
 endif()
 
@@ -531,6 +532,11 @@ if(OTTD_APPLE_MACOS)
         ${COCOA_LIBRARY}
         ${QUARTZCORE_LIBRARY}
     )
+
+    if(METAL_LIBRARY)
+        target_link_libraries(openttd_lib ${METAL_LIBRARY})
+        add_definitions(-DWITH_COCOA_METAL)
+    endif()
 
     add_definitions(
         -DWITH_COCOA

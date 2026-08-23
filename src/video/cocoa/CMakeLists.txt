@@ -12,3 +12,9 @@ add_files(
     cocoa_ogl.mm
     CONDITION APPLE AND NOT OTTD_APPLE_IOS AND OPENGL_FOUND
 )
+
+add_files(
+    cocoa_met.h
+    cocoa_met.mm
+    CONDITION APPLE AND NOT OTTD_APPLE_IOS AND METAL_LIBRARY
+)
