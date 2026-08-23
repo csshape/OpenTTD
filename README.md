@@ -7,6 +7,8 @@ things upstream does not have:
   output. See [1.3.2](#132-ipados).
 - **A Metal video driver for macOS**, preferred over OpenGL when the machine has
   a Metal device.
+- **An MCP bridge**, so a language model can play as a competitor. See
+  [1.8](#18-playing-against-a-language-model).
 
 Everything else below is upstream's documentation and applies unchanged.
 
@@ -21,6 +23,7 @@ Everything else below is upstream's documentation and applies unchanged.
     - 1.5) [Add-on content / mods](#15-add-on-content--mods)
     - 1.6) [OpenTTD directories](#16-openttd-directories)
     - 1.7) [Compiling OpenTTD](#17-compiling-openttd)
+    - 1.8) [Playing against a language model](#18-playing-against-a-language-model)
 - 2.0) [Contact and community](#20-contact-and-community)
     - 2.1) [Multiplayer games](#21-multiplayer-games)
     - 2.2) [Contributing to OpenTTD](#22-contributing-to-openttd)
@@ -162,6 +165,26 @@ For more information, see the [directory structure guide](./docs/directory_struc
 ### 1.7) Compiling OpenTTD
 
 If you want to compile OpenTTD from source, instructions can be found in [COMPILING.md](./COMPILING.md).
+
+## 1.8) Playing against a language model
+
+This fork can hand a company over to a language model through
+[MCP](https://modelcontextprotocol.io), so you can play against something that
+reasons about its moves rather than following a fixed script.
+
+Scripts in OpenTTD run sandboxed with no access to the outside world, so the
+bridge is split in two. A script, `MCPAgent`, does the building inside the game.
+An MCP server outside it exposes tools such as `get_state`, `build_bus_route`
+and `build_truck_route`. They exchange messages through three files in the
+personal directory, reachable from a script only through the `AIMCP` API this
+fork adds.
+
+The division of labour is deliberate: a model thinks in seconds while the game
+runs in ticks, so the model decides *what* to build and the script works out
+*how*.
+
+Setup, the full tool list and notes on extending it are in
+[`mcp/README.md`](mcp/README.md).
 
 ## 2.0) Contact and Community
 
