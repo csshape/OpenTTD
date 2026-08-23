@@ -64,10 +64,12 @@ protected:
 
 class FVideoDriver_CocoaMetal : public DriverFactoryBase {
 public:
-	/* Priority 10 puts Metal ahead of cocoa-opengl (9) and cocoa (8), so it is
-	 * picked first when the machine has a Metal device; Start() fails cleanly
-	 * otherwise and probing falls through to OpenGL. */
-	FVideoDriver_CocoaMetal() : DriverFactoryBase(Driver::Type::Video, 10, "cocoa-metal", "Cocoa Metal Video Driver") {}
+	/* Priority 1 keeps this below cocoa (8) and cocoa-opengl (9) so autoprobe
+	 * never reaches it. Painting is still unreliable: AllocateBackingStore
+	 * mutates the CAMetalLayer from the game thread, which races the main
+	 * thread's Paint(), and the driver has to be asked for explicitly with
+	 * -v cocoa-metal until that is sorted out. */
+	FVideoDriver_CocoaMetal() : DriverFactoryBase(Driver::Type::Video, 1, "cocoa-metal", "Cocoa Metal Video Driver") {}
 	std::unique_ptr<Driver> CreateInstance() const override { return std::make_unique<VideoDriver_CocoaMetal>(); }
 
 protected:
