@@ -257,6 +257,7 @@ add_files(
     script_log.cpp
     script_map.cpp
     script_marine.cpp
+    script_mcp.cpp
     script_newgrf.cpp
     script_news.cpp
     script_object.cpp
