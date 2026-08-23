@@ -23,6 +23,7 @@ class MCPAgent extends AIController {
 	routes = null;      /* [{kind, a, b, depot, cargo, vehicles}] */
 	poll_ticks = 25;
 	round = 0;
+	last_error = "";
 
 	constructor() {
 		this.routes = [];
@@ -357,20 +358,32 @@ function MCPAgent::AddVehicleTo(route, count) {
  * Returns the route index, or -1.
  */
 function MCPAgent::OpenRoadRoute(kind, loc_a, loc_b, cargo, veh_type) {
+	/* Record why we gave up, so a failed order says something useful. */
+	this.last_error = "";
+
 	local site_a = this.StopSiteNear(loc_a, 8);
-	if (site_a == null) return -1;
+	if (site_a == null) { this.last_error = "no room for a stop at the first end"; return -1; }
 	local site_b = this.StopSiteNear(loc_b, 8);
-	if (site_b == null) return -1;
+	if (site_b == null) { this.last_error = "no room for a stop at the second end"; return -1; }
 
 	AIRoad.SetCurrentRoadType(AIRoad.ROADTYPE_ROAD);
 	if (!AIRoad.BuildDriveThroughRoadStation(site_a[0], site_a[1], veh_type, AIStation.STATION_NEW)
-			&& AIError.GetLastError() != AIError.ERR_ALREADY_BUILT) return -1;
+			&& AIError.GetLastError() != AIError.ERR_ALREADY_BUILT) {
+		this.last_error = "could not build the first stop: " + AIError.GetLastErrorString();
+		return -1;
+	}
 	if (!AIRoad.BuildDriveThroughRoadStation(site_b[0], site_b[1], veh_type, AIStation.STATION_NEW)
-			&& AIError.GetLastError() != AIError.ERR_ALREADY_BUILT) return -1;
-	if (!this.ConnectTiles(site_a[0], site_b[0])) return -1;
+			&& AIError.GetLastError() != AIError.ERR_ALREADY_BUILT) {
+		this.last_error = "could not build the second stop: " + AIError.GetLastErrorString();
+		return -1;
+	}
+	if (!this.ConnectTiles(site_a[0], site_b[0])) {
+		this.last_error = "no road path between the stops";
+		return -1;
+	}
 
 	local depot = this.BuildDepotNear(site_a[0]);
-	if (depot == -1) return -1;
+	if (depot == -1) { this.last_error = "no room for a depot near the first stop"; return -1; }
 
 	local route = { kind = kind, a = site_a[0], b = site_b[0], depot = depot, cargo = cargo, vehicles = [] };
 	this.routes.append(route);
@@ -419,7 +432,7 @@ function MCPAgent::Execute(line) {
 		if (cargo == -1) { this.Report(id, false, "no passenger cargo in this climate"); return; }
 
 		local idx = this.OpenRoadRoute("bus", AITown.GetLocation(ta), AITown.GetLocation(tb), cargo, AIRoad.ROADVEHTYPE_BUS);
-		if (idx == -1) { this.Report(id, false, "could not build route"); return; }
+		if (idx == -1) { this.Report(id, false, AITown.GetName(ta) + " <-> " + AITown.GetName(tb) + ": " + this.last_error); return; }
 		local n = this.AddVehicleTo(this.routes[idx], 3);
 		this.Report(id, true, "route " + idx + " open: " + AITown.GetName(ta) + " <-> " + AITown.GetName(tb) + ", " + n + " buses");
 		return;
@@ -442,7 +455,7 @@ function MCPAgent::Execute(line) {
 		if (cargo == -1) { this.Report(id, false, "no cargo links those industries"); return; }
 
 		local idx = this.OpenRoadRoute("truck", AIIndustry.GetLocation(ia), AIIndustry.GetLocation(ib), cargo, AIRoad.ROADVEHTYPE_TRUCK);
-		if (idx == -1) { this.Report(id, false, "could not build route"); return; }
+		if (idx == -1) { this.Report(id, false, AIIndustry.GetName(ia) + " -> " + AIIndustry.GetName(ib) + ": " + this.last_error); return; }
 		local n = this.AddVehicleTo(this.routes[idx], 3);
 		this.Report(id, true, "route " + idx + " open: " + AIIndustry.GetName(ia) + " -> " + AIIndustry.GetName(ib)
 			+ " (" + AICargo.GetCargoLabel(cargo) + "), " + n + " lorries");
