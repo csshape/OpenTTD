@@ -1810,9 +1810,21 @@ void UpdateGUIZoom()
 	/* Determine real GUI zoom to use. */
 	if (_gui_scale_cfg == -1) {
 		/* Minimum design size of the game is 640x480. */
+#if defined(OTTD_IOS)
+		/* The device rotates, and deriving the scale from the current screen
+		 * dimensions alone would make it jump on every rotation. Evaluate both
+		 * orientations and keep the smaller scale, so the interface stays put
+		 * and never outgrows the shorter edge. */
+		float shorter = std::min(_screen.width, _screen.height);
+		float longer = std::max(_screen.width, _screen.height);
+		float upright = std::min(shorter / 640.f, longer / 480.f);
+		float sideways = std::min(longer / 640.f, shorter / 480.f);
+		int scale = std::min(upright, sideways) * 100;
+#else
 		float xs = _screen.width / 640.f;
 		float ys = _screen.height / 480.f;
 		int scale = std::min(xs, ys) * 100;
+#endif
 		/* Round down scaling to 25% increments and clamp to limits. */
 		_gui_scale = Clamp((scale / 25) * 25, MIN_INTERFACE_SCALE, MAX_INTERFACE_SCALE);
 	} else {
