@@ -1,11 +1,22 @@
 # OpenTTD
 
+This is a fork of [OpenTTD](https://github.com/OpenTTD/OpenTTD) that adds two
+things upstream does not have:
+
+- **iPadOS support**, with a Metal renderer, touch controls and external-display
+  output. See [1.3.2](#132-ipados).
+- **A Metal video driver for macOS**, preferred over OpenGL when the machine has
+  a Metal device.
+
+Everything else below is upstream's documentation and applies unchanged.
+
 ## Table of contents
 
 - 1.0) [About](#10-about)
     - 1.1) [Downloading OpenTTD](#11-downloading-openttd)
     - 1.2) [OpenTTD gameplay manual](#12-openttd-gameplay-manual)
     - 1.3) [Supported platforms](#13-supported-platforms)
+        - 1.3.2) [iPadOS](#132-ipados)
     - 1.4) [Installing and running OpenTTD](#14-installing-and-running-openttd)
     - 1.5) [Add-on content / mods](#15-add-on-content--mods)
     - 1.6) [OpenTTD directories](#16-openttd-directories)
@@ -48,8 +59,9 @@ OpenTTD has been ported to several platforms and operating systems.
 The currently supported platforms are:
 
 - Linux (SDL (OpenGL and non-OpenGL))
-- macOS (universal) (Cocoa)
+- macOS (universal) (Cocoa, Metal or OpenGL)
 - Windows (Win32 GDI / OpenGL)
+- iPadOS 18 or newer (Metal) - this fork only, see [1.3.2](#132-ipados)
 
 Other platforms may also work (in particular various BSD systems), but we don't actively test or maintain these.
 
@@ -60,6 +72,27 @@ We'll keep support going on old platforms as long as someone is interested in su
 
 We guarantee that every revision of OpenTTD will be able to load savegames from every older revision (excepting where the savegame is corrupt).
 Please report a bug if you find a save that doesn't load.
+
+### 1.3.2) iPadOS
+
+This fork builds and runs on iPadOS 18 and newer. The port is iPad-only and
+renders through Metal rather than SDL or OpenGL.
+
+What works:
+
+- Touch input, with the on-screen keyboard for text entry
+- A connected mouse or trackpad, including the right button
+- Rotation, and running on an external display with the iPad acting as the
+  input surface
+- Sound and music through the iOS audio stack
+
+Building it needs Xcode and a host build of the `strgen` and `settingsgen`
+tools, because those run on the machine doing the build rather than on the
+device. `COMPILING.md` has the commands, and
+`docs/ios_testflight_release.md` walks through signing and uploading a build.
+
+OpenGFX is fetched and bundled automatically when no graphics set is present,
+so a fresh build starts without any manual file copying.
 
 ## 1.4) Installing and running OpenTTD
 
