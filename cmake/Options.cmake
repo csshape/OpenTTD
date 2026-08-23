@@ -6,7 +6,11 @@ include(GNUInstallDirs)
 #
 function(set_directory_options)
     if(APPLE AND NOT OTTD_APPLE_IOS)
-        set(DEFAULT_PERSONAL_DIR "Documents/OpenTTD")
+        # Not Documents/OpenTTD: that folder is usually iCloud-synced, which
+        # leaves the game's files as dataless placeholders. Startup scanning
+        # then has to pull every one of them down, adding tens of seconds
+        # before the first frame. ~/OpenTTD is never synced.
+        set(DEFAULT_PERSONAL_DIR "OpenTTD")
         set(DEFAULT_SHARED_DIR "/Library/Application Support/OpenTTD")
         set(DEFAULT_GLOBAL_DIR "(not set)")
     elseif(APPLE AND OTTD_APPLE_IOS)
