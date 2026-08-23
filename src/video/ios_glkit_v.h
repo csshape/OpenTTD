@@ -11,6 +11,7 @@
 #define VIDEO_IOS_GLKIT_V_H
 
 #include "video_driver.hpp"
+#include "../gfx_type.h"
 #include <atomic>
 
 /** iOS video driver using UIKit + Metal (SDL2-free). */
@@ -73,7 +74,7 @@ private:
 	bool shift_down = false;
 	bool alt_down = false;
 	bool tab_down = false;
-	uint8_t directional_keys = 0;
+	DirectionKeys directional_keys{};
 
 	Dimension GetScreenSize() const override;
 	void InputLoop() override;

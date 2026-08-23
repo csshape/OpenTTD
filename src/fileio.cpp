@@ -885,14 +885,14 @@ extern void CocoaSetApplicationBundleDir();
 		if (url != nullptr) {
 			char buf[PATH_MAX];
 			if (CFURLGetFileSystemRepresentation(url, true, reinterpret_cast<UInt8 *>(buf), sizeof(buf))) {
-				_searchpaths[SP_APPLICATION_BUNDLE_DIR] = buf;
-				AppendPathSeparator(_searchpaths[SP_APPLICATION_BUNDLE_DIR]);
+				_searchpaths[Searchpath::ApplicationBundleDir] = buf;
+				AppendPathSeparator(_searchpaths[Searchpath::ApplicationBundleDir]);
 			} else {
-				_searchpaths[SP_APPLICATION_BUNDLE_DIR].clear();
+				_searchpaths[Searchpath::ApplicationBundleDir].clear();
 			}
 			CFRelease(url);
 		} else {
-			_searchpaths[SP_APPLICATION_BUNDLE_DIR].clear();
+			_searchpaths[Searchpath::ApplicationBundleDir].clear();
 		}
 	}
 #else

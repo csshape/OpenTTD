@@ -1768,16 +1768,16 @@ void VideoDriver_iOS_Metal::OnHardwareKeyDown(uint keycode, char32_t character, 
 			this->tab_down = true;
 			break;
 		case WKC_LEFT:
-			this->directional_keys |= 1;
+			this->directional_keys.Set(DirectionKey::Left);
 			break;
 		case WKC_UP:
-			this->directional_keys |= 2;
+			this->directional_keys.Set(DirectionKey::Up);
 			break;
 		case WKC_RIGHT:
-			this->directional_keys |= 4;
+			this->directional_keys.Set(DirectionKey::Right);
 			break;
 		case WKC_DOWN:
-			this->directional_keys |= 8;
+			this->directional_keys.Set(DirectionKey::Down);
 			break;
 		default:
 			break;
@@ -1805,16 +1805,16 @@ void VideoDriver_iOS_Metal::OnHardwareKeyUp(uint keycode)
 			this->tab_down = false;
 			break;
 		case WKC_LEFT:
-			this->directional_keys &= ~1;
+			this->directional_keys.Reset(DirectionKey::Left);
 			break;
 		case WKC_UP:
-			this->directional_keys &= ~2;
+			this->directional_keys.Reset(DirectionKey::Up);
 			break;
 		case WKC_RIGHT:
-			this->directional_keys &= ~4;
+			this->directional_keys.Reset(DirectionKey::Right);
 			break;
 		case WKC_DOWN:
-			this->directional_keys &= ~8;
+			this->directional_keys.Reset(DirectionKey::Down);
 			break;
 		default:
 			break;
@@ -1885,7 +1885,7 @@ void VideoDriver_iOS_Metal::ReleaseVideoPointer()
 
 void VideoDriver_iOS_Metal::Paint()
 {
-	PerformanceMeasurer framerate(PFE_VIDEO);
+	PerformanceMeasurer framerate(PerformanceElement::Video);
 
 	if (IsEmptyRect(this->dirty_rect) && this->local_palette.count_dirty == 0) return;
 	if (this->pixel_buffer == nullptr) return;
