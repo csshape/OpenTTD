@@ -45,7 +45,9 @@ public:
 
 	bool HasEfficient8Bpp() const override { return true; }
 
-	bool UseSystemCursor() override { return true; }
+	/* No override of UseSystemCursor(): this driver has no cursor drawing of
+	 * its own, so let the game blit its cursor sprite into the buffer like the
+	 * Quartz driver does. Claiming otherwise leaves no cursor at all. */
 
 	std::string_view GetName() const override { return "cocoa-metal"; }
 
