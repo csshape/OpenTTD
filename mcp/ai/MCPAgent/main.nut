@@ -187,33 +187,120 @@ function MCPAgent::StopSiteNear(centre, radius) {
 	return null;
 }
 
-function MCPAgent::ConnectTiles(from, to) {
-	AIRoad.SetCurrentRoadType(AIRoad.ROADTYPE_ROAD);
-	local x0 = AIMap.GetTileX(from), y0 = AIMap.GetTileY(from);
-	local x1 = AIMap.GetTileX(to),   y1 = AIMap.GetTileY(to);
-	local failures = 0, laid = 0, prev = from;
+/**
+ * Lay one road tile and confirm the two tiles really are connected.
+ *
+ * BuildRoad returning false is not by itself a failure: the tile may already
+ * carry road, which is exactly what we want. What matters is the end state, so
+ * check that rather than the return value.
+ */
+function MCPAgent::LinkTiles(a, b) {
+	if (AIRoad.AreRoadTilesConnected(a, b)) return true;
+	AIRoad.BuildRoad(a, b);
+	return AIRoad.AreRoadTilesConnected(a, b);
+}
 
-	local step = (x1 > x0) ? 1 : -1;
-	for (local x = x0; x != x1; x += step) {
-		local next = AIMap.GetTileIndex(x + step, y0);
-		if (!AIMap.IsValidTile(next)) return false;
-		if (!AIRoad.BuildRoad(prev, next)) {
-			if (AIError.GetLastError() != AIError.ERR_ALREADY_BUILT) failures++;
-			if (failures > 10) return false;
+/** Can a road plausibly sit on this tile? */
+function MCPAgent::Passable(tile) {
+	if (!AIMap.IsValidTile(tile)) return false;
+	if (AIRoad.IsRoadTile(tile)) return true;
+	if (AITile.IsWaterTile(tile)) return false;
+	if (AITile.IsStationTile(tile)) return false;
+	if (!AITile.IsBuildable(tile)) return false;
+	/* Steep slopes cannot take road without terraforming. */
+	local slope = AITile.GetSlope(tile);
+	if (slope == AITile.SLOPE_STEEP_W || slope == AITile.SLOPE_STEEP_S
+			|| slope == AITile.SLOPE_STEEP_E || slope == AITile.SLOPE_STEEP_N) return false;
+	return true;
+}
+
+/**
+ * Breadth-first search for a road path between two tiles.
+ *
+ * An L-shaped path cannot go around anything, which is how a route ends up
+ * with a road that stops in a forest and never reaches the town. This walks
+ * the map properly instead.
+ *
+ * The search is boxed to the area around the two endpoints and capped in nodes,
+ * because a script shares the game's tick budget and an unbounded flood fill
+ * would stall the game.
+ *
+ * @return An array of tiles from start to goal, or null.
+ */
+function MCPAgent::FindPath(start, goal) {
+	local sx = AIMap.GetTileX(start), sy = AIMap.GetTileY(start);
+	local gx = AIMap.GetTileX(goal),  gy = AIMap.GetTileY(goal);
+
+	/* Search box: the endpoints plus room to detour around obstacles. */
+	local margin = 14;
+	local min_x = (sx < gx ? sx : gx) - margin;
+	local max_x = (sx > gx ? sx : gx) + margin;
+	local min_y = (sy < gy ? sy : gy) - margin;
+	local max_y = (sy > gy ? sy : gy) + margin;
+
+	local came_from = {};
+	local queue = [start];
+	local head = 0;
+	came_from[start] <- -1;
+
+	local visited = 0;
+	local node_cap = 4000;
+
+	while (head < queue.len()) {
+		local tile = queue[head];
+		head++;
+
+		if (tile == goal) break;
+		if (++visited > node_cap) return null;
+		if (visited % 150 == 0) this.Sleep(1);
+
+		local tx = AIMap.GetTileX(tile), ty = AIMap.GetTileY(tile);
+		local neighbours = [
+			AIMap.GetTileIndex(tx + 1, ty), AIMap.GetTileIndex(tx - 1, ty),
+			AIMap.GetTileIndex(tx, ty + 1), AIMap.GetTileIndex(tx, ty - 1),
+		];
+
+		foreach (next in neighbours) {
+			if (next in came_from) continue;
+			local nx = AIMap.GetTileX(next), ny = AIMap.GetTileY(next);
+			if (nx < min_x || nx > max_x || ny < min_y || ny > max_y) continue;
+			/* The goal itself is a station tile, so let it through. */
+			if (next != goal && !this.Passable(next)) continue;
+
+			came_from[next] <- tile;
+			queue.append(next);
 		}
-		prev = next;
-		if (++laid % 20 == 0) this.Sleep(1);
 	}
-	step = (y1 > y0) ? 1 : -1;
-	for (local y = y0; y != y1; y += step) {
-		local next = AIMap.GetTileIndex(x1, y + step);
-		if (!AIMap.IsValidTile(next)) return false;
-		if (!AIRoad.BuildRoad(prev, next)) {
-			if (AIError.GetLastError() != AIError.ERR_ALREADY_BUILT) failures++;
-			if (failures > 10) return false;
-		}
-		prev = next;
-		if (++laid % 20 == 0) this.Sleep(1);
+
+	if (!(goal in came_from)) return null;
+
+	/* Walk the parents back, then reverse. */
+	local reverse = [];
+	local cur = goal;
+	while (cur != -1) {
+		reverse.append(cur);
+		cur = came_from[cur];
+	}
+	local path = [];
+	for (local i = reverse.len() - 1; i >= 0; i--) path.append(reverse[i]);
+	return path;
+}
+
+/**
+ * Connect two tiles by road, following a searched path.
+ *
+ * Every link is confirmed, and a single missing link fails the whole thing: a
+ * road with a gap is worse than no road, because the route looks finished and
+ * the vehicles have nowhere to go.
+ */
+function MCPAgent::ConnectTiles(from, to) {
+	local path = this.FindPath(from, to);
+	if (path == null) return false;
+
+	AIRoad.SetCurrentRoadType(AIRoad.ROADTYPE_ROAD);
+	for (local i = 0; i < path.len() - 1; i++) {
+		if (!this.LinkTiles(path[i], path[i + 1])) return false;
+		if (i % 15 == 0) this.Sleep(1);
 	}
 	return true;
 }
@@ -234,10 +321,11 @@ function MCPAgent::BuildDepotNear(stop_tile) {
 				];
 				foreach (plot in plots) {
 					if (!AIMap.IsValidTile(plot) || !AITile.IsBuildable(plot)) continue;
-					if (AIRoad.BuildRoadDepot(plot, road)) {
-						AIRoad.BuildRoad(plot, road);
-						return plot;
-					}
+					if (!AIRoad.BuildRoadDepot(plot, road)) continue;
+					/* A depot the vehicles cannot drive out of is useless, so
+					 * confirm the link instead of assuming it. */
+					if (this.LinkTiles(plot, road)) return plot;
+					AITile.DemolishTile(plot);
 				}
 			}
 		}

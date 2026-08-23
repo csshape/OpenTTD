@@ -36,9 +36,18 @@ def channel_dir() -> Path:
     return Path.home() / "OpenTTD" / "mcp"
 
 
+_order_counter = 0
+
+
 def next_order_id() -> str:
-    """Monotonic-ish id so results can be matched to orders."""
-    return f"o{int(time.time() * 1000) % 100000000}"
+    """Unique id so results can be matched to the order that produced them.
+
+    A timestamp alone is not enough: several orders queued in the same
+    millisecond would share an id, and the results become unmatchable.
+    """
+    global _order_counter
+    _order_counter += 1
+    return f"o{int(time.time()) % 1000000}-{_order_counter}"
 
 
 def queue_order(*fields) -> str:
