@@ -807,9 +807,12 @@ static UIScreen *PickPreferredScreen()
 	UIScreen *preferred = main;
 	uint64_t preferred_pixels = 0;
 
-	NSArray<UIScreen *> *screens = [UIScreen screens];
-	for (UIScreen *screen in screens) {
-		if (screen == main) continue;
+	/* Enumerate screens via connected window scenes; [UIScreen screens] is
+	 * deprecated and a screen without a scene cannot be rendered to anyway. */
+	for (UIScene *scene in [UIApplication sharedApplication].connectedScenes) {
+		if (![scene isKindOfClass:[UIWindowScene class]]) continue;
+		UIScreen *screen = ((UIWindowScene *)scene).screen;
+		if (screen == nil || screen == main) continue;
 
 		uint64_t pixels = GetScreenPixelArea(screen);
 		if (preferred == main || pixels > preferred_pixels) {
@@ -858,12 +861,6 @@ static UIWindow *FindWindowForScreen(UIScreen *screen)
 		}
 	}
 
-	UIApplication *app = [UIApplication sharedApplication];
-	for (UIWindow *window in app.windows) {
-		if (window == nil) continue;
-		if (window.windowScene != nil && screen != nil && window.windowScene.screen != screen) continue;
-		return window;
-	}
 	return nil;
 }
 
@@ -1010,25 +1007,21 @@ bool VideoDriver_iOS_Metal::SetupContextAndView()
 		UIWindow *window = FindWindowForScreen(screen);
 
 		if (window == nil) {
+			/* A window must be created against a window scene; -setScreen: is
+			 * deprecated and scene-less windows do not render correctly. */
 			UIWindowScene *window_scene = FindWindowSceneForScreen(screen);
-			if (window_scene != nil) {
-				window = [[[UIWindow alloc] initWithWindowScene:window_scene] autorelease];
+			if (window_scene == nil) {
+				ok = false;
+				return;
 			}
-		}
-
-		if (window == nil) {
-			window = [[[UIWindow alloc] initWithFrame:screen.bounds] autorelease];
+			window = [[[UIWindow alloc] initWithWindowScene:window_scene] autorelease];
 		}
 		if (window == nil) {
 			ok = false;
 			return;
 		}
-		if (window.windowScene == nil) {
-			window.screen = screen;
-			window.frame = screen.bounds;
-		} else {
-			window.frame = window.windowScene.screen.bounds;
-		}
+		UIWindowScene *window_scene = window.windowScene;
+		window.frame = window_scene != nil ? window_scene.screen.bounds : screen.bounds;
 		window.backgroundColor = [UIColor blackColor];
 
 		OTTDViewController *ottd_root = [[[OTTDViewController alloc] init] autorelease];
@@ -1168,8 +1161,9 @@ void VideoDriver_iOS_Metal::RegisterScreenNotifications()
 		observer->driver = this;
 
 		NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-		[center addObserver:observer selector:@selector(onScreenChanged:) name:UIScreenDidConnectNotification object:nil];
-		[center addObserver:observer selector:@selector(onScreenChanged:) name:UIScreenDidDisconnectNotification object:nil];
+		/* External displays arrive and leave as window scenes; the UIScreen
+		 * connect/disconnect notifications are deprecated and redundant with
+		 * the UIScene ones registered below. */
 		[center addObserver:observer selector:@selector(onScreenChanged:) name:UIScreenModeDidChangeNotification object:nil];
 		[center addObserver:observer selector:@selector(onScreenChanged:) name:UISceneWillConnectNotification object:nil];
 		[center addObserver:observer selector:@selector(onScreenChanged:) name:UISceneDidActivateNotification object:nil];
