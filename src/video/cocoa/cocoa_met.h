@@ -64,10 +64,10 @@ protected:
 
 class FVideoDriver_CocoaMetal : public DriverFactoryBase {
 public:
-	/* Priority 1 keeps this below cocoa (8) and cocoa-opengl (9) so autoprobe
-	 * never picks it: the renderer still presents a black screen, so it must be
-	 * requested explicitly with -v cocoa-metal while that is being fixed. */
-	FVideoDriver_CocoaMetal() : DriverFactoryBase(Driver::Type::Video, 1, "cocoa-metal", "Cocoa Metal Video Driver") {}
+	/* Priority 10 puts Metal ahead of cocoa-opengl (9) and cocoa (8), so it is
+	 * picked first when the machine has a Metal device; Start() fails cleanly
+	 * otherwise and probing falls through to OpenGL. */
+	FVideoDriver_CocoaMetal() : DriverFactoryBase(Driver::Type::Video, 10, "cocoa-metal", "Cocoa Metal Video Driver") {}
 	std::unique_ptr<Driver> CreateInstance() const override { return std::make_unique<VideoDriver_CocoaMetal>(); }
 
 protected:

@@ -277,9 +277,7 @@ std::optional<std::string_view> VideoDriver_CocoaMetal::Start(const StringList &
 	this->UpdateVideoModes();
 	MarkWholeScreenDirty();
 
-	/* Drawing goes through the layer's drawable, which belongs to the thread
-	 * that owns the view, so keep the game loop and drawing on one thread. */
-	this->is_game_threaded = false;
+	this->is_game_threaded = !GetDriverParamBool(param, "no_threads") && !GetDriverParamBool(param, "no_thread");
 
 	return std::nullopt;
 }
